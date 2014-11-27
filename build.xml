@@ -11,8 +11,10 @@
   <path id="classpath">
     <dirset dir="${path.src}"/>
     <fileset refid="files.build"/>
+    <pathelement location="/usr/share/java/junit4.jar"/>
+    <pathelement location="${path.target}"/>
   </path>
-  
+
   <target name="-init">
     <mkdir dir="${path.target}"/>
   </target>
@@ -26,8 +28,21 @@
      classpathref="classpath"
      destdir="${path.target}" 
      includeantruntime="false">
-       <src path="${path.src}/main/java"/>
+     <src path="${path.src}"/>
        <compilerarg line="-Xlint"/>
     </javac>
   </target>
+
+  <target name="test" depends="build">
+    <junit fork="yes" haltonfailure="yes">
+      <classpath refid="classpath"/>
+      <formatter type="plain" usefile="false"/>
+      <batchtest>
+        <fileset dir="${path.src}/test/java">
+          <include name="**/*Test.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
 </project>

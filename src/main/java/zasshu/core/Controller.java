@@ -181,4 +181,23 @@ public final class Controller {
   public Map getMap() {
     return new Map(computeTerrain());
   }
+
+  public boolean broadcast(int channel, int val) {
+    try {
+      rc.broadcast(channel, val);
+    } catch (GameActionException e) {
+      e.printStackTrace();
+      return false;
+    }
+    return true;
+  }
+
+  public int readBroadcast(int channel) {
+    try {
+      return rc.readBroadcast(channel);
+    } catch (GameActionException e) {
+      e.printStackTrace();
+      return 0;
+    }
+  }
 }

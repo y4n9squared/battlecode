@@ -7,7 +7,9 @@ package zasshu;
 
 import zasshu.core.*;
 
-import battlecode.common.Direction;
+import battlecode.common.*;
+
+import java.io.*;
 
 public final class HQ extends AbstractRobot {
 
@@ -16,6 +18,9 @@ public final class HQ extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
+    if (Clock.getRoundNum() == 50) {
+      radio.broadcast(0, new SerializableObject());
+    }
     if (controller.senseRobotCount() < 1) {
       Direction dir = controller.enemyDirection();
       controller.spawn(dir);
