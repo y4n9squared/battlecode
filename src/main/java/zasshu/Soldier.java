@@ -20,12 +20,7 @@ public final class Soldier extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
-    // Direction dir = navigator.getNextStep(controller.getLocation());
-    // controller.move(dir);
-
-    if (Clock.getRoundNum() == 100) {
-      Object obj = radio.recv(0);
-      System.out.println(obj);
-    }
+    Direction dir = navigator.getNextStep(controller.getLocation());
+    controller.move(dir);
   }
 }

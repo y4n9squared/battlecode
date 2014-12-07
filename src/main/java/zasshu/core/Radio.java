@@ -27,16 +27,12 @@ public final class Radio {
   }
 
   public void broadcast(int channel, Object obj) {
-    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
     try {
-      ObjectOutputStream stream = new ObjectOutputStream(byteStream);
-      stream.writeObject(obj);
-      stream.close();
+      int size = writeChannels(toByteArray(obj), channel);
     } catch (IOException e) {
       e.printStackTrace();
       return;
     }
-    int objSize = writeChannels(byteStream.toByteArray(), channel);
   }
 
   public Object recv(int channel) {
@@ -84,6 +80,14 @@ public final class Radio {
       arr[4 * i + 3] = val[3];
     }
     return strip(arr);
+  }
+
+  private byte[] toByteArray(Object obj) throws IOException {
+    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+    ObjectOutputStream stream = new ObjectOutputStream(byteStream);
+    stream.writeObject(obj);
+    stream.close();
+    return byteStream.toByteArray();
   }
 
   /**
