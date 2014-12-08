@@ -9,12 +9,55 @@ import static org.junit.Assert.*;
 
 import org.junit.*;
 
+import static org.mockito.Mockito.*;
+import org.mockito.stubbing.*;
+import org.mockito.invocation.*;
+
+import java.util.HashMap;
+
+import battlecode.common.*;
+
 /**
  * Unit tests for {@link Radio}.
  *
  * @author Yang Yang
  */
 public class RadioTest {
+
+  @Test public void identity() {
+    RobotController mockRC = mock(RobotController.class);
+
+    try {
+      final HashMap<Integer, Integer> mockChannels = new HashMap<Integer, Integer>();
+
+      doAnswer(new Answer<Void>() {
+        @Override public Void answer(InvocationOnMock invocation) {
+          Object[] args = invocation.getArguments();
+          mockChannels.put((Integer)(args[0]), (Integer)(args[1]));
+          return null;
+        }
+      }).when(mockRC).broadcast(anyInt(), anyInt());
+
+      doAnswer(new Answer<Object>() {
+        @Override public Object answer(InvocationOnMock invocation) {
+          Object[] args = invocation.getArguments();
+          return mockChannels.get((Integer)(args[0])).intValue();
+        }
+      }).when(mockRC).readBroadcast(anyInt());
+
+      mockRC.broadcast(5, 4);
+      assertEquals(mockRC.readBroadcast(5), 4);
+
+      Controller controller = new Controller(mockRC);
+      Radio radio = new Radio(controller);
+
+      SerializableObject obj = new SerializableObject();
+      radio.broadcast(77, obj);
+      assertEquals(obj, radio.recv(77));
+    } catch (GameActionException e) {
+      fail("GameActionException thrown");
+    }
+  }
 
   @Test public void testPad0() {
     byte[] arr = {};

@@ -3,7 +3,7 @@
   <property name="path.base" location="."/>
   <property name="path.target" location="${path.base}/target"/>
   <property name="path.src" location="${path.base}/src"/>
-  
+
   <fileset id="files.build" dir="/usr/share/java">
     <include name="battlecode-server.jar"/>
   </fileset>
@@ -12,6 +12,7 @@
     <dirset dir="${path.src}"/>
     <fileset refid="files.build"/>
     <pathelement location="/usr/share/java/junit4.jar"/>
+    <pathelement location="/usr/share/java/mockito-all-1.9.5.jar"/>
     <pathelement location="${path.target}"/>
   </path>
 
@@ -24,10 +25,11 @@
   </target>
 
   <target name="build" depends="-init">
-    <javac 
+    <javac
      classpathref="classpath"
-     destdir="${path.target}" 
-     includeantruntime="false">
+     destdir="${path.target}"
+     includeantruntime="false"
+     debug="true">
      <src path="${path.src}"/>
        <compilerarg line="-Xlint"/>
     </javac>

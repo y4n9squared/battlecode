@@ -29,9 +29,9 @@ public final class Controller {
    */
   public Controller(RobotController rc) {
     this.rc = rc;
-    myTeam = rc.getTeam();
-    opponentTeam = myTeam.opponent();
-    myType = rc.getType();
+    //myTeam = rc.getTeam();
+    //opponentTeam = myTeam.opponent();
+    //myType = rc.getType();
   }
 
   /**
