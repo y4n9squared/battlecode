@@ -17,6 +17,8 @@ import battlecode.common.*;
  */
 public final class Controller {
   private final RobotController rc;
+
+  // Lazily-evaluated constants
   private Team myTeam;
   private Team opponentTeam;
   private RobotType myType;
@@ -29,9 +31,6 @@ public final class Controller {
    */
   public Controller(RobotController rc) {
     this.rc = rc;
-    //myTeam = rc.getTeam();
-    //opponentTeam = myTeam.opponent();
-    //myType = rc.getType();
   }
 
   /**

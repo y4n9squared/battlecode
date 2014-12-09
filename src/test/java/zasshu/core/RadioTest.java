@@ -6,16 +6,16 @@
 package zasshu.core;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import battlecode.common.*;
 
 import org.junit.*;
-
-import static org.mockito.Mockito.*;
 import org.mockito.stubbing.*;
 import org.mockito.invocation.*;
 
+import java.io.Serializable;
 import java.util.HashMap;
-
-import battlecode.common.*;
 
 /**
  * Unit tests for {@link Radio}.
@@ -24,8 +24,27 @@ import battlecode.common.*;
  */
 public class RadioTest {
 
+  private static class SerializableObject implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private final String val = "unique id";
+
+    @Override public int hashCode() {
+      return 17 + 31 * val.hashCode();
+    }
+
+    @Override public boolean equals(Object obj) {
+      if (obj == null) {
+        return false;
+      }
+      if (this.getClass() != obj.getClass()) {
+        return false;
+      }
+      return this.val == ((SerializableObject) obj).val;
+    }
+  }
+
   @Test public void identity() {
-    RobotController mockRC = mock(RobotController.class);
+    RobotController mockRC = mock(RobotController.class, RETURNS_SMART_NULLS);
 
     try {
       final HashMap<Integer, Integer> mockChannels = new HashMap<Integer, Integer>();

@@ -5,9 +5,9 @@
 
 package zasshu.core;
 
-import java.io.*;
-
 import battlecode.common.*;
+
+import java.io.*;
 
 /**
  * A {@code Radio} that provides an {@code Object} abstraction on top of
@@ -38,7 +38,7 @@ public final class Radio {
   public Object recv(int channel) {
     Object obj = null;
     // TODO(Yang): Handle size. Hardcoded for now.
-    byte[] arr = readChannels(channel, 12);
+    byte[] arr = readChannels(channel, 26);
     ByteArrayInputStream byteStream = new ByteArrayInputStream(arr);
     try {
       ObjectInputStream stream = new ObjectInputStream(byteStream);
