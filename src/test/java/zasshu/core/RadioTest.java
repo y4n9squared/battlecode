@@ -20,26 +20,28 @@ import java.util.HashMap;
 /**
  * Unit tests for {@link Radio}.
  *
+ * @author Holman Gao
  * @author Yang Yang
  */
 public class RadioTest {
 
   private static class SerializableObject implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final String val = "unique id";
+    private final String val;
+
+    public SerializableObject(String s) {
+      val = s;
+    }
 
     @Override public int hashCode() {
       return 17 + 31 * val.hashCode();
     }
 
     @Override public boolean equals(Object obj) {
-      if (obj == null) {
+      if (obj == null || this.getClass() != obj.getClass()) {
         return false;
       }
-      if (this.getClass() != obj.getClass()) {
-        return false;
-      }
-      return this.val == ((SerializableObject) obj).val;
+      return val.equals(((SerializableObject) obj).val);
     }
   }
 
@@ -70,7 +72,7 @@ public class RadioTest {
       Controller controller = new Controller(mockRC);
       Radio radio = new Radio(controller);
 
-      SerializableObject obj = new SerializableObject();
+      SerializableObject obj = new SerializableObject("unique ID");
       radio.broadcast(77, obj);
       assertEquals(obj, radio.recv(77));
     } catch (GameActionException e) {
