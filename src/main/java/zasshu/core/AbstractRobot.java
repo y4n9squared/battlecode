@@ -14,11 +14,9 @@ package zasshu.core;
 public abstract class AbstractRobot implements Robot {
 
   protected final Controller controller;
-  protected final Radio radio;
 
   protected AbstractRobot(Controller c) {
     controller = c;
-    radio = new Radio(controller);
   }
 
   @Override public void run() {

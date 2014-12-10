@@ -181,22 +181,91 @@ public final class Controller {
     return new Map(computeTerrain());
   }
 
-  public boolean broadcast(int channel, int val) {
-    try {
-      rc.broadcast(channel, val);
-    } catch (GameActionException e) {
-      e.printStackTrace();
-      return false;
+  /**
+   * Broadcasts an object to the {@code RobotController}'s channels.
+   * <p>
+   * The object is serialzed into a byte stream and saved to channels in 4-byte
+   * pieces. The total bytecode usage is proportional to the size of the object,
+   * plus a constant serialization overhead.
+   * <p>
+   * If an error occurs, the return value will be -1.
+   *
+   * @param start start channel
+   * @param obj object to broadcast
+   * @return number of channels written
+   */
+  public int writeChannels(int start, Object obj) {
+    byte[] arr = Serialization.toByteArray(obj);
+    // TODO(Yang): Need to do some check here to determine if the array being
+    // passed is too large (i.e. will overflow channel buffer).
+    int numChannelsWritten = 0;
+    for (int i = arr.length / 4; --i >= 0;) {
+      byte[] tmp = new byte[4];
+      System.arraycopy(arr, 4 * i, tmp, 0, 4);
+      int data = pack(tmp);
+      try {
+        rc.broadcast(start + i, data);
+        ++numChannelsWritten;
+      } catch (GameActionException e) {
+        e.printStackTrace();
+        return -1;
+      }
     }
-    return true;
+    return numChannelsWritten;
   }
 
-  public int readBroadcast(int channel) {
-    try {
-      return rc.readBroadcast(channel);
-    } catch (GameActionException e) {
-      e.printStackTrace();
-      return 0;
+  /**
+   * Reads an object from the {@code RobotController}'s channels.
+   * <p>
+   * The object is reconstructed from its byte stream via deserialization.
+   * Bytecode usage is proportional to the size of the object, plus a constant
+   * deserialization overhead.
+   * <p>
+   * If an error occurs, the return value will be {@code null}.
+   *
+   * @param start start channel
+   * @param size number of channels to read
+   */
+  public Object readChannels(int start, int size) {
+    byte[] arr = new byte[size * 4];
+    for (int i = 0; i < size; ++i) {
+      byte[] val;
+      try {
+        val = unpack(rc.readBroadcast(start + i));
+      } catch (GameActionException e) {
+        e.printStackTrace();
+        return null;
+      }
+      arr[4 * i] = val[0];
+      arr[4 * i + 1] = val[1];
+      arr[4 * i + 2] = val[2];
+      arr[4 * i + 3] = val[3];
     }
+    return Serialization.fromByteArray(arr);
+  }
+
+  /**
+   * Converts 4 bytes into an int.
+   *
+   * Cost: 33 bytecodes
+   *
+   * @param arr byte array of length 4
+   */
+  static int pack(byte[] arr) {
+    return (((0xFF & arr[0]) << 24) | ((0xFF & arr[1]) << 16) | ((0xFF & arr[2]) << 8) | (0xFF & arr[3]));
+  }
+
+  /**
+   * Returns a byte array of length 4 representing the specified integer.
+   *
+   * @param val integer value to convert
+   */
+  static byte[] unpack(int val) {
+    byte[] arr = new byte[4];
+    arr[0] = (byte) (val >> 24);
+    arr[1] = (byte) (val >> 16);
+    arr[2] = (byte) (val >> 8);
+    arr[3] = (byte) val;
+    return arr;
   }
 }
