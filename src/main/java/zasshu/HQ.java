@@ -7,7 +7,7 @@ package zasshu;
 
 import zasshu.core.*;
 
-import battlecode.common.Direction;
+import battlecode.common.*;
 
 public final class HQ extends AbstractRobot {
 

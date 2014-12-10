@@ -7,12 +7,15 @@ package zasshu;
 
 import zasshu.core.*;
 
-import battlecode.common.Direction;
+import battlecode.common.*;
 
 public final class Soldier extends AbstractRobot {
 
+  private final Navigator navigator;
+
   public Soldier(Controller c) {
     super(c);
+    navigator = new BugNavigator(controller.getMap());
     navigator.setDestination(controller.enemySpawn());
   }
 

@@ -17,6 +17,8 @@ import battlecode.common.*;
  */
 public final class Controller {
   private final RobotController rc;
+
+  // Lazily-evaluated constants
   private Team myTeam;
   private Team opponentTeam;
   private RobotType myType;
@@ -29,9 +31,6 @@ public final class Controller {
    */
   public Controller(RobotController rc) {
     this.rc = rc;
-    myTeam = rc.getTeam();
-    opponentTeam = myTeam.opponent();
-    myType = rc.getType();
   }
 
   /**
@@ -180,5 +179,24 @@ public final class Controller {
    */
   public Map getMap() {
     return new Map(computeTerrain());
+  }
+
+  public boolean broadcast(int channel, int val) {
+    try {
+      rc.broadcast(channel, val);
+    } catch (GameActionException e) {
+      e.printStackTrace();
+      return false;
+    }
+    return true;
+  }
+
+  public int readBroadcast(int channel) {
+    try {
+      return rc.readBroadcast(channel);
+    } catch (GameActionException e) {
+      e.printStackTrace();
+      return 0;
+    }
   }
 }
