@@ -12,7 +12,7 @@
     <dirset dir="${path.src}"/>
     <fileset refid="files.build"/>
     <pathelement location="/usr/share/java/junit4.jar"/>
-    <pathelement location="/usr/share/java/mockito-all-1.9.5.jar"/>
+    <pathelement location="/usr/share/java/mockito-all.jar"/>
     <pathelement location="${path.target}"/>
   </path>
 
