@@ -24,12 +24,4 @@ public interface Navigator {
    * @see #setDestination(MapLocation)
    */
   Direction getNextStep(MapLocation location);
-
-  /**
-   * Sets a target destination.
-   *
-   * @param destination target destination
-   */
-  void setDestination(MapLocation destination);
-
 }

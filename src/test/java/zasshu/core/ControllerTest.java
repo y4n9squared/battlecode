@@ -11,6 +11,7 @@ import static zasshu.core.Controller.*;
 
 import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
+import battlecode.common.Team;
 
 import org.junit.*;
 import org.mockito.invocation.InvocationOnMock;
@@ -74,6 +75,7 @@ public class ControllerTest {
 
     when(rc.getMapWidth()).thenReturn(20);
     when(rc.getMapHeight()).thenReturn(20);
+    when(rc.getTeam()).thenReturn(Team.A);
   }
 
   @Test public void testReadWriteChannels() {
