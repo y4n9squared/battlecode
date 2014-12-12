@@ -5,8 +5,7 @@
 
 package zasshu.core;
 
-import battlecode.common.Direction;
-import battlecode.common.MapLocation;
+import battlecode.common.*;
 
 /**
  * A simple bug navigator with a sensor radius of 1 unit.
@@ -62,23 +61,19 @@ public final class BugNavigator extends AbstractNavigator {
       state = State.FOLLOW_BOUNDARY;
       wall = nextLoc;
       distReach = Integer.MAX_VALUE;
-      System.out.println("Going to follow mode.");
       return Direction.NONE;
     }
     return dir;
   }
 
   private Direction followBoundary(MapLocation loc) {
-    System.out.println("Current wall: " + wall);
     MapLocation dest = getDestination();
     distReach = Math.min(distReach, wall.distanceSquaredTo(dest));
     distFollowed = loc.distanceSquaredTo(dest);
     if (distFollowed < distReach) {
-      System.out.println("Going to goal mode");
       state = State.MOTION_TO_GOAL;
       return Direction.NONE;
     }
-    // TODO (Yang): Fix bug. Wall-following behavior is incorrect.
     Direction dir = loc.directionTo(wall);
     MapLocation nextWall = wall;
     while (map.isLocationBlocked(nextWall)) {

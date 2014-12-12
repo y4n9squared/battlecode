@@ -16,6 +16,7 @@ import battlecode.common.*;
  * @author Yang Yang
  */
 public final class Controller {
+
   private final RobotController rc;
 
   // Lazily-evaluated constants
@@ -23,6 +24,9 @@ public final class Controller {
   private Team opponentTeam;
   private RobotType myType;
   private MapLocation enemySpawn;
+
+  private static int startByteCount;
+  private static int startRound;
 
   /**
    * Constructs a {@code Controller}.
@@ -131,6 +135,10 @@ public final class Controller {
   public boolean move(Direction dir) {
     try {
       if (rc.senseObjectAtLocation(getLocationInDirection(dir)) == null) {
+        // TODO: Seeing some exceptions being thrown here despite checking
+        // location prior to moving. If our robot runs out of bytecodes here, it
+        // could cause an exception to be thrown. Checking and moving need to be
+        // performed atomically.
         rc.move(dir);
         return true;
       }
@@ -267,5 +275,24 @@ public final class Controller {
     arr[2] = (byte) (val >> 8);
     arr[3] = (byte) val;
     return arr;
+  }
+
+  /**
+   * Starts the controller clock to begin measuring the number of bytecodes
+   * executed.
+   */
+  public static void startBytecodeCounter() {
+    startByteCount = Clock.getBytecodeNum();
+    startRound = Clock.getRoundNum();
+  }
+
+  /**
+   * Stops the controller clock and returns the number of bytecodes executed
+   * since started.
+   */
+  public static int stopBytecodeCounter() {
+    return (GameConstants.BYTECODE_LIMIT - startByteCount)
+      + (Clock.getRoundNum() - startRound - 1) * GameConstants.BYTECODE_LIMIT
+      + Clock.getBytecodeNum();
   }
 }
