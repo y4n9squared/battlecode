@@ -15,7 +15,7 @@ public final class Soldier extends AbstractRobot {
 
   public Soldier(Controller c) {
     super(c);
-    navigator = new BugNavigator(controller.getMap());
+    navigator = new BugNavigator(controller.getTerrainMap());
     navigator.setDestination(controller.enemySpawn());
   }
 

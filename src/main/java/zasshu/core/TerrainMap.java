@@ -14,7 +14,7 @@ import battlecode.common.TerrainTile;
  *
  * @author Yang Yang
  */
-public final class Map {
+public final class TerrainMap {
 
   private final TerrainTile[][] terrain;
   private final int width;
@@ -25,8 +25,8 @@ public final class Map {
    *
    * @param terrain terrain tiles
    */
-  public Map(TerrainTile[][] terrain) {
-    this.terrain = terrain;
+  public TerrainMap(TerrainTile[][] tiles) {
+    terrain = tiles;
     width = terrain.length;
     height = terrain[0].length;
   }

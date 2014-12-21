@@ -187,9 +187,9 @@ public final class Controller {
   /**
    * Returns the terrain map.
    *
-   * @return map
+   * @return terrain map
    */
-  public Map getMap() {
+  public TerrainMap getTerrainMap() {
     return terrainMap;
   }
 

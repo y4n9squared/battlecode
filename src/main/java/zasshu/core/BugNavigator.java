@@ -16,20 +16,22 @@ import battlecode.common.*;
  *
  * @author Yang Yang
  */
-public final class BugNavigator extends AbstractNavigator {
+public final class BugNavigator implements Navigator {
 
   private static enum State {
     MOTION_TO_GOAL,
     FOLLOW_BOUNDARY
   }
 
+  private final TerrainMap map;
   private State state;
   private MapLocation wall;
   private int distReach;
   private int distFollowed;
+  private MapLocation destination;
 
-  public BugNavigator(Map map) {
-    super(map);
+  public BugNavigator(TerrainMap m) {
+    map = m;
     state = State.MOTION_TO_GOAL;
   }
 
@@ -38,7 +40,7 @@ public final class BugNavigator extends AbstractNavigator {
   */
   @Override public Direction getNextStep(MapLocation loc) {
     Direction nextDir = Direction.NONE;
-    if (loc.equals(getDestination())) {
+    if (destination == null || loc.equals(destination)) {
       return nextDir;
     }
     while (nextDir == Direction.NONE) {
@@ -54,8 +56,12 @@ public final class BugNavigator extends AbstractNavigator {
     return nextDir;
   }
 
+  public void setDestination(MapLocation dest) {
+    destination = dest;
+  }
+
   private Direction motionToGoal(MapLocation loc) {
-    Direction dir = loc.directionTo(getDestination());
+    Direction dir = loc.directionTo(destination);
     MapLocation nextLoc = loc.add(dir);
     if (map.isLocationBlocked(nextLoc)) {
       state = State.FOLLOW_BOUNDARY;
@@ -67,9 +73,8 @@ public final class BugNavigator extends AbstractNavigator {
   }
 
   private Direction followBoundary(MapLocation loc) {
-    MapLocation dest = getDestination();
-    distReach = Math.min(distReach, wall.distanceSquaredTo(dest));
-    distFollowed = loc.distanceSquaredTo(dest);
+    distReach = Math.min(distReach, wall.distanceSquaredTo(destination));
+    distFollowed = loc.distanceSquaredTo(destination);
     if (distFollowed < distReach) {
       state = State.MOTION_TO_GOAL;
       return Direction.NONE;
