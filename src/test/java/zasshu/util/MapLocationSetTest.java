@@ -35,12 +35,12 @@ public class MapLocationSetTest {
   @Test public void testIsEmpty() {
     assertTrue(s.isEmpty());
     s.add(new MapLocation(0, 0));
-    assertTrue(!s.isEmpty());
+    assertFalse(s.isEmpty());
   }
 
   @Test public void testAdd() {
     assertTrue(s.add(new MapLocation(1, 1)));
-    assertTrue(!s.add(new MapLocation(1, 1)));
+    assertFalse(s.add(new MapLocation(1, 1)));
     assertTrue(s.contains(new MapLocation(1, 1)));
   }
 
@@ -48,13 +48,13 @@ public class MapLocationSetTest {
     s.add(new MapLocation(1, 1));
     assertTrue(s.remove(new MapLocation(1, 1)));
     assertEquals(0, s.size());
-    assertTrue(!s.remove(new MapLocation(1, 1)));
+    assertFalse(s.remove(new MapLocation(1, 1)));
   }
 
   @Test public void testContains() {
     s.add(new MapLocation(-1, 0));
     assertTrue(s.contains(new MapLocation(-1, 0)));
-    assertTrue(!s.contains(new MapLocation(0, -1)));
+    assertFalse(s.contains(new MapLocation(0, -1)));
   }
 
   @Test public void testClear() {
