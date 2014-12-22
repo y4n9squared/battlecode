@@ -69,6 +69,9 @@ public class ControllerTest {
     } catch (GameActionException e) {
       fail("GameActionException thrown.");
     }
+
+    when(rc.getMapWidth()).thenReturn(20);
+    when(rc.getMapHeight()).thenReturn(20);
   }
 
   @Test public void testReadWriteChannels() {

@@ -24,7 +24,7 @@ public final class Controller {
   private Team opponentTeam;
   private RobotType myType;
   private MapLocation enemySpawn;
-  private Map terrainMap;
+  private TerrainMap terrainMap;
 
   private static int startByteCount;
   private static int startRound;
@@ -36,7 +36,7 @@ public final class Controller {
    */
   public Controller(RobotController rc) {
     this.rc = rc;
-    terrainMap = new Map(computeTerrain());
+    terrainMap = new TerrainMap(computeTerrain());
   }
 
   /**
