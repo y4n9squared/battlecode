@@ -24,6 +24,7 @@ public final class Controller {
   private Team opponentTeam;
   private RobotType myType;
   private MapLocation enemySpawn;
+  private Map terrainMap;
 
   private static int startByteCount;
   private static int startRound;
@@ -35,6 +36,7 @@ public final class Controller {
    */
   public Controller(RobotController rc) {
     this.rc = rc;
+    terrainMap = new Map(computeTerrain());
   }
 
   /**
@@ -133,8 +135,10 @@ public final class Controller {
    * @return {@code true} if move was successful
    */
   public boolean move(Direction dir) {
+    MapLocation loc = getLocationInDirection(dir);
     try {
-      if (rc.senseObjectAtLocation(getLocationInDirection(dir)) == null) {
+      if (!terrainMap.isLocationBlocked(loc)
+          && rc.senseObjectAtLocation(loc) == null) {
         // TODO: Seeing some exceptions being thrown here despite checking
         // location prior to moving. If our robot runs out of bytecodes here, it
         // could cause an exception to be thrown. Checking and moving need to be
@@ -181,12 +185,12 @@ public final class Controller {
   }
 
   /**
-   * Returns the map.
+   * Returns the terrain map.
    *
    * @return map
    */
   public Map getMap() {
-    return new Map(computeTerrain());
+    return terrainMap;
   }
 
   /**
