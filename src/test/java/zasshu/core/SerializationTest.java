@@ -6,17 +6,11 @@
 package zasshu.core;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 import static zasshu.core.Serialization.*;
 
 import battlecode.common.*;
 
 import org.junit.*;
-import org.mockito.stubbing.*;
-import org.mockito.invocation.*;
-
-import java.io.Serializable;
-import java.util.HashMap;
 
 /**
  * Unit tests for the {@link Serialization} library.

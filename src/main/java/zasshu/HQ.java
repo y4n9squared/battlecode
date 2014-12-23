@@ -5,7 +5,8 @@
 
 package zasshu;
 
-import zasshu.core.*;
+import zasshu.core.AbstractRobot;
+import zasshu.core.Controller;
 
 import battlecode.common.*;
 

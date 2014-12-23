@@ -23,7 +23,7 @@ public final class TerrainMap {
   /**
    * Constructs a {@code Map}.
    *
-   * @param terrain terrain tiles
+   * @param tiles terrain tiles
    */
   public TerrainMap(TerrainTile[][] tiles) {
     terrain = tiles;

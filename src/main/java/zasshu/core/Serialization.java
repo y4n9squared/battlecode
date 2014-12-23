@@ -5,15 +5,20 @@
 
 package zasshu.core;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 
 /**
  * {@code Serialization} is a static library for serializing and deserialing
  * objects to byte arrays so that they can be broadcast to Battlecode channels.
- * <p>
- * Unlike default Java serialization, byte arrays handeled through this library
- * always coincide with 4-byte words. PKCS#5 padding is used when the object's
- * serialized length is less than the boundary for a word.
+ *
+ * <p>Unlike default Java serialization, byte arrays handeled through this
+ * library always coincide with 4-byte words. PKCS#5 padding is used when the
+ * object's serialized length is less than the boundary for a word.
  *
  * @author Yang Yang
  */
@@ -62,7 +67,7 @@ public final class Serialization {
   /**
    * Appends a pad to the byte array according to the PKCS#5 padding scheme.
    *
-   * Cost: ~200 bytecodes
+   * <p>Cost: ~200 bytecodes
    *
    * @param arr unpadded byte array
    * @return PKCS#5-padded byte array
@@ -81,7 +86,7 @@ public final class Serialization {
   /**
    * Strips the PKCS#5 padding from the specified byte array.
    *
-   * Throws {@code IllegalArgumentException} if the PKCS#5 pad is invalid.
+   * <p>Throws {@code IllegalArgumentException} if the PKCS#5 pad is invalid.
    *
    * @param arr PKCS#5-padded byte array
    * @return unpadded byte array

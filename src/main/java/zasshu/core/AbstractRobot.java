@@ -15,12 +15,12 @@ public abstract class AbstractRobot implements Robot {
 
   protected final Controller controller;
 
-  protected AbstractRobot(Controller c) {
-    controller = c;
+  protected AbstractRobot(Controller ctrl) {
+    controller = ctrl;
   }
 
   @Override public void run() {
-    while(true) {
+    while (true) {
       if (controller.isActive()) {
         try {
           runHelper();

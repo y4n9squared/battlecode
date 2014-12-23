@@ -10,9 +10,9 @@ import battlecode.common.*;
 /**
  * A simple bug navigator with a sensor radius of 1 unit.
  *
- * BugNavigator moves in the direction of its destination when its next
- * step is unobstructed. When it encounters a wall, it follows it until the
- * tangent bug termination condition is satisfied.
+ * <p>BugNavigator moves in the direction of its destination when its next step
+ * is unobstructed. When it encounters a wall, it follows it until the tangent
+ * bug termination condition is satisfied.
  *
  * @author Yang Yang
  */
@@ -23,15 +23,15 @@ public final class BugNavigator implements Navigator {
     FOLLOW_BOUNDARY
   }
 
-  private final TerrainMap map;
+  private final TerrainMap terrainMap;
   private State state;
   private MapLocation wall;
   private int distReach;
   private int distFollowed;
   private MapLocation destination;
 
-  public BugNavigator(TerrainMap m) {
-    map = m;
+  public BugNavigator(TerrainMap map) {
+    terrainMap = map;
     state = State.MOTION_TO_GOAL;
   }
 
@@ -51,6 +51,9 @@ public final class BugNavigator implements Navigator {
         case FOLLOW_BOUNDARY:
           nextDir = followBoundary(loc);
           break;
+        default:
+          // Should never be reached
+          System.err.println("Unrecognized state.");
       }
     }
     return nextDir;
@@ -63,7 +66,7 @@ public final class BugNavigator implements Navigator {
   private Direction motionToGoal(MapLocation loc) {
     Direction dir = loc.directionTo(destination);
     MapLocation nextLoc = loc.add(dir);
-    if (map.isLocationBlocked(nextLoc)) {
+    if (terrainMap.isLocationBlocked(nextLoc)) {
       state = State.FOLLOW_BOUNDARY;
       wall = nextLoc;
       distReach = Integer.MAX_VALUE;
@@ -81,7 +84,7 @@ public final class BugNavigator implements Navigator {
     }
     Direction dir = loc.directionTo(wall);
     MapLocation nextWall = wall;
-    while (map.isLocationBlocked(nextWall)) {
+    while (terrainMap.isLocationBlocked(nextWall)) {
       wall = nextWall;
       dir = dir.rotateRight();
       nextWall = loc.add(dir);

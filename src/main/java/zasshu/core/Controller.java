@@ -58,7 +58,7 @@ public final class Controller {
   /**
    * Attacks the specified map location.
    *
-   * @param targetLoc location to attack
+   * @param loc location to attack
    * @return {@code true} if attack was successful
    */
   public boolean attack(MapLocation loc) {
@@ -195,12 +195,12 @@ public final class Controller {
 
   /**
    * Broadcasts an object to the {@code RobotController}'s channels.
-   * <p>
-   * The object is serialzed into a byte stream and saved to channels in 4-byte
-   * pieces. The total bytecode usage is proportional to the size of the object,
-   * plus a constant serialization overhead.
-   * <p>
-   * If an error occurs, the return value will be -1.
+   *
+   * <p>The object is serialzed into a byte stream and saved to channels in
+   * 4-byte pieces. The total bytecode usage is proportional to the size of the
+   * object, plus a constant serialization overhead.
+   *
+   * <p>If an error occurs, the return value will be -1.
    *
    * @param start start channel
    * @param obj object to broadcast
@@ -228,12 +228,12 @@ public final class Controller {
 
   /**
    * Reads an object from the {@code RobotController}'s channels.
-   * <p>
-   * The object is reconstructed from its byte stream via deserialization.
+   *
+   * <p>The object is reconstructed from its byte stream via deserialization.
    * Bytecode usage is proportional to the size of the object, plus a constant
    * deserialization overhead.
-   * <p>
-   * If an error occurs, the return value will be {@code null}.
+   *
+   * <p>If an error occurs, the return value will be {@code null}.
    *
    * @param start start channel
    * @param size number of channels to read
@@ -259,12 +259,13 @@ public final class Controller {
   /**
    * Converts 4 bytes into an int.
    *
-   * Cost: 33 bytecodes
+   * <p>Cost: 33 bytecodes
    *
    * @param arr byte array of length 4
    */
   static int pack(byte[] arr) {
-    return (((0xFF & arr[0]) << 24) | ((0xFF & arr[1]) << 16) | ((0xFF & arr[2]) << 8) | (0xFF & arr[3]));
+    return (((0xFF & arr[0]) << 24) | ((0xFF & arr[1]) << 16)
+        | ((0xFF & arr[2]) << 8) | (0xFF & arr[3]));
   }
 
   /**

@@ -9,11 +9,12 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static zasshu.core.Controller.*;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.RobotController;
 
 import org.junit.*;
-import org.mockito.stubbing.*;
-import org.mockito.invocation.*;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -30,8 +31,8 @@ public class ControllerTest {
     private static final long serialVersionUID = 1L;
     private final String val;
 
-    public SerializableObject(String s) {
-      val = s;
+    public SerializableObject(String str) {
+      val = str;
     }
 
     @Override public int hashCode() {
@@ -50,7 +51,7 @@ public class ControllerTest {
 
   @Before public void setUp() {
     rc = mock(RobotController.class, RETURNS_SMART_NULLS);
-    final HashMap<Integer, Integer> mockChannels = new HashMap<Integer, Integer>();
+    HashMap<Integer, Integer> mockChannels = new HashMap<Integer, Integer>();
     try {
       doAnswer(new Answer<Void>() {
         @Override public Void answer(InvocationOnMock invocation) {

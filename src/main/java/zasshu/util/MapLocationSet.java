@@ -34,7 +34,7 @@ public final class MapLocationSet {
   /**
    * Adds the specified element to this set if it is not already present.
    *
-   * @param loc element to be added to this set
+   * @param e element to be added to this set
    * @return {@code true} if this set did not already contain the specified
    *         location
    */
@@ -51,14 +51,14 @@ public final class MapLocationSet {
   /**
    * Removes the specified element from this set if it is present.
    *
-   * @param loc element to be removed from this set
+   * @param e element to be removed from this set
    * @return {@code true} if this set contained the specified element
    */
   public boolean remove(MapLocation e) {
     String key = locToStr(e);
     int index = keys.indexOf(key);
     if (index != -1) {
-      keys.delete(index, index+3);
+      keys.delete(index, index + 3);
       --size;
       return true;
     }
@@ -103,7 +103,8 @@ public final class MapLocationSet {
   public MapLocation[] toArray() {
     MapLocation[] elems = new MapLocation[size];
     for (int i = size; --i >= 0;) {
-      elems[i] = new MapLocation(keys.charAt(i*3+1), keys.charAt(i*3+2));
+      elems[i] = new MapLocation(keys.charAt(i * 3 + 1),
+          keys.charAt(i * 3 + 2));
     }
     return elems;
   }

@@ -5,9 +5,10 @@
 
 package zasshu;
 
-import battlecode.common.RobotController;
+import zasshu.core.Controller;
+import zasshu.core.Robot;
 
-import zasshu.core.*;
+import battlecode.common.RobotController;
 
 /**
  *
@@ -25,15 +26,15 @@ public class RobotPlayer {
     Controller controller = new Controller(rc);
     Robot robot;
     switch (rc.getType()) {
-     case HQ:
-      robot = new HQ(controller);
-      break;
-     case SOLDIER:
-      robot = new Soldier(controller);
-      break;
-     default:
-      // Should never happen
-      return;
+      case HQ:
+        robot = new HQ(controller);
+        break;
+      case SOLDIER:
+        robot = new Soldier(controller);
+        break;
+      default:
+        // Should never happen
+        return;
     }
     robot.run();
   }
