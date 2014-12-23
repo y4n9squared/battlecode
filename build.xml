@@ -1,5 +1,6 @@
 <project name="Battlecode 2015" basedir="." default="build"
-  xmlns:ivy="antlib:org.apache.ivy.ant">
+  xmlns:ivy="antlib:org.apache.ivy.ant"
+  xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
 
   <property name="path.base" location="."/>
   <property name="path.target" location="${path.base}/target"/>
@@ -48,4 +49,11 @@
     </junit>
   </target>
 
+  <target name="lint" depends="test">
+    <cs:checkstyle config="checkstyle.xml" failOnViolation="yes">
+      <fileset dir="${path.src}">
+        <include name="**/*.java"/>
+      </fileset>
+    </cs:checkstyle>
+  </target>
 </project>
