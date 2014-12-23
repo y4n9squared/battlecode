@@ -1,0 +1,13 @@
+<ivy-module version="2.3">
+  <info organisation="zasshu" module="${ant.project.name}">
+    <ivyauthor name="zasshu" url="https://github.com/y4n9squared/battlecode"/>
+    <description>Battlecode 2015</description>
+  </info>
+
+  <dependencies>
+    <dependency org="junit" name="junit" rev="4.11"/>
+    <dependency org="org.mockito" name="mockito-all" rev="1.10.17"/>
+  </dependencies>
+</ivy-module>
+
+
