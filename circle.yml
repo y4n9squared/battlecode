@@ -1,0 +1,13 @@
+machine:
+  java:
+    version: oraclejdk6
+
+dependencies:
+  pre:
+    - bash ./install.sh
+  cache_directories:
+    - "~/.ant"
+
+test:
+  override:
+    - ant test
