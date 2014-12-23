@@ -1,22 +1,24 @@
-<project name="battlecode" basedir="." default="build">
+<project name="Battlecode 2015" basedir="." default="build"
+  xmlns:ivy="antlib:org.apache.ivy.ant">
 
   <property name="path.base" location="."/>
   <property name="path.target" location="${path.base}/target"/>
   <property name="path.src" location="${path.base}/src"/>
+  <property name="path.lib" location="${path.base}/lib/"/>
 
   <fileset id="files.build" dir="/usr/share/java">
     <include name="battlecode-server.jar"/>
   </fileset>
 
   <path id="classpath">
-    <dirset dir="${path.src}"/>
+    <fileset dir="${path.lib}">
+      <include name="**/*.jar"/>
+    </fileset>
     <fileset refid="files.build"/>
-    <pathelement location="/usr/share/java/junit4.jar"/>
-    <pathelement location="/usr/share/java/mockito-all.jar"/>
     <pathelement location="${path.target}"/>
   </path>
 
-  <target name="-init">
+  <target name="init">
     <mkdir dir="${path.target}"/>
   </target>
 
@@ -24,7 +26,11 @@
     <delete dir="${path.target}"/>
   </target>
 
-  <target name="build" depends="-init">
+  <target name="resolve" depends="clean,init">
+    <ivy:retrieve/>
+  </target>
+
+  <target name="build" depends="resolve">
     <javac
      classpathref="classpath"
      destdir="${path.target}"
