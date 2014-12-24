@@ -7,6 +7,8 @@
   <dependencies>
     <dependency org="junit" name="junit" rev="4.11"/>
     <dependency org="org.mockito" name="mockito-all" rev="1.10.17"/>
+    <dependency org="com.puppycrawl.tools" name="checkstyle" rev="6.1.1"/>
+    <exclude org="org.apache.ant"/>
   </dependencies>
 </ivy-module>
 
