@@ -6,15 +6,10 @@
   <property name="path.src" location="${path.base}/src"/>
   <property name="path.lib" location="${path.base}/lib/"/>
 
-  <fileset id="files.build" dir="/usr/share/java">
-    <include name="battlecode-server.jar"/>
-  </fileset>
-
   <path id="classpath">
     <fileset dir="${path.lib}">
       <include name="**/*.jar"/>
     </fileset>
-    <fileset refid="files.build"/>
     <pathelement location="${path.target}"/>
   </path>
 
