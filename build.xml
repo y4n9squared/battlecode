@@ -48,12 +48,18 @@
     </junit>
   </target>
 
-  <taskdef resource="checkstyletask.properties" classpathref="classpath"/>
-  <target name="lint" depends="test">
+  <target name="lint" depends="init-checkstyle">
     <checkstyle config="checkstyle.xml" failOnViolation="yes">
       <fileset dir="${path.src}">
         <include name="**/*.java"/>
       </fileset>
     </checkstyle>
+  </target>
+
+  <target name="init-checkstyle" depends="resolve">
+    <path id="checkstyle.lib.path">
+      <fileset dir="lib" includes="*.jar"/>
+    </path>
+    <taskdef resource="checkstyletask.properties" classpathref="checkstyle.lib.path"/>
   </target>
 </project>
