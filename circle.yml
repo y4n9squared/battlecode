@@ -10,4 +10,5 @@ dependencies:
 
 test:
   override:
+    - ant lint
     - ant test
