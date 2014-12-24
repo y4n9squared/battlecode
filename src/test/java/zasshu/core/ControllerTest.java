@@ -48,10 +48,11 @@ public class ControllerTest {
   }
 
   private RobotController rc;
+  HashMap<Integer, Integer> mockChannels;
 
   @Before public void setUp() {
     rc = mock(RobotController.class, RETURNS_SMART_NULLS);
-    HashMap<Integer, Integer> mockChannels = new HashMap<Integer, Integer>();
+    mockChannels = new HashMap<Integer, Integer>();
     try {
       doAnswer(new Answer<Void>() {
         @Override public Void answer(InvocationOnMock invocation) {
