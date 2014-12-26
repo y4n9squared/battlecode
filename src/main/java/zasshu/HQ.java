@@ -17,7 +17,7 @@ public final class HQ extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
-    if (controller.senseRobotCount() < 1) {
+    if (controller.senseRobotCount() < 10) {
       Direction dir = controller.enemyDirection();
       controller.spawn(dir);
     }

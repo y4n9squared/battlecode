@@ -5,6 +5,7 @@
 
 package zasshu.core;
 
+import battlecode.common.Robot;
 import battlecode.common.*;
 
 /**
@@ -18,11 +19,11 @@ import battlecode.common.*;
 public final class Controller {
 
   private final RobotController rc;
+  private final RobotType type;
+  private final Team myTeam;
+  private final Team opponentTeam;
 
   // Lazily-evaluated constants
-  private Team myTeam;
-  private Team opponentTeam;
-  private RobotType myType;
   private MapLocation enemySpawn;
   private TerrainMap terrainMap;
 
@@ -36,7 +37,29 @@ public final class Controller {
    */
   public Controller(RobotController rc) {
     this.rc = rc;
+    type = rc.getType();
+    myTeam = rc.getTeam();
+    opponentTeam = myTeam.opponent();
     terrainMap = new TerrainMap(computeTerrain());
+  }
+
+  /**
+   * Starts the controller clock to begin measuring the number of bytecodes
+   * executed.
+   */
+  public static void startBytecodeCounter() {
+    startByteCount = Clock.getBytecodeNum();
+    startRound = Clock.getRoundNum();
+  }
+
+  /**
+   * Stops the controller clock and returns the number of bytecodes executed
+   * since started.
+   */
+  public static int stopBytecodeCounter() {
+    return (GameConstants.BYTECODE_LIMIT - startByteCount)
+      + (Clock.getRoundNum() - startRound - 1) * GameConstants.BYTECODE_LIMIT
+      + Clock.getBytecodeNum();
   }
 
   /**
@@ -194,6 +217,37 @@ public final class Controller {
   }
 
   /**
+   * Returns the attack radius squared of this robot.
+   *
+   * @return attack radius squared
+   */
+  public int getAttackRadiusMaxSquared() {
+    return type.attackRadiusMaxSquared;
+  }
+
+  /**
+   * Returns an array of {@code MapLocation}s corresponding to the locations of
+   * enemy robots within sensor radius.
+   *
+   * @return locations of enemy robots
+   */
+  public MapLocation[] nearbyEnemyLocations() {
+    MapLocation[] locations;
+    try {
+      Robot[] enemies = rc.senseNearbyGameObjects(
+          Robot.class, type.sensorRadiusSquared, opponentTeam);
+      locations = new MapLocation[enemies.length];
+      for (int i = enemies.length; --i >= 0;) {
+        locations[i] = rc.senseLocationOf(enemies[i]);
+      }
+    } catch (GameActionException e) {
+      e.printStackTrace();
+      return null;
+    }
+    return locations;
+  }
+
+  /**
    * Broadcasts an object to the {@code RobotController}'s channels.
    *
    * <p>The object is serialzed into a byte stream and saved to channels in
@@ -280,24 +334,5 @@ public final class Controller {
     arr[2] = (byte) (val >> 8);
     arr[3] = (byte) val;
     return arr;
-  }
-
-  /**
-   * Starts the controller clock to begin measuring the number of bytecodes
-   * executed.
-   */
-  public static void startBytecodeCounter() {
-    startByteCount = Clock.getBytecodeNum();
-    startRound = Clock.getRoundNum();
-  }
-
-  /**
-   * Stops the controller clock and returns the number of bytecodes executed
-   * since started.
-   */
-  public static int stopBytecodeCounter() {
-    return (GameConstants.BYTECODE_LIMIT - startByteCount)
-      + (Clock.getRoundNum() - startRound - 1) * GameConstants.BYTECODE_LIMIT
-      + Clock.getBytecodeNum();
   }
 }
