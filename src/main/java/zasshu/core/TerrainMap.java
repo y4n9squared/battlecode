@@ -5,6 +5,8 @@
 
 package zasshu.core;
 
+import zasshu.util.MapLocationSet;
+
 import battlecode.common.MapLocation;
 import battlecode.common.TerrainTile;
 
@@ -16,7 +18,7 @@ import battlecode.common.TerrainTile;
  */
 public final class TerrainMap {
 
-  private final TerrainTile[][] terrain;
+  private final MapLocationSet obstacles;
   private final int width;
   private final int height;
 
@@ -26,9 +28,17 @@ public final class TerrainMap {
    * @param tiles terrain tiles
    */
   public TerrainMap(TerrainTile[][] tiles) {
-    terrain = tiles;
-    width = terrain.length;
-    height = terrain[0].length;
+    obstacles = new MapLocationSet();
+    for (int i = tiles.length; --i >= 0;) {
+      for (int j = tiles[0].length; --j >= 0;) {
+        if (tiles[i][j] == TerrainTile.VOID
+            || tiles[i][j] == TerrainTile.OFF_MAP) {
+          obstacles.add(new MapLocation(i, j));
+        }
+      }
+    }
+    width = tiles.length;
+    height = tiles[0].length;
   }
 
   /**
@@ -52,7 +62,10 @@ public final class TerrainMap {
    * @param loc map location
    */
   public boolean isLocationBlocked(MapLocation loc) {
-    return isLocationBlocked(loc.x, loc.y);
+    if (isOutOfBounds(loc) || obstacles.contains(loc)) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -63,11 +76,11 @@ public final class TerrainMap {
    * @param y y-coordinate
    */
   public boolean isLocationBlocked(int x, int y) {
-    if (x < 0 || y < 0 || x >= width || y >= height) {
-      return true;
-    }
-    if (terrain[x][y] == TerrainTile.VOID
-        || terrain[x][y] == TerrainTile.OFF_MAP) {
+    return isLocationBlocked(new MapLocation(x, y));
+  }
+
+  private boolean isOutOfBounds(MapLocation loc) {
+    if (loc.x < 0 || loc.y < 0 || loc.x >= width || loc.y >= height) {
       return true;
     }
     return false;
