@@ -16,6 +16,7 @@ import battlecode.common.*;
  *  charges from all sources.
  *
  *  @author Holman Gao
+ *  @author Yang Yang
  */
 public final class InfluenceField {
 
@@ -31,7 +32,7 @@ public final class InfluenceField {
   private final int attackRangeSquared;
 
   /**
-   * Initializes instance variables and sets the range
+   * Initializes instance variables and sets the range.
    */
   public InfluenceField(int range) {
     teammates = new MapLocationSet();
@@ -72,11 +73,13 @@ public final class InfluenceField {
    */
   public double influence(MapLocation loc) {
     double myInfluence = 0;
-    for (MapLocation s : teammates.toArray()) {
-      myInfluence += influenceHelper(loc, s);
+    MapLocation[] arr = teammates.toArray();
+    for (int i = arr.length; --i >= 0;) {
+      myInfluence += influenceHelper(loc, arr[i]);
     }
-    for (MapLocation s : enemies.toArray()) {
-      myInfluence -= influenceHelper(loc, s);
+    arr = enemies.toArray();
+    for (int i = arr.length; --i >= 0;) {
+      myInfluence -= influenceHelper(loc, arr[i]);
     }
     return myInfluence;
   }
