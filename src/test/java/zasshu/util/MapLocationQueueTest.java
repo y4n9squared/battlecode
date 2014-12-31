@@ -58,6 +58,14 @@ public class MapLocationQueueTest {
     assertEquals(0, queue.size());
   }
 
+  @Test public void testBack() {
+    assertNull(queue.back());
+    queue.add(new MapLocation(-1, 0));
+    assertEquals(new MapLocation(-1, 0), queue.back());
+    queue.add(new MapLocation(1, 1));
+    assertEquals(new MapLocation(1, 1), queue.back());
+  }
+
   @Test public void testToArray() {
     queue.add(new MapLocation(-1, 2));
     queue.add(new MapLocation(-1, 3));

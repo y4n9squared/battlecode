@@ -56,6 +56,19 @@ public final class MapLocationQueue {
   }
 
   /**
+   * Returns the most recently added element, if exists, and {@code null}
+   * otherwise.
+   *
+   * @return most recently added element
+   */
+  public MapLocation back() {
+    if (size == 0) {
+      return null;
+    }
+    return queue[headIndex + size - 1];
+  }
+
+  /**
    * Returns the number of elements in this set.
    *
    * @return the number of elements in this set
