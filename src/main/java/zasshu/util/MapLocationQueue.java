@@ -32,7 +32,7 @@ public final class MapLocationQueue {
   }
 
   /**
-   * Adds the specified element to the end of the queue
+   * Adds the specified element to the end of the queue.
    *
    * @param e element to be added to this set
    */

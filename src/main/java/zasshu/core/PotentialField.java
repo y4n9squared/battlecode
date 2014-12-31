@@ -22,6 +22,13 @@ public final class PotentialField {
   private static final double SOLDIER_CHARGE = 10.0;
 
   /**
+   * Maximum range of obstacle repelling force.
+   */
+  private static final int REPEL_RADIUS_SQUARED = 2;
+
+  private final double[][] staticField;
+
+  /**
    * Map locations that emit attracting forces.
    */
   private final MapLocationSet sources;
@@ -41,10 +48,12 @@ public final class PotentialField {
    *
    * @param r radius of maximal charge of sources
    */
-  public PotentialField(int r) {
+  public PotentialField(TerrainMap map, int r) {
     sources = new MapLocationSet();
     sinks = new MapLocationSet();
     radiusSquared = r;
+    staticField = new double[map.getWidth()][map.getHeight()];
+    initStaticField(map);
   }
 
   /**
@@ -79,14 +88,25 @@ public final class PotentialField {
    */
   public double potential(MapLocation loc) {
     double maxPotential = Double.NEGATIVE_INFINITY;
+
+    // Account for sources
     MapLocation[] elems = sources.toArray();
     for (int i = elems.length; --i >= 0;) {
-      maxPotential = Math.max(maxPotential, potentialHelper(loc, elems[i]));
+      maxPotential = Math.max(maxPotential,
+          computeEnemyForce(loc, elems[i]));
     }
-    return maxPotential;
+
+    // Account for sinks
+    elems = sinks.toArray();
+    for (int i = elems.length; --i >= 0;) {
+      maxPotential += computeObstacleForce(elems[i], loc);
+    }
+
+    // Account for static
+    return maxPotential + staticField[loc.x][loc.y];
   }
 
-  private double potentialHelper(MapLocation loc, MapLocation sourceLoc) {
+  private double computeEnemyForce(MapLocation loc, MapLocation sourceLoc) {
     int d = sourceLoc.distanceSquaredTo(loc);
     if (d > 0 && d < radiusSquared - 2) {
       return SOLDIER_CHARGE / (d * (radiusSquared - 2));
@@ -96,5 +116,37 @@ public final class PotentialField {
       return SOLDIER_CHARGE - 0.24 * (d - radiusSquared);
     }
   }
-}
 
+  /**
+   * Computes the force felt at {@code point} from a charge located at {@code
+   * source}.
+   *
+   * <p>The location of the charge and point must be different.
+   *
+   * @param source location of charge
+   * @param point location of observer
+   * @return force felt by observer from charge
+   */
+  private double computeObstacleForce(MapLocation source, MapLocation point) {
+    return -1 * 5.0 / source.distanceSquaredTo(point);
+  }
+
+  /**
+   * Compute the static field contributions from map obstacles.
+   */
+  private void initStaticField(TerrainMap map) {
+    double[][] localStaticField = staticField;
+    MapLocation[] arr = map.getObstacles().toArray();
+    for (int i = arr.length; --i >= 0;) {
+      MapLocation[] area = MapLocation.getAllMapLocationsWithinRadiusSq(
+          arr[i], REPEL_RADIUS_SQUARED);
+      for (int j = area.length; --j >= 0;) {
+        MapLocation loc = area[j];
+        if (map.isLocationBlocked(loc)) {
+          continue;
+        }
+        localStaticField[loc.x][loc.y] += computeObstacleForce(arr[i], loc);
+      }
+    }
+  }
+}

@@ -21,7 +21,8 @@ public final class Soldier extends AbstractRobot {
 
   public Soldier(Controller c) {
     super(c);
-    field = new PotentialField(controller.getAttackRadiusMaxSquared());
+    field = new PotentialField(controller.getTerrainMap(),
+        controller.getAttackRadiusMaxSquared());
     navigator = new PotentialNavigator(field, controller.getTerrainMap());
   }
 
