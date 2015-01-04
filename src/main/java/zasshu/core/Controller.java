@@ -247,6 +247,11 @@ public final class Controller {
     return locations;
   }
 
+  public Robot[] nearbyAttackableEnemies() {
+    return rc.senseNearbyGameObjects(
+        Robot.class, type.attackRadiusMaxSquared, opponentTeam);
+  }
+
   /**
    * Broadcasts an object to the {@code RobotController}'s channels.
    *
