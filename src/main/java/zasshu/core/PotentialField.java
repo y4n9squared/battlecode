@@ -142,10 +142,12 @@ public final class PotentialField {
           arr[i], REPEL_RADIUS_SQUARED);
       for (int j = area.length; --j >= 0;) {
         MapLocation loc = area[j];
-        if (map.isLocationBlocked(loc)) {
-          continue;
+        if (!map.isOutOfBounds(loc)) {
+          if (map.isObstructed(loc)) {
+            continue;
+          }
+          localStaticField[loc.x][loc.y] += computeObstacleForce(arr[i], loc);
         }
-        localStaticField[loc.x][loc.y] += computeObstacleForce(arr[i], loc);
       }
     }
   }

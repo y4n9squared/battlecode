@@ -36,6 +36,21 @@ public class TerrainMapTest {
     assertTrue(map.isLocationBlocked(100, 0));
   }
 
+  @Test public void testOutOfBounds() {
+    TerrainMap map = new TerrainMap(tiles);
+    assertTrue(map.isOutOfBounds(new MapLocation(-1, 0)));
+    assertTrue(map.isOutOfBounds(new MapLocation(0, size)));
+    assertFalse(map.isOutOfBounds(new MapLocation(0, 0)));
+    assertFalse(map.isOutOfBounds(new MapLocation(1, 1)));
+  }
+
+  @Test public void testIsObstructed() {
+    TerrainMap map = new TerrainMap(tiles);
+    assertTrue(map.isObstructed(0, 0));
+    assertTrue(map.isObstructed(new MapLocation(0, 0)));
+    assertFalse(map.isObstructed(1, 0));
+  }
+
   @Test public void testDimensions() {
     TerrainMap map = new TerrainMap(tiles);
     assertEquals(100, map.getWidth());
