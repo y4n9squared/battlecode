@@ -7,37 +7,76 @@ package zasshu;
 
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
+import zasshu.core.InfluenceField;
 import zasshu.core.Navigator;
 import zasshu.core.PotentialField;
 import zasshu.core.PotentialNavigator;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
+import battlecode.common.Robot;
 
 public final class Soldier extends AbstractRobot {
 
   private final PotentialNavigator navigator;
-  private final PotentialField field;
+  private final PotentialField potentialField;
+  private final InfluenceField influenceField;
 
   public Soldier(Controller c) {
     super(c);
-    field = new PotentialField(controller.getTerrainMap(),
+    potentialField = new PotentialField(controller.getTerrainMap(),
         controller.getAttackRadiusMaxSquared());
-    navigator = new PotentialNavigator(field, controller.getTerrainMap());
+    influenceField = new InfluenceField();
+    navigator = new PotentialNavigator(
+        potentialField, controller.getTerrainMap());
   }
 
   @Override protected void runHelper() {
-    updatePotentialField();
-    Direction dir = navigator.getNextStep(controller.getLocation());
-    controller.move(dir);
+    updateInfluenceField();
+
+    if (influenceField.influence(controller.getLocation()) > 0) {
+      attack();
+    } else {
+      retreat();
+    }
+  }
+
+  private void attack() {
+    Robot[] enemies = controller.nearbyAttackableEnemies();
+    if (enemies.length > 0) {
+      controller.attack(enemies[0]);
+    } else {
+      updatePotentialField();
+      Direction dir = navigator.getNextStep(controller.getLocation());
+      controller.move(dir);
+    }
+  }
+
+  /* TODO */
+  private void retreat() {
+  }
+
+  private void updateInfluenceField() {
+    influenceField.clear();
+    influenceField.addTeammate(controller.mySpawn());
+    MapLocation[] teammates = controller.nearbyTeammateLocations();
+    for (int i = teammates.length; --i >= 0;) {
+      influenceField.addTeammate(teammates[i]);
+    }
+
+    influenceField.addEnemy(controller.enemySpawn());
+    MapLocation[] enemies = controller.nearbyEnemyLocations();
+    for (int i = enemies.length; --i >= 0;) {
+      influenceField.addEnemy(enemies[i]);
+    }
   }
 
   private void updatePotentialField() {
-    field.clear();
-    field.addSource(controller.enemySpawn());
+    potentialField.clear();
+    potentialField.addSource(controller.enemySpawn());
     MapLocation[] enemies = controller.nearbyEnemyLocations();
     for (int i = enemies.length; --i >= 0;) {
-      field.addSource(enemies[i]);
+      potentialField.addSource(enemies[i]);
     }
     // TODO: Add friendly obstacles
   }

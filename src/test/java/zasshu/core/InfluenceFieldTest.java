@@ -20,25 +20,27 @@ import org.junit.*;
 public class InfluenceFieldTest {
 
   @Test public void testTeammateInfluence() {
-    InfluenceField field = new InfluenceField(25);
+    InfluenceField field = new InfluenceField();
     field.addTeammate(new MapLocation(8, 10));
     assertTrue(field.influence(new MapLocation(8, 8)) > 0);
   }
 
   @Test public void testEnemyInfluence() {
-    InfluenceField field = new InfluenceField(25);
+    InfluenceField field = new InfluenceField();
     field.addEnemy(new MapLocation(8, 10));
-    assertTrue(field.influence(new MapLocation(8, 10)) < 0);
+    field.addEnemy(new MapLocation(10, 8));
+    assertTrue(field.influence(new MapLocation(8, 8)) < 0);
   }
 
   @Test public void testCombinedInfluence() {
-    InfluenceField field = new InfluenceField(25);
+    InfluenceField field = new InfluenceField();
     field.addEnemy(new MapLocation(8, 10));
-    field.addTeammate(new MapLocation(9, 10));
-    assertTrue(field.influence(new MapLocation(8, 8)) < 0);
-
-    field.addTeammate(new MapLocation(9, 9));
+    field.addTeammate(new MapLocation(11, 8));
     assertTrue(field.influence(new MapLocation(8, 8)) > 0);
+
+    field.addEnemy(new MapLocation(9, 9));
+    field.addEnemy(new MapLocation(10, 8));
+    assertTrue(field.influence(new MapLocation(8, 8)) < 0);
   }
 
 }

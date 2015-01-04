@@ -25,6 +25,7 @@ public final class Controller {
 
   // Lazily-evaluated constants
   private MapLocation enemySpawn;
+  private MapLocation mySpawn;
   private TerrainMap terrainMap;
 
   private static int startByteCount;
@@ -153,6 +154,18 @@ public final class Controller {
   }
 
   /**
+   * Returns the map location of our spawn.
+   *
+   * @return map location of our spawn
+   */
+  public MapLocation mySpawn() {
+    if (mySpawn == null) {
+      mySpawn = rc.senseHQLocation();
+    }
+    return mySpawn;
+  }
+
+  /**
    * Attempt to move in the specified direction.
    *
    * @return {@code true} if move was successful
@@ -232,19 +245,22 @@ public final class Controller {
    * @return locations of enemy robots
    */
   public MapLocation[] nearbyEnemyLocations() {
-    MapLocation[] locations;
-    try {
-      Robot[] enemies = rc.senseNearbyGameObjects(
-          Robot.class, type.sensorRadiusSquared, opponentTeam);
-      locations = new MapLocation[enemies.length];
-      for (int i = enemies.length; --i >= 0;) {
-        locations[i] = rc.senseLocationOf(enemies[i]);
-      }
-    } catch (GameActionException e) {
-      e.printStackTrace();
-      return null;
-    }
-    return locations;
+    return nearbyRobotLocationsOfTeam(opponentTeam);
+  }
+
+  /**
+   * Returns an array of {@code MapLocation}s corresponding to the locations of
+   * teammate robots within sensor radius.
+   *
+   * @return locations of enemy robots
+   */
+  public MapLocation[] nearbyTeammateLocations() {
+    return nearbyRobotLocationsOfTeam(myTeam);
+  }
+
+  public Robot[] nearbyAttackableEnemies() {
+    return rc.senseNearbyGameObjects(
+        Robot.class, type.attackRadiusMaxSquared, opponentTeam);
   }
 
   /**
@@ -335,4 +351,21 @@ public final class Controller {
     arr[3] = (byte) val;
     return arr;
   }
+
+  private MapLocation[] nearbyRobotLocationsOfTeam(Team team) {
+    MapLocation[] locations;
+    try {
+      Robot[] enemies = rc.senseNearbyGameObjects(
+          Robot.class, type.sensorRadiusSquared, team);
+      locations = new MapLocation[enemies.length];
+      for (int i = enemies.length; --i >= 0;) {
+        locations[i] = rc.senseLocationOf(enemies[i]);
+      }
+    } catch (GameActionException e) {
+      e.printStackTrace();
+      return null;
+    }
+    return locations;
+  }
+
 }
