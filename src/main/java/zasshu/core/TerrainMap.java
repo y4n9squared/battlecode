@@ -85,4 +85,16 @@ public final class TerrainMap {
     }
     return false;
   }
+
+  /**
+   * Returns the set of map obstacles.
+   *
+   * <p>This method does not make a defensive copy in order to save bytecodes.
+   * However, it is intended to be read-only.
+   *
+   * @return set of map obstacles
+   */
+  public MapLocationSet getObstacles() {
+    return obstacles;
+  }
 }

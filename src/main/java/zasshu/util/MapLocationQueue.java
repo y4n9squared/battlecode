@@ -32,7 +32,7 @@ public final class MapLocationQueue {
   }
 
   /**
-   * Adds the specified element to the end of the queue
+   * Adds the specified element to the end of the queue.
    *
    * @param e element to be added to this set
    */
@@ -53,6 +53,19 @@ public final class MapLocationQueue {
       --size;
       return queue[headIndex++];
     }
+  }
+
+  /**
+   * Returns the most recently added element, if exists, and {@code null}
+   * otherwise.
+   *
+   * @return most recently added element
+   */
+  public MapLocation back() {
+    if (size == 0) {
+      return null;
+    }
+    return queue[headIndex + size - 1];
   }
 
   /**
