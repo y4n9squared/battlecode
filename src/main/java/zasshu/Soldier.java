@@ -13,6 +13,7 @@ import zasshu.core.PotentialNavigator;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
+import battlecode.common.Robot;
 
 public final class Soldier extends AbstractRobot {
 
@@ -26,9 +27,18 @@ public final class Soldier extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
-    updatePotentialField();
-    Direction dir = navigator.getNextStep(controller.getLocation());
-    controller.move(dir);
+    if (controller.isActive()) {
+      Robot[] enemies = controller.nearbyAttackableEnemies();
+      if (enemies.length > 0) {
+        controller.attack(enemies[0]);
+      } else {
+        updatePotentialField();
+        Direction dir = navigator.getNextStep(controller.getLocation());
+        controller.move(dir);
+      }
+    }
+
+    controller.yield();
   }
 
   private void updatePotentialField() {
