@@ -56,30 +56,69 @@ public final class TerrainMap {
   }
 
   /**
-   * Returns {@code true} if {@code loc} is a wall or off of the map and {@code
-   * false} otherwise.
+   * Returns {@code true} if the specified map location is impassable.
+   *
+   * <p>A map location is impassable if either there is an obstruction or the
+   * location is out-of-bounds.
    *
    * @param loc map location
+   * @return {@code true} if location is impassable
    */
   public boolean isLocationBlocked(MapLocation loc) {
-    if (isOutOfBounds(loc) || obstacles.contains(loc)) {
+    return isObstructed(loc) || isOutOfBounds(loc);
+  }
+
+  /**
+   * Returns {@code true} if the specified map location is impassable.
+   *
+   * <p>A map location is impassable if either there is an obstruction or the
+   * location is out-of-bounds.
+   *
+   * @param x x-coordinate of map location
+   * @param y y-coordinate of map location
+   * @return {@code true} if location is impassable
+   */
+  public boolean isLocationBlocked(int x, int y) {
+    return isObstructed(x, y) || isOutOfBounds(new MapLocation(x, y));
+  }
+
+  /**
+   * Returns {@code true} if {@code loc} is obstructed.
+   *
+   * <p>Calling this method with out-of-bounds locations results in undefined
+   * behavior.
+   *
+   * @param loc map location
+   * @return {@code true} if there is an obstacle at the specified map location
+   */
+  public boolean isObstructed(MapLocation loc) {
+    if (obstacles.contains(loc)) {
       return true;
     }
     return false;
   }
 
   /**
-   * Returns {@code true} if {@code loc} is a wall or off of the map and {@code
-   * false} otherwise.
+   * Returns {@code true} if the location at (x, y) is obstructed.
+   *
+   * <p>Calling this method with out-of-bounds coordinates results in undefined
+   * behavior.
    *
    * @param x x-coordinate
    * @param y y-coordinate
+   * @return {@code true} if there is an obstacle at the specified map location
    */
-  public boolean isLocationBlocked(int x, int y) {
-    return isLocationBlocked(new MapLocation(x, y));
+  public boolean isObstructed(int x, int y) {
+    return isObstructed(new MapLocation(x, y));
   }
 
-  private boolean isOutOfBounds(MapLocation loc) {
+  /**
+   * Returns {@code true} if {@code loc} is not within the bounds of the map.
+   *
+   * @param loc map location
+   * @return {@code true} if location is out-of-bounds
+   */
+  public boolean isOutOfBounds(MapLocation loc) {
     if (loc.x < 0 || loc.y < 0 || loc.x >= width || loc.y >= height) {
       return true;
     }
