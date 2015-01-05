@@ -20,24 +20,18 @@ import battlecode.common.*;
  */
 public final class InfluenceField {
 
-  private static final double SOLDIER_CHARGE = 10.0;
+  private static final double SOLDIER_CHARGE = 1.0;
+  private static final double SELF_SOLDIER_CHARGE = 2.0;
 
   private final MapLocationSet teammates;
   private final MapLocationSet enemies;
 
   /**
-   * The attack radius of robot in distance squared. Enemies will have maximum
-   * influence close to this value.
-   */
-  private final int attackRangeSquared;
-
-  /**
    * Initializes instance variables and sets the range.
    */
-  public InfluenceField(int range) {
+  public InfluenceField() {
     teammates = new MapLocationSet();
     enemies = new MapLocationSet();
-    attackRangeSquared = range;
   }
 
   /**
@@ -81,18 +75,13 @@ public final class InfluenceField {
     for (int i = arr.length; --i >= 0;) {
       myInfluence -= influenceHelper(loc, arr[i]);
     }
-    return myInfluence;
+
+    return myInfluence + SELF_SOLDIER_CHARGE;
   }
 
   private double influenceHelper(MapLocation loc, MapLocation sourceLoc) {
     int d = sourceLoc.distanceSquaredTo(loc);
-    if (d > 0 && d < attackRangeSquared - 2) {
-      return SOLDIER_CHARGE / (d * (attackRangeSquared - 2));
-    } else if (d >= attackRangeSquared - 2 && d <= attackRangeSquared) {
-      return SOLDIER_CHARGE;
-    } else {
-      return SOLDIER_CHARGE - 0.24 * (d - attackRangeSquared);
-    }
+    return SOLDIER_CHARGE * (1.0 / d + 1);
   }
 }
 
