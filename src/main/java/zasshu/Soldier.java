@@ -42,10 +42,7 @@ public final class Soldier extends AbstractRobot {
   }
 
   private void attack() {
-    Robot[] enemies = controller.nearbyAttackableEnemies();
-    if (enemies.length > 0) {
-      controller.attack(enemies[0]);
-    } else {
+    if (!controller.attackLowest()) {
       updatePotentialField();
       Direction dir = navigator.getNextStep(controller.getLocation());
       controller.move(dir);

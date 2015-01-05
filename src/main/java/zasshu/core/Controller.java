@@ -64,6 +64,30 @@ public final class Controller {
   }
 
   /**
+   * Attacks the lowest {@code target} in range
+   *
+   * @return {@code true} if a robot was attacked
+   */
+  public boolean attackLowest() {
+    Robot[] enemies = nearbyAttackableEnemies();
+    if (enemies.length == 0) {
+      return false;
+    }
+
+    int indexToAttack = 0;
+    double minHealth = Double.POSITIVE_INFINITY;
+
+    for (int i = enemies.length; --i >= 0;) {
+      double health = senseHealth(enemies[i]);
+      if (health < minHealth) {
+        indexToAttack = i;
+        minHealth = health;
+      }
+    }
+    return attack(enemies[indexToAttack]);
+  }
+
+  /**
    * Attacks the map location occupied by {@code target} if in range.
    *
    * @param target object to attack
@@ -368,4 +392,18 @@ public final class Controller {
     return locations;
   }
 
+  /**
+   * Returns health of a {@code Robot}
+   *
+   * @param robot robot
+   * @return health of a robot
+   */
+  private double senseHealth(Robot r) {
+    try {
+      return rc.senseRobotInfo(r).health;
+    } catch (GameActionException e) {
+      e.printStackTrace();
+    }
+    return 0.0;
+  }
 }
