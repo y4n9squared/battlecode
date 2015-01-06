@@ -26,8 +26,6 @@ public final class PotentialField {
    */
   private static final int REPEL_RADIUS_SQUARED = 2;
 
-  private final double[][] staticField;
-
   /**
    * Map locations that emit attracting forces.
    */
@@ -52,8 +50,6 @@ public final class PotentialField {
     sources = new MapLocationSet();
     sinks = new MapLocationSet();
     radiusSquared = r;
-    staticField = new double[map.getWidth()][map.getHeight()];
-    initStaticField(map);
   }
 
   /**
@@ -102,8 +98,7 @@ public final class PotentialField {
       maxPotential += computeObstacleForce(elems[i], loc);
     }
 
-    // Account for static
-    return maxPotential + staticField[loc.x][loc.y];
+    return maxPotential;
   }
 
   private double computeEnemyForce(MapLocation loc, MapLocation sourceLoc) {
@@ -129,26 +124,5 @@ public final class PotentialField {
    */
   private double computeObstacleForce(MapLocation source, MapLocation point) {
     return -1 * 5.0 / source.distanceSquaredTo(point);
-  }
-
-  /**
-   * Compute the static field contributions from map obstacles.
-   */
-  private void initStaticField(TerrainMap map) {
-    double[][] localStaticField = staticField;
-    MapLocation[] arr = map.getObstacles().toArray();
-    for (int i = arr.length; --i >= 0;) {
-      MapLocation[] area = MapLocation.getAllMapLocationsWithinRadiusSq(
-          arr[i], REPEL_RADIUS_SQUARED);
-      for (int j = area.length; --j >= 0;) {
-        MapLocation loc = area[j];
-        if (!map.isOutOfBounds(loc)) {
-          if (map.isObstructed(loc)) {
-            continue;
-          }
-          localStaticField[loc.x][loc.y] += computeObstacleForce(arr[i], loc);
-        }
-      }
-    }
   }
 }
