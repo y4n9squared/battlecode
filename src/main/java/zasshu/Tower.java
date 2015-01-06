@@ -18,5 +18,8 @@ public final class Tower extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
+    if (controller.isWeaponReady()) {
+      controller.attackLowest();
+    }
   }
 }
