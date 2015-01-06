@@ -5,7 +5,6 @@
 
 package zasshu.core;
 
-import battlecode.common.Robot;
 import battlecode.common.*;
 
 /**
@@ -41,14 +40,13 @@ public final class Controller {
     type = rc.getType();
     myTeam = rc.getTeam();
     opponentTeam = myTeam.opponent();
-    terrainMap = new TerrainMap(computeTerrain());
   }
 
   /**
    * Starts the controller clock to begin measuring the number of bytecodes
    * executed.
    */
-  public static void startBytecodeCounter() {
+  public void startBytecodeCounter() {
     startByteCount = Clock.getBytecodeNum();
     startRound = Clock.getRoundNum();
   }
@@ -57,9 +55,9 @@ public final class Controller {
    * Stops the controller clock and returns the number of bytecodes executed
    * since started.
    */
-  public static int stopBytecodeCounter() {
-    return (GameConstants.BYTECODE_LIMIT - startByteCount)
-      + (Clock.getRoundNum() - startRound - 1) * GameConstants.BYTECODE_LIMIT
+  public int stopBytecodeCounter() {
+    return (type.bytecodeLimit - startByteCount)
+      + (Clock.getRoundNum() - startRound - 1) * type.bytecodeLimit
       + Clock.getBytecodeNum();
   }
 
@@ -69,7 +67,7 @@ public final class Controller {
    * @return {@code true} if a robot was attacked
    */
   public boolean attackLowest() {
-    Robot[] enemies = nearbyAttackableEnemies();
+    RobotInfo[] enemies = nearbyAttackableEnemies();
     if (enemies.length == 0) {
       return false;
     }
@@ -78,7 +76,7 @@ public final class Controller {
     double minHealth = Double.POSITIVE_INFINITY;
 
     for (int i = enemies.length; --i >= 0;) {
-      double health = senseHealth(enemies[i]);
+      double health = enemies[i].health;
       if (health < minHealth) {
         indexToAttack = i;
         minHealth = health;
@@ -93,14 +91,9 @@ public final class Controller {
    * @param target object to attack
    * @return {@code true} if attack was successful
    */
-  public boolean attack(GameObject target) {
-    try {
-      MapLocation targetLoc = rc.senseLocationOf(target);
-      return attack(targetLoc);
-    } catch (GameActionException e) {
-      e.printStackTrace();
-    }
-    return false;
+  public boolean attack(RobotInfo target) {
+    MapLocation targetLoc = target.location;
+    return attack(targetLoc);
   }
 
   /**
@@ -111,7 +104,7 @@ public final class Controller {
    */
   public boolean attack(MapLocation loc) {
     try {
-      rc.attackSquare(loc);
+      rc.attackLocation(loc);
       return true;
     } catch (GameActionException e) {
       e.printStackTrace();
@@ -125,8 +118,8 @@ public final class Controller {
    * @return 2-dimensional array of TerrainTile objects
    */
   public TerrainTile[][] computeTerrain() {
-    int width = rc.getMapWidth();
-    int height = rc.getMapHeight();
+    int width = GameConstants.MAP_MAX_WIDTH;
+    int height = GameConstants.MAP_MAX_HEIGHT;
     TerrainTile[][] terrain = new TerrainTile[width][height];
     for (int x = width; --x >= 0;) {
       for (int y = height; --y >= 0;) {
@@ -195,10 +188,8 @@ public final class Controller {
    * @return {@code true} if move was successful
    */
   public boolean move(Direction dir) {
-    MapLocation loc = getLocationInDirection(dir);
     try {
-      if (!terrainMap.isLocationBlocked(loc)
-          && rc.senseObjectAtLocation(loc) == null) {
+      if (rc.canMove(dir)) {
         // TODO: Seeing some exceptions being thrown here despite checking
         // location prior to moving. If our robot runs out of bytecodes here, it
         // could cause an exception to be thrown. Checking and moving need to be
@@ -212,20 +203,16 @@ public final class Controller {
     return false;
   }
 
-  public boolean spawn(Direction dir) {
+  public boolean spawn(Direction dir, RobotType type) {
     try {
-      if (rc.senseObjectAtLocation(getLocationInDirection(dir)) == null) {
-        rc.spawn(dir);
+      if (rc.canSpawn(dir, type)) {
+        rc.spawn(dir, type);
         return true;
       }
     } catch (GameActionException e) {
       e.printStackTrace();
     }
     return false;
-  }
-
-  public int senseRobotCount() {
-    return rc.senseRobotCount();
   }
 
   /**
@@ -236,12 +223,12 @@ public final class Controller {
   }
 
   /**
-   * Whether or not this robot is currently active.
+   * Whether or not this robot can perform a core action.
    *
    * @return {@code true} if robot is active
    */
-  public boolean isActive() {
-    return rc.isActive();
+  public boolean isCoreReady() {
+    return rc.isCoreReady();
   }
 
   /**
@@ -258,8 +245,8 @@ public final class Controller {
    *
    * @return attack radius squared
    */
-  public int getAttackRadiusMaxSquared() {
-    return type.attackRadiusMaxSquared;
+  public int getAttackRadiusSquared() {
+    return type.attackRadiusSquared;
   }
 
   /**
@@ -282,9 +269,8 @@ public final class Controller {
     return nearbyRobotLocationsOfTeam(myTeam);
   }
 
-  public Robot[] nearbyAttackableEnemies() {
-    return rc.senseNearbyGameObjects(
-        Robot.class, type.attackRadiusMaxSquared, opponentTeam);
+  public RobotInfo[] nearbyAttackableEnemies() {
+    return rc.senseNearbyRobots(type.attackRadiusSquared, opponentTeam);
   }
 
   /**
@@ -378,32 +364,12 @@ public final class Controller {
 
   private MapLocation[] nearbyRobotLocationsOfTeam(Team team) {
     MapLocation[] locations;
-    try {
-      Robot[] enemies = rc.senseNearbyGameObjects(
-          Robot.class, type.sensorRadiusSquared, team);
-      locations = new MapLocation[enemies.length];
-      for (int i = enemies.length; --i >= 0;) {
-        locations[i] = rc.senseLocationOf(enemies[i]);
-      }
-    } catch (GameActionException e) {
-      e.printStackTrace();
-      return null;
+
+    RobotInfo[] enemies = rc.senseNearbyRobots(type.sensorRadiusSquared, team);
+    locations = new MapLocation[enemies.length];
+    for (int i = enemies.length; --i >= 0;) {
+      locations[i] = enemies[i].location;
     }
     return locations;
-  }
-
-  /**
-   * Returns health of a {@code Robot}
-   *
-   * @param robot robot
-   * @return health of a robot
-   */
-  private double senseHealth(Robot r) {
-    try {
-      return rc.senseRobotInfo(r).health;
-    } catch (GameActionException e) {
-      e.printStackTrace();
-    }
-    return 0.0;
   }
 }

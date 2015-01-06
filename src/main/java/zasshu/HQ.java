@@ -8,7 +8,8 @@ package zasshu;
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 
-import battlecode.common.*;
+import battlecode.common.Direction;
+import battlecode.common.RobotType;
 
 public final class HQ extends AbstractRobot {
 
@@ -17,9 +18,7 @@ public final class HQ extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
-    if (controller.senseRobotCount() < 1) {
-      Direction dir = controller.enemyDirection();
-      controller.spawn(dir);
-    }
+    Direction dir = controller.enemyDirection();
+    controller.spawn(dir, RobotType.BEAVER);
   }
 }
