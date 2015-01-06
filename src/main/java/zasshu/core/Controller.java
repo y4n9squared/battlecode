@@ -205,9 +205,12 @@ public final class Controller {
 
   public boolean spawn(Direction dir, RobotType type) {
     try {
-      if (rc.canSpawn(dir, type)) {
-        rc.spawn(dir, type);
-        return true;
+      for (int i = 8; --i >= 0;) {
+        if (rc.canSpawn(dir, type)) {
+          rc.spawn(dir, type);
+          return true;
+        }
+        dir = dir.rotateRight();
       }
     } catch (GameActionException e) {
       e.printStackTrace();
