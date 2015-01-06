@@ -11,16 +11,12 @@ import zasshu.core.Controller;
 import battlecode.common.Direction;
 import battlecode.common.RobotType;
 
-public final class HQ extends AbstractRobot {
+public final class Tower extends AbstractRobot {
 
-  public HQ(Controller controller) {
+  public Tower(Controller controller) {
     super(controller);
   }
 
   @Override protected void runHelper() {
-    if (controller.isCoreReady()) {
-      Direction dir = controller.enemyDirection();
-      controller.spawn(dir, RobotType.BEAVER);
-    }
   }
 }
