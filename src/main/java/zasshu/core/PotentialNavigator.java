@@ -47,13 +47,12 @@ public final class PotentialNavigator implements Navigator {
    */
   @Override public Direction getNextStep(MapLocation loc) {
     updateTrail(loc);
+    updateField();
+
     double maxPotential = Double.NEGATIVE_INFINITY;
     int idx = -1;
     MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(loc, 2);
     for (int i = 0; i < locs.length; ++i) {
-      if (map.isLocationBlocked(locs[i])) {
-        continue;
-      }
       double potential = field.potential(locs[i]);
       if (potential > maxPotential) {
         maxPotential = potential;
