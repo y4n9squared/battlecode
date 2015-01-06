@@ -15,13 +15,13 @@ import zasshu.core.PotentialNavigator;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 
-public final class Soldier extends AbstractRobot {
+public final class Beaver extends AbstractRobot {
 
   private final PotentialNavigator navigator;
   private final PotentialField potentialField;
   private final InfluenceField influenceField;
 
-  public Soldier(Controller c) {
+  public Beaver(Controller c) {
     super(c);
     potentialField = new PotentialField(controller.getTerrainMap(),
         controller.getAttackRadiusSquared());
@@ -34,7 +34,7 @@ public final class Soldier extends AbstractRobot {
     updateInfluenceField();
 
     if (influenceField.influence(controller.getLocation()) > 0) {
-      attack();
+      // attack();
     } else {
       retreat();
     }

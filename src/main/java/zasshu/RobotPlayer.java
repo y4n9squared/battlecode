@@ -29,8 +29,11 @@ public class RobotPlayer {
       case HQ:
         robot = new HQ(controller);
         break;
-      case SOLDIER:
-        robot = new Soldier(controller);
+      case TOWER:
+        robot = new Tower(controller);
+        break;
+      case BEAVER:
+        robot = new Beaver(controller);
         break;
       default:
         // Should never happen
