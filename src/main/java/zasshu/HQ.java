@@ -18,7 +18,13 @@ public final class HQ extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
-    if (controller.isCoreReady()) {
+    boolean attacked = false;
+
+    if (controller.isWeaponReady()) {
+      attacked = controller.attackLowest();
+    }
+
+    if (!attacked && controller.isCoreReady()) {
       Direction dir = controller.enemyDirection();
       controller.spawn(dir, RobotType.BEAVER);
     }

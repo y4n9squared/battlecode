@@ -225,10 +225,19 @@ public final class Controller {
   /**
    * Whether or not this robot can perform a core action.
    *
-   * @return {@code true} if robot is active
+   * @return {@code true} if robot can perform a core action
    */
   public boolean isCoreReady() {
     return rc.isCoreReady();
+  }
+
+  /**
+   * Whether or not this robot can perform an attack
+   *
+   * @return {@code true} if robot can attack
+   */
+  public boolean isWeaponReady() {
+    return rc.isWeaponReady();
   }
 
   /**
