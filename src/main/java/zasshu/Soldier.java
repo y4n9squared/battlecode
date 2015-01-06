@@ -14,7 +14,6 @@ import zasshu.core.PotentialNavigator;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
-import battlecode.common.Robot;
 
 public final class Soldier extends AbstractRobot {
 
@@ -25,7 +24,7 @@ public final class Soldier extends AbstractRobot {
   public Soldier(Controller c) {
     super(c);
     potentialField = new PotentialField(controller.getTerrainMap(),
-        controller.getAttackRadiusMaxSquared());
+        controller.getAttackRadiusSquared());
     influenceField = new InfluenceField();
     navigator = new PotentialNavigator(
         potentialField, controller.getTerrainMap());

@@ -21,14 +21,12 @@ public abstract class AbstractRobot implements Robot {
 
   @Override public void run() {
     while (true) {
-      if (controller.isActive()) {
-        try {
-          runHelper();
-        } catch (Exception e) {
-          e.printStackTrace();
-        } finally {
-          controller.yield();
-        }
+      try {
+        runHelper();
+      } catch (Exception e) {
+        e.printStackTrace();
+      } finally {
+        controller.yield();
       }
     }
   }

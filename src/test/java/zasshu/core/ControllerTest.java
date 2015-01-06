@@ -73,8 +73,6 @@ public class ControllerTest {
       fail("GameActionException thrown.");
     }
 
-    when(rc.getMapWidth()).thenReturn(20);
-    when(rc.getMapHeight()).thenReturn(20);
     when(rc.getTeam()).thenReturn(Team.A);
   }
 
