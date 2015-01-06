@@ -34,14 +34,19 @@ public final class Beaver extends AbstractRobot {
     updateInfluenceField();
 
     if (influenceField.influence(controller.getLocation()) > 0) {
-      // attack();
+      attack();
     } else {
       retreat();
     }
   }
 
   private void attack() {
-    if (!controller.attackLowest()) {
+    boolean attacked = false;
+    if (controller.isWeaponReady()) {
+      attacked = controller.attackLowest();
+    }
+
+    if (!attacked && controller.isCoreReady()) {
       updatePotentialField();
       Direction dir = navigator.getNextStep(controller.getLocation());
       controller.move(dir);
