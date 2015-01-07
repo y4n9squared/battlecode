@@ -183,6 +183,15 @@ public final class Controller {
   }
 
   /**
+   * Returns whether robot can move in a direction
+   *
+   * @return {@code true} if robot can move in that direction
+   */
+  public boolean canMove(Direction dir) {
+    return rc.canMove(dir);
+  }
+
+  /**
    * Attempt to move in the specified direction.
    *
    * @return {@code true} if move was successful

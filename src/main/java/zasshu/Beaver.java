@@ -48,7 +48,16 @@ public final class Beaver extends AbstractRobot {
 
     if (!attacked && controller.isCoreReady()) {
       updatePotentialField();
-      Direction dir = navigator.getNextStep(controller.getLocation());
+
+      MapLocation myLoc = controller.getLocation();
+      Direction[] dirs = Direction.values();
+      for (int i = 8; --i >= 0;) {
+        if (!controller.canMove(dirs[i])) {
+          dirs[i] = Direction.NONE;
+        }
+      }
+
+      Direction dir = navigator.getNextStep(controller.getLocation(), dirs);
       controller.move(dir);
     }
   }
