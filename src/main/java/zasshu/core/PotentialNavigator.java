@@ -40,26 +40,37 @@ public final class PotentialNavigator implements Navigator {
     trail = new MapLocationQueue();
   }
 
+  public Direction getNextStep(MapLocation loc) {
+    return null;
+  }
+
   /**
    * Returns the direction of the maximum potential gradient.
    *
    * @param loc current location
    */
-  @Override public Direction getNextStep(MapLocation loc) {
+  public Direction getNextStep(MapLocation loc,
+      Direction[] possibleDirections) {
+
     updateTrail(loc);
     updateField();
 
     double maxPotential = Double.NEGATIVE_INFINITY;
-    int idx = -1;
-    MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(loc, 2);
-    for (int i = 0; i < locs.length; ++i) {
-      double potential = field.potential(locs[i]);
+    int idx = 0;
+    for (int i = 8; --i >= 0;) {
+      Direction dir = possibleDirections[i];
+
+      if (dir == Direction.NONE) {
+        continue;
+      }
+
+      double potential = field.potential(loc.add(dir));
       if (potential > maxPotential) {
         maxPotential = potential;
         idx = i;
       }
     }
-    return loc.directionTo(locs[idx]);
+    return possibleDirections[idx];
   }
 
   /**
