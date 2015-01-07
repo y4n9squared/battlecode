@@ -21,10 +21,11 @@ public final class Controller {
   private final RobotType type;
   private final Team myTeam;
   private final Team opponentTeam;
+  private final MapLocation enemySpawn;
+  private final MapLocation mySpawn;
+  private final MapLocation[] enemyTowers;
+  private final MapLocation[] myTowers;
 
-  // Lazily-evaluated constants
-  private MapLocation enemySpawn;
-  private MapLocation mySpawn;
   private TerrainMap terrainMap;
 
   private static int startByteCount;
@@ -40,6 +41,10 @@ public final class Controller {
     type = rc.getType();
     myTeam = rc.getTeam();
     opponentTeam = myTeam.opponent();
+    mySpawn = rc.senseHQLocation();
+    enemySpawn = rc.senseEnemyHQLocation();
+    myTowers = rc.senseTowerLocations();
+    enemyTowers = rc.senseEnemyTowerLocations();
   }
 
   /**
@@ -164,9 +169,6 @@ public final class Controller {
    * @return map location of enemy spawn
    */
   public MapLocation enemySpawn() {
-    if (enemySpawn == null) {
-      enemySpawn = rc.senseEnemyHQLocation();
-    }
     return enemySpawn;
   }
 
@@ -176,9 +178,6 @@ public final class Controller {
    * @return map location of our spawn
    */
   public MapLocation mySpawn() {
-    if (mySpawn == null) {
-      mySpawn = rc.senseHQLocation();
-    }
     return mySpawn;
   }
 
