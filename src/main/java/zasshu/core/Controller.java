@@ -233,16 +233,17 @@ public final class Controller {
   }
 
   /**
-   * Try to spawn a robot in a given direction.  It will continue by rotating
-   * the spawn direction until it can spawn a robot.
+   * Transfer supplies to a robot at a given location.
+   *
+   * @param supply amount of supply to transfer
+   * @param loc location of robot
    */
   public void transferSupplies(int supply, MapLocation loc) {
-    try {
-      int maxSupply = (int)rc.getSupplyLevel();
-      if (supply > maxSupply) {
-        supply = maxSupply;
-      }
+    if (rc.getSupplyLevel() == 0) {
+      return;
+    }
 
+    try {
       rc.transferSupplies(supply, loc);
     } catch (GameActionException e) {
       e.printStackTrace();
@@ -318,7 +319,7 @@ public final class Controller {
 
   public RobotInfo[] nearbyRobotsToSupply() {
     return rc.senseNearbyRobots(
-        GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED, myTeam);
+        getLocation(), GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED, myTeam);
   }
 
   /**

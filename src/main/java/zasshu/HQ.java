@@ -33,9 +33,10 @@ public final class HQ extends AbstractRobot {
 
     RobotInfo[] robotsToSupply = controller.nearbyRobotsToSupply();
     for (int i = robotsToSupply.length; --i >= 0;) {
-      if (robotsToSupply[i].supplyLevel < 10
-          && robotsToSupply[i].type.supplyUpkeep > 0) {
-        controller.transferSupplies(100, robotsToSupply[i].location);
+      int upkeep = robotsToSupply[i].type.supplyUpkeep;
+
+      if (upkeep > 0 && robotsToSupply[i].supplyLevel < upkeep * 2) {
+        controller.transferSupplies(upkeep * 10, robotsToSupply[i].location);
       }
     }
   }
