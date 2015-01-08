@@ -211,6 +211,12 @@ public final class Controller {
     return false;
   }
 
+  /**
+   * Try to spawn a robot in a given direction.  It will continue by rotating
+   * the spawn direction until it can spawn a robot.
+   *
+   * @return {@code true} if robot was spawned
+   */
   public boolean spawn(Direction dir, RobotType type) {
     try {
       for (int i = 8; --i >= 0;) {
@@ -224,6 +230,24 @@ public final class Controller {
       e.printStackTrace();
     }
     return false;
+  }
+
+  /**
+   * Transfer supplies to a robot at a given location.
+   *
+   * @param supply amount of supply to transfer
+   * @param loc location of robot
+   */
+  public void transferSupplies(int supply, MapLocation loc) {
+    if (rc.getSupplyLevel() == 0) {
+      return;
+    }
+
+    try {
+      rc.transferSupplies(supply, loc);
+    } catch (GameActionException e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -291,6 +315,11 @@ public final class Controller {
 
   public RobotInfo[] nearbyAttackableEnemies() {
     return rc.senseNearbyRobots(type.attackRadiusSquared, opponentTeam);
+  }
+
+  public RobotInfo[] nearbyRobotsToSupply() {
+    return rc.senseNearbyRobots(
+        getLocation(), GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED, myTeam);
   }
 
   /**
