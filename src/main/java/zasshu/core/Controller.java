@@ -26,8 +26,6 @@ public final class Controller {
   private final MapLocation[] enemyTowers;
   private final MapLocation[] myTowers;
 
-  private TerrainMap terrainMap;
-
   private static int startByteCount;
   private static int startRound;
 
@@ -115,25 +113,6 @@ public final class Controller {
       e.printStackTrace();
     }
     return false;
-  }
-
-  /**
-   * Computes the terrain of the map.
-   *
-   * @return 2-dimensional array of TerrainTile objects
-   */
-  public TerrainTile[][] computeTerrain() {
-    int width = GameConstants.MAP_MAX_WIDTH;
-    int height = GameConstants.MAP_MAX_HEIGHT;
-    TerrainTile[][] terrain = new TerrainTile[width][height];
-    for (int x = width; --x >= 0;) {
-      for (int y = height; --y >= 0;) {
-        // TODO (Yang): Maps are 180-degree rotationally invariant. Can reduce
-        // bytecode cost of this method by half.
-        terrain[x][y] = rc.senseTerrainTile(new MapLocation(x, y));
-      }
-    }
-    return terrain;
   }
 
   /**
@@ -273,15 +252,6 @@ public final class Controller {
    */
   public boolean isWeaponReady() {
     return rc.isWeaponReady();
-  }
-
-  /**
-   * Returns the terrain map.
-   *
-   * @return terrain map
-   */
-  public TerrainMap getTerrainMap() {
-    return terrainMap;
   }
 
   /**

@@ -15,12 +15,11 @@ import battlecode.common.MapLocation;
  *
  * @author Yang Yang
  */
-public final class PotentialNavigator implements Navigator {
+public final class PotentialNavigator {
 
   private static final int MAX_TRAIL_LENGTH = 3;
 
   private final PotentialField field;
-  private final TerrainMap map;
 
   /**
    * Tracks the past {@code MAX_TRAIL_LENGTH} locations, including the current
@@ -32,16 +31,10 @@ public final class PotentialNavigator implements Navigator {
    * Constructs a {@code PotentialNavigator}.
    *
    * @param f potential field
-   * @param m terrain map
    */
-  public PotentialNavigator(PotentialField f, TerrainMap m) {
+  public PotentialNavigator(PotentialField f) {
     field = f;
-    map = m;
     trail = new MapLocationQueue();
-  }
-
-  public Direction getNextStep(MapLocation loc) {
-    return null;
   }
 
   /**
