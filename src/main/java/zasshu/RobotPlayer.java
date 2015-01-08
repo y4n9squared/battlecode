@@ -36,6 +36,12 @@ public class RobotPlayer {
       case BEAVER:
         robot = new Beaver(controller);
         break;
+      case SOLDIER:
+        robot = new Soldier(controller);
+        break;
+      case BARRACKS:
+        robot = new Barracks(controller);
+        break;
       default:
         // Should never happen
         return;
