@@ -8,7 +8,6 @@ package zasshu;
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 import zasshu.core.InfluenceField;
-import zasshu.core.Navigator;
 import zasshu.core.PotentialField;
 import zasshu.core.PotentialNavigator;
 
@@ -23,11 +22,9 @@ public final class Soldier extends AbstractRobot {
 
   public Soldier(Controller c) {
     super(c);
-    potentialField = new PotentialField(controller.getTerrainMap(),
-        controller.getAttackRadiusSquared());
+    potentialField = new PotentialField(controller.getAttackRadiusSquared());
     influenceField = new InfluenceField();
-    navigator = new PotentialNavigator(
-        potentialField, controller.getTerrainMap());
+    navigator = new PotentialNavigator(potentialField);
   }
 
   @Override protected void runHelper() {
