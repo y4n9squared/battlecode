@@ -46,7 +46,7 @@ public final class PotentialField {
    *
    * @param r radius of maximal charge of sources
    */
-  public PotentialField(TerrainMap map, int r) {
+  public PotentialField(int r) {
     sources = new MapLocationSet();
     sinks = new MapLocationSet();
     radiusSquared = r;
