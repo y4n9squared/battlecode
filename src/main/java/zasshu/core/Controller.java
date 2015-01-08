@@ -232,6 +232,30 @@ public final class Controller {
     return false;
   }
 
+  public void mine() {
+    try {
+      rc.mine();
+    } catch (GameActionException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public boolean canBuild(Direction dir, RobotType type) {
+    return rc.canBuild(dir, type);
+  }
+
+  public boolean canAffordToBuild(RobotType type) {
+    return rc.getTeamOre() > type.oreCost;
+  }
+
+  public void build(Direction dir, RobotType type) {
+    try {
+      rc.build(dir, type);
+    } catch (GameActionException e) {
+      e.printStackTrace();
+    }
+  }
+
   /**
    * Transfer supplies to a robot at a given location.
    *
