@@ -11,6 +11,7 @@ import zasshu.core.Robot;
 import battlecode.common.RobotController;
 
 /**
+ * Main entry-point into player.
  *
  * @author Holman Gao
  * @author Yang Yang

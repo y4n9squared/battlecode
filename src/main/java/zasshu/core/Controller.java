@@ -67,7 +67,7 @@ public final class Controller {
   }
 
   /**
-   * Attacks the lowest {@code target} in range
+   * Attacks the lowest {@code target} in range.
    *
    * @return {@code true} if a robot was attacked
    */
@@ -182,7 +182,7 @@ public final class Controller {
   }
 
   /**
-   * Returns whether robot can move in a direction
+   * Returns whether robot can move in a direction.
    *
    * @return {@code true} if robot can move in that direction
    */
@@ -267,7 +267,7 @@ public final class Controller {
   }
 
   /**
-   * Whether or not this robot can perform an attack
+   * Whether or not this robot can perform an attack.
    *
    * @return {@code true} if robot can attack
    */
