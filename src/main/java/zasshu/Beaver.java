@@ -43,7 +43,7 @@ public final class Beaver extends AbstractRobot {
       boolean built = false;
 
       if (buildCounter > 3) {
-        if (controller.canBuild(RobotType.BARRACKS)) {
+        if (controller.canAffordToBuild(RobotType.BARRACKS)) {
           build(RobotType.BARRACKS);
           built = true;
         }

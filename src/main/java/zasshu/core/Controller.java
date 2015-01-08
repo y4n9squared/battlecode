@@ -244,7 +244,7 @@ public final class Controller {
     return rc.canBuild(dir, type);
   }
 
-  public boolean canBuild(RobotType type) {
+  public boolean canAffordToBuild(RobotType type) {
     return rc.getTeamOre() > type.oreCost;
   }
 
