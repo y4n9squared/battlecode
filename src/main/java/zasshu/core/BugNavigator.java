@@ -36,7 +36,7 @@ public final class BugNavigator implements Navigator {
   }
 
  /**
-  * {@inheritDoc}
+  * {@inheritDoc}.
   */
   @Override public Direction getNextStep(MapLocation loc) {
     Direction nextDir = Direction.NONE;

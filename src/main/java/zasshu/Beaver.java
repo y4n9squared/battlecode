@@ -21,6 +21,11 @@ public final class Beaver extends AbstractRobot {
   private final PotentialField potentialField;
   private final InfluenceField influenceField;
 
+  /**
+   * Constructs a {@code Beaver} object.
+   *
+   * @param c controller
+   */
   public Beaver(Controller c) {
     super(c);
     potentialField = new PotentialField(controller.getTerrainMap(),
