@@ -5,9 +5,9 @@
 
 package zasshu.core;
 
-import zasshu.util.MapLocationSet;
-
 import battlecode.common.MapLocation;
+import battlecode.common.RobotInfo;
+import battlecode.common.Team;
 
 /**
  * A vector field that represents the "potential" of each map location. Enemy
@@ -19,110 +19,65 @@ import battlecode.common.MapLocation;
  */
 public final class PotentialField {
 
-  private static final double SOLDIER_CHARGE = 10.0;
-
-  /**
-   * Maximum range of obstacle repelling force.
-   */
-  private static final int REPEL_RADIUS_SQUARED = 2;
-
-  /**
-   * Map locations that emit attracting forces.
-   */
-  private final MapLocationSet sources;
-
-  /**
-   * Map locations that emit repelling forces.
-   */
-  private final MapLocationSet sinks;
-
-  /**
-   * Enemies will have maximum potential at this radius squared value.
-   */
-  private final int radiusSquared;
+  private final GameState state;
+  private final FieldConfiguration config;
 
   /**
    * Constructs a {@code PotentialField} object with no sources.
    *
    * @param r radius of maximal charge of sources
    */
-  public PotentialField(int r) {
-    sources = new MapLocationSet();
-    sinks = new MapLocationSet();
-    radiusSquared = r;
+  public PotentialField(GameState gs, FieldConfiguration fc) {
+    state = gs;
+    config = fc;
   }
 
   /**
-   * Adds a source at the specified map location.
+   * Computes the potential of the specified map location. Only the highest
+   * potential produced by an enemy is added to the total field.
    *
-   * @param loc location of source
-   */
-  public void addSource(MapLocation loc) {
-    sources.add(loc);
-  }
-
-
-  /**
-   * Adds a sink at the specific map location.
-   */
-  public void addSink(MapLocation loc) {
-    sinks.add(loc);
-  }
-
-  /**
-   * Clears all sources and sinks.
-   */
-  public void clear() {
-    sources.clear();
-    sinks.clear();
-  }
-
-  /**
-   * Computes the potential of the specified map location.
-   *
-   * @param loc map location
+   * @param loc map location where potential is to be calculated
+   * @return potential value
    */
   public double potential(MapLocation loc) {
-    double maxPotential = Double.NEGATIVE_INFINITY;
-
-    // Account for sources
-    MapLocation[] elems = sources.toArray();
-    for (int i = elems.length; --i >= 0;) {
-      maxPotential = Math.max(maxPotential,
-          computeEnemyForce(loc, elems[i]));
+    double positive = 0;
+    double negative = 0;
+    RobotInfo[] units = state.nearbyUnits();
+    for (int i = units.length; --i >= 0;) {
+      double force = computeForce(loc, units[i]);
+      if (force > 0) {
+        positive = Math.max(positive, force);
+      } else {
+        negative += force;
+      }
     }
-
-    // Account for sinks
-    elems = sinks.toArray();
-    for (int i = elems.length; --i >= 0;) {
-      maxPotential += computeObstacleForce(elems[i], loc);
-    }
-
-    return maxPotential;
+    return positive + negative;
   }
 
-  private double computeEnemyForce(MapLocation loc, MapLocation sourceLoc) {
-    int d = sourceLoc.distanceSquaredTo(loc);
-    if (d > 0 && d < radiusSquared - 2) {
-      return SOLDIER_CHARGE / (d * (radiusSquared - 2));
-    } else if (d >= radiusSquared - 2 && d <= radiusSquared) {
-      return SOLDIER_CHARGE;
-    } else {
-      return SOLDIER_CHARGE - 0.24 * (d - radiusSquared);
+  private double computeForce(MapLocation loc, RobotInfo unit) {
+    double potential = 0;
+    int d = loc.distanceSquaredTo(unit.location);
+    if (unit.team == config.getTeam().opponent()) {
+      switch (unit.type) {
+        case BEAVER:
+        case SOLDIER:
+        case BASHER:
+          return computePositiveForce(d);
+        case TOWER:
+          return 10 * computePositiveForce(d);
+        default:
+          return 0;
+      }
     }
+    return computeNegativeForce(d);
   }
 
-  /**
-   * Computes the force felt at {@code point} from a charge located at {@code
-   * source}.
-   *
-   * <p>The location of the charge and point must be different.
-   *
-   * @param source location of charge
-   * @param point location of observer
-   * @return force felt by observer from charge
-   */
-  private double computeObstacleForce(MapLocation source, MapLocation point) {
-    return -1 * 5.0 / source.distanceSquaredTo(point);
+  private double computePositiveForce(int d) {
+    return 10.0 / (Math.abs(
+          d - config.getAttackRadiusSquared()) + 1);
+  }
+
+  private double computeNegativeForce(int d) {
+    return -5.0 / d;
   }
 }
