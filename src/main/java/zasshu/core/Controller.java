@@ -5,6 +5,8 @@
 
 package zasshu.core;
 
+import zasshu.util.MapLocationQueue;
+
 import battlecode.common.*;
 
 /**
@@ -17,6 +19,9 @@ import battlecode.common.*;
  */
 public final class Controller {
 
+  private static int startByteCount;
+  private static int startRound;
+
   private final RobotController rc;
   private final RobotType type;
   private final Team myTeam;
@@ -26,8 +31,11 @@ public final class Controller {
   private final MapLocation[] enemyTowers;
   private final MapLocation[] myTowers;
 
-  private static int startByteCount;
-  private static int startRound;
+  /**
+   * Tracks the past {@code MAX_TRAIL_LENGTH} locations, including the current
+   * location.
+   */
+  private MapLocationQueue trail;
 
   /**
    * Constructs a {@code Controller}.
@@ -43,6 +51,10 @@ public final class Controller {
     enemySpawn = rc.senseEnemyHQLocation();
     myTowers = rc.senseTowerLocations();
     enemyTowers = rc.senseEnemyTowerLocations();
+  }
+
+  public Team getTeam() {
+    return myTeam;
   }
 
   /**
@@ -182,6 +194,7 @@ public final class Controller {
         // could cause an exception to be thrown. Checking and moving need to be
         // performed atomically.
         rc.move(dir);
+        updateTrail();
         return true;
       }
     } catch (GameActionException e) {
@@ -414,5 +427,22 @@ public final class Controller {
       locations[i] = enemies[i].location;
     }
     return locations;
+  }
+
+  /**
+   * Adds {loc} to {@code trail} if it is not equal to the previous location. If
+   * the trail is larger than {@code MAX_TRAIL_LENGTH}, the oldest location is
+   * removed.
+   *
+   * @param loc current location
+   */
+  private void updateTrail() {
+    MapLocation loc = getLocation();
+    if (trail.isEmpty() || !trail.back().equals(loc)) {
+      trail.add(loc);
+      while (trail.size() > 3) {
+        trail.remove();
+      }
+    }
   }
 }

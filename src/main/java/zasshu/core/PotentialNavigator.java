@@ -5,8 +5,6 @@
 
 package zasshu.core;
 
-import zasshu.util.MapLocationQueue;
-
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 
@@ -17,15 +15,7 @@ import battlecode.common.MapLocation;
  */
 public final class PotentialNavigator {
 
-  private static final int MAX_TRAIL_LENGTH = 3;
-
   private final PotentialField field;
-
-  /**
-   * Tracks the past {@code MAX_TRAIL_LENGTH} locations, including the current
-   * location.
-   */
-  private MapLocationQueue trail;
 
   /**
    * Constructs a {@code PotentialNavigator}.
@@ -34,7 +24,6 @@ public final class PotentialNavigator {
    */
   public PotentialNavigator(PotentialField f) {
     field = f;
-    trail = new MapLocationQueue();
   }
 
   /**
@@ -44,9 +33,6 @@ public final class PotentialNavigator {
    */
   public Direction getNextStep(MapLocation loc,
       Direction[] possibleDirections) {
-
-    updateTrail(loc);
-    updateField();
 
     double maxPotential = Double.NEGATIVE_INFINITY;
     int idx = 0;
@@ -64,32 +50,5 @@ public final class PotentialNavigator {
       }
     }
     return possibleDirections[idx];
-  }
-
-  /**
-   * Adds {loc} to {@code trail} if it is not equal to the previous location. If
-   * the trail is larger than {@code MAX_TRAIL_LENGTH}, the oldest location is
-   * removed.
-   *
-   * @param loc current location
-   */
-  private void updateTrail(MapLocation loc) {
-    if (trail.isEmpty() || !trail.back().equals(loc)) {
-      trail.add(loc);
-      while (trail.size() > MAX_TRAIL_LENGTH) {
-        trail.remove();
-      }
-    }
-  }
-
-  /**
-   * Adds all locations in {@code trail} except for the last (current location)
-   * as sinks in the potential field.
-   */
-  private void updateField() {
-    MapLocation[] locs = trail.toArray();
-    for (int i = locs.length - 1; --i >= 0;) {
-      field.addSink(locs[i]);
-    }
   }
 }

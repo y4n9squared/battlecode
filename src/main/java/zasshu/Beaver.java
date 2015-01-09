@@ -7,6 +7,7 @@ package zasshu;
 
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
+import zasshu.core.FieldConfiguration;
 import zasshu.core.InfluenceField;
 import zasshu.core.PotentialField;
 import zasshu.core.PotentialNavigator;
@@ -30,7 +31,8 @@ public final class Beaver extends AbstractRobot {
    */
   public Beaver(Controller c) {
     super(c);
-    potentialField = new PotentialField(controller.getAttackRadiusSquared());
+    potentialField = new PotentialField(gameState, new FieldConfiguration(
+          c.getTeam(), c.getAttackRadiusSquared(), RobotType.BEAVER));
     influenceField = new InfluenceField();
     navigator = new PotentialNavigator(potentialField);
   }
@@ -84,8 +86,6 @@ public final class Beaver extends AbstractRobot {
   }
 
   private void move() {
-    updatePotentialField();
-
     MapLocation myLoc = controller.getLocation();
     Direction[] dirs = Direction.values();
     for (int i = 8; --i >= 0;) {
@@ -111,15 +111,5 @@ public final class Beaver extends AbstractRobot {
     for (int i = enemies.length; --i >= 0;) {
       influenceField.addEnemy(enemies[i]);
     }
-  }
-
-  private void updatePotentialField() {
-    potentialField.clear();
-    potentialField.addSource(controller.enemySpawn());
-    MapLocation[] enemies = controller.nearbyEnemyLocations();
-    for (int i = enemies.length; --i >= 0;) {
-      potentialField.addSource(enemies[i]);
-    }
-    // TODO: Add friendly obstacles
   }
 }

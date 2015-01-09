@@ -14,9 +14,11 @@ package zasshu.core;
 public abstract class AbstractRobot implements Robot {
 
   protected final Controller controller;
+  protected final GameState gameState;
 
   protected AbstractRobot(Controller ctrl) {
     controller = ctrl;
+    gameState = new GameState();
   }
 
   @Override public void run() {
@@ -30,7 +32,6 @@ public abstract class AbstractRobot implements Robot {
       }
     }
   }
-
 
   protected abstract void runHelper();
 }
