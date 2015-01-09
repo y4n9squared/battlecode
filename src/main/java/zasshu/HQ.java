@@ -28,7 +28,10 @@ public final class HQ extends AbstractRobot {
 
     if (!attacked && controller.isCoreReady()) {
       Direction dir = controller.enemyDirection();
-      controller.spawn(dir, RobotType.BEAVER);
+
+      if (controller.teammatesOfType(RobotType.BEAVER) < 4) {
+        controller.spawn(dir, RobotType.BEAVER);
+      }
     }
 
     RobotInfo[] robotsToSupply = controller.nearbyRobotsToSupply();
