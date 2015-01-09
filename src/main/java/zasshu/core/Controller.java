@@ -51,6 +51,7 @@ public final class Controller {
     enemySpawn = rc.senseEnemyHQLocation();
     myTowers = rc.senseTowerLocations();
     enemyTowers = rc.senseEnemyTowerLocations();
+    trail = new MapLocationQueue();
   }
 
   public Team getTeam() {
@@ -234,6 +235,10 @@ public final class Controller {
 
   public boolean canBuild(Direction dir, RobotType type) {
     return rc.canBuild(dir, type);
+  }
+
+  public double senseOre(MapLocation loc) {
+    return rc.senseOre(loc);
   }
 
   public boolean canAffordToBuild(RobotType type) {

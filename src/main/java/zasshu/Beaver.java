@@ -86,6 +86,8 @@ public final class Beaver extends AbstractRobot {
   }
 
   private void move() {
+    updateOreState();
+
     MapLocation myLoc = controller.getLocation();
     Direction[] dirs = Direction.values();
     for (int i = 8; --i >= 0;) {
@@ -111,5 +113,17 @@ public final class Beaver extends AbstractRobot {
     for (int i = enemies.length; --i >= 0;) {
       influenceField.addEnemy(enemies[i]);
     }
+  }
+
+  private void updateOreState() {
+    MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(
+        controller.getLocation(), 2);
+    double[] oreValues = new double[locs.length];
+
+    for (int i = locs.length; --i >= 0;) {
+      oreValues[i] = controller.senseOre(locs[i]);
+    }
+
+    gameState.updateOre(locs, oreValues);
   }
 }
