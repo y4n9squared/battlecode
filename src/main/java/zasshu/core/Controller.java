@@ -334,6 +334,18 @@ public final class Controller {
         getLocation(), GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED, myTeam);
   }
 
+  public int teammatesOfType(RobotType type) {
+    RobotInfo[] robots = rc.senseNearbyRobots();
+
+    int counter = 0;
+    for (int i = robots.length; --i >= 0;) {
+      if (type == robots[i].type && myTeam == robots[i].team) {
+        counter++;
+      }
+    }
+    return counter;
+  }
+
   /**
    * Broadcasts an object to the {@code RobotController}'s channels.
    *
