@@ -7,6 +7,7 @@ package zasshu.core;
 
 import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
+import battlecode.common.RobotType;
 import battlecode.common.Team;
 
 /**
@@ -40,6 +41,10 @@ public final class PotentialField {
    * @return potential value
    */
   public double potential(MapLocation loc) {
+    if (config.getRobotType() == RobotType.BEAVER) {
+      return potentialForBeaver(loc);
+    }
+
     double positive = 0;
     double negative = 0;
     RobotInfo[] units = state.nearbyUnits();
@@ -52,6 +57,10 @@ public final class PotentialField {
       }
     }
     return positive + negative;
+  }
+
+  private double potentialForBeaver(MapLocation loc) {
+    return state.lookupOre(loc);
   }
 
   private double computeForce(MapLocation loc, RobotInfo unit) {

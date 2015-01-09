@@ -55,6 +55,9 @@ public final class Soldier extends AbstractRobot {
         }
       }
 
+      gameState.updateVision(
+          controller.nearbyAttackableEnemies(), new MapLocation[0]);
+
       Direction dir = navigator.getNextStep(controller.getLocation(), dirs);
       controller.move(dir);
     }
