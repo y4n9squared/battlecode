@@ -11,16 +11,19 @@ import zasshu.core.Controller;
 import battlecode.common.Direction;
 import battlecode.common.RobotType;
 
-public final class Barracks extends AbstractRobot {
+public final class Structure extends AbstractRobot {
 
-  public Barracks(Controller controller) {
+  private RobotType typeToBuild;
+
+  public Structure(Controller controller, RobotType type) {
     super(controller);
+    this.typeToBuild = type;
   }
 
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
       Direction dir = controller.enemyDirection();
-      controller.spawn(dir, RobotType.SOLDIER);
+      controller.spawn(dir, typeToBuild);
     }
   }
 }

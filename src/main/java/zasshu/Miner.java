@@ -16,20 +16,20 @@ import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotType;
 
-public final class Beaver extends AbstractRobot {
+public final class Miner extends AbstractRobot {
 
   private final PotentialNavigator navigator;
   private final PotentialField potentialField;
   private final InfluenceField influenceField;
 
-  private int buildCounter = 0;
+  private int mineCounter = 0;
 
   /**
    * Constructs a {@code Beaver} object.
    *
    * @param c controller
    */
-  public Beaver(Controller c) {
+  public Miner(Controller c) {
     super(c);
     potentialField = new PotentialField(gameState, new FieldConfiguration(
           c.getTeam(), c.getAttackRadiusSquared(), RobotType.BEAVER));
@@ -39,59 +39,14 @@ public final class Beaver extends AbstractRobot {
 
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
-      boolean built = false;
-
-      if (buildCounter > 3) {
-        RobotType type;
-
-        if (controller.teammatesOfType(RobotType.MINERFACTORY) < 1) {
-          type = RobotType.MINERFACTORY;
-        } else {
-          type = RobotType.BARRACKS;
-        }
-        built = build(type);
-
-        buildCounter -= 2;
+      if (mineCounter % 2 == 0) {
+        controller.mine();
+      } else {
+        move();
       }
 
-      if (!built) {
-        if (buildCounter % 2 == 0) {
-          controller.mine();
-        } else {
-          move();
-        }
-
-        buildCounter++;
-      }
+      mineCounter++;
     }
-  }
-
-  private boolean build(RobotType type) {
-    if (!controller.canAffordToBuild(type)) {
-      return false;
-    }
-
-    updateInfluenceField();
-
-    MapLocation myLoc = controller.getLocation();
-    Direction[] dirs = Direction.values();
-    Direction bestDir = Direction.NONE;
-    double maxInfluence = 0.0;
-    for (int i = 8; --i >= 0;) {
-      if (!controller.canBuild(dirs[i], type)) {
-        continue;
-      }
-
-      double influence = influenceField.influence(myLoc.add(dirs[i]));
-
-      if (influence > maxInfluence) {
-        bestDir = dirs[i];
-        maxInfluence = influence;
-      }
-    }
-
-    controller.build(bestDir, type);
-    return true;
   }
 
   private void move() {

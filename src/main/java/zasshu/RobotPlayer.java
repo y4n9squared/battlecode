@@ -9,6 +9,7 @@ import zasshu.core.Controller;
 import zasshu.core.Robot;
 
 import battlecode.common.RobotController;
+import battlecode.common.RobotType;
 
 /**
  * Main entry-point into player.
@@ -40,7 +41,13 @@ public class RobotPlayer {
         robot = new Soldier(controller);
         break;
       case BARRACKS:
-        robot = new Barracks(controller);
+        robot = new Structure(controller, RobotType.SOLDIER);
+        break;
+      case MINER:
+        robot = new Miner(controller);
+        break;
+      case MINERFACTORY:
+        robot = new Structure(controller, RobotType.MINER);
         break;
       default:
         // Should never happen
