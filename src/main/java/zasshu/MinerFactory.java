@@ -9,9 +9,15 @@ import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 
 import battlecode.common.Direction;
+import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 
 public final class MinerFactory extends AbstractRobot {
+
+  /**
+   * The number of miners to maintain on the map.
+   */
+  private static int NUM_MINER_TARGET = 4;
 
   public MinerFactory(Controller controller) {
     super(controller);
@@ -19,8 +25,20 @@ public final class MinerFactory extends AbstractRobot {
 
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
-      Direction dir = getEnemyHQDirection();
-      controller.spawn(dir, RobotType.MINER);
+      RobotInfo[] robots = controller.getNearbyRobots();
+
+      // Check for the number of miners on the map that we own.
+      int numMiners = 0;
+      for (int i = robots.length; --i >= 0;) {
+        if (robots[i].type == RobotType.MINER
+            && robots[i].team == controller.getTeam()) {
+          ++numMiners;
+        }
+      }
+
+      if (numMiners < NUM_MINER_TARGET) {
+        controller.spawn(getEnemyHQDirection(), RobotType.MINER);
+      }
     }
   }
 }
