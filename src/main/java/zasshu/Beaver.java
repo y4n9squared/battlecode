@@ -8,15 +8,12 @@ package zasshu;
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 import zasshu.core.FieldConfiguration;
-import zasshu.core.InfluenceField;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotType;
 
 public final class Beaver extends Unit {
-
-  private final InfluenceField influenceField;
 
   private int buildCounter = 0;
 
@@ -27,7 +24,6 @@ public final class Beaver extends Unit {
    */
   public Beaver(Controller c) {
     super(c);
-    influenceField = new InfluenceField();
   }
 
   @Override protected void runHelper() {
@@ -56,8 +52,6 @@ public final class Beaver extends Unit {
   }
 
   private void build(RobotType type) {
-    updateInfluenceField();
-
     MapLocation myLoc = controller.getLocation();
     Direction[] dirs = Direction.values();
     Direction bestDir = Direction.NONE;
@@ -67,7 +61,7 @@ public final class Beaver extends Unit {
         continue;
       }
 
-      double influence = influenceField.influence(myLoc.add(dirs[i]));
+      double influence = getInfluence(myLoc.add(dirs[i]));
 
       if (influence > maxInfluence) {
         bestDir = dirs[i];
@@ -95,21 +89,6 @@ public final class Beaver extends Unit {
 
     Direction dir = getNextStep(controller.getLocation(), dirs);
     controller.move(dir);
-  }
-
-  private void updateInfluenceField() {
-    influenceField.clear();
-    influenceField.addTeammate(controller.mySpawn());
-    MapLocation[] teammates = controller.nearbyTeammateLocations();
-    for (int i = teammates.length; --i >= 0;) {
-      influenceField.addTeammate(teammates[i]);
-    }
-
-    influenceField.addEnemy(controller.enemySpawn());
-    MapLocation[] enemies = controller.nearbyEnemyLocations();
-    for (int i = enemies.length; --i >= 0;) {
-      influenceField.addEnemy(enemies[i]);
-    }
   }
 
   private void updateOreState() {
