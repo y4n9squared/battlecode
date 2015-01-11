@@ -263,13 +263,16 @@ public final class Controller {
    * @return {@code true} if build is started
    */
   public boolean build(Direction dir, RobotType type) {
-    if (rc.isCoreReady() && rc.canBuild(dir, type)) {
-      try {
-        rc.build(dir, type);
-        return true;
-      } catch (GameActionException e) {
-        e.printStackTrace();
+    try {
+      for (int i = 8; --i >= 0;) {
+        if (rc.isCoreReady() && rc.canBuild(dir, type)) {
+          rc.build(dir, type);
+          return true;
+        }
+        dir = dir.rotateRight();
       }
+    } catch (GameActionException e) {
+      e.printStackTrace();
     }
     return false;
   }
