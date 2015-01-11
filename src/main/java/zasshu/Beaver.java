@@ -8,6 +8,7 @@ package zasshu;
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 
+import battlecode.common.DependencyProgress;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotType;
@@ -25,8 +26,14 @@ public final class Beaver extends AbstractRobot {
 
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
-      // TODO: Build if tech tree is not satisfied. If enemies are close, flee
-      // from danger. Otherwise, mine.
+      // TODO: Build if tech tree is not satisfied.
+      DependencyProgress progress =
+          controller.getDependencyProgress(RobotType.BARRACKS);
+      if (progress == DependencyProgress.NONE) {
+        controller.build(getEnemyHQDirection(), RobotType.BARRACKS);
+      }
+
+      // If enemies are close, flee from danger. Otherwise, mine.
     }
   }
 }

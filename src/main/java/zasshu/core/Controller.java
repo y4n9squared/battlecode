@@ -295,6 +295,15 @@ public final class Controller {
   }
 
   /**
+   * Returns the dependency progress of a robot type.
+   *
+   * @return dependency progress
+   */
+  public DependencyProgress getDependencyProgress(RobotType type) {
+    return rc.checkDependencyProgress(type);
+  }
+
+  /**
    * Yield execution of this robot and flush cache.
    */
   public void yield() {
