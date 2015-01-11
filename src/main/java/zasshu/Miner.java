@@ -15,6 +15,8 @@ import battlecode.common.RobotType;
 
 public final class Miner extends AbstractRobot {
 
+  private int mineCounter = 0;
+
   /**
    * Constructs a {@code Miner} object.
    *
@@ -26,7 +28,30 @@ public final class Miner extends AbstractRobot {
 
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
-      // mine and move
+      // For now, let's have a mine:move ratio of 3:1
+      if (mineCounter < 3) {
+        controller.mine();
+        mineCounter++;
+      } else {
+        double maxOre = 0.0;
+        Direction maxDir = null;
+        MapLocation myLoc = controller.getLocation();
+        Direction[] dirs = Direction.values();
+
+        for (int i = 8; --i >= 0;) {
+          double ore = controller.senseOre(myLoc.add(dirs[i]));
+          if (ore > maxOre) {
+            maxOre = ore;
+            maxDir = dirs[i];
+          }
+        }
+
+        if (controller.move(maxDir)) {
+          mineCounter = 0;
+        } else {
+          controller.mine();
+        }
+      }
     }
   }
 }
