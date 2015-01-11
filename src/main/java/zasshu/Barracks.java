@@ -19,7 +19,7 @@ public final class Barracks extends AbstractRobot {
 
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
-      Direction dir = enemyDirection();
+      Direction dir = getEnemyHQDirection();
       controller.spawn(dir, RobotType.SOLDIER);
     }
   }

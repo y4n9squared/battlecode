@@ -7,9 +7,6 @@ package zasshu.core;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
-import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
-import battlecode.common.Team;
 
 /**
  * Abstract skeletal implementation of the {@code Robot} interface.
@@ -18,9 +15,6 @@ import battlecode.common.Team;
  * @author Yang Yang
  */
 public abstract class AbstractRobot implements Robot {
-
-  private static final double SOLDIER_CHARGE = 1.0;
-  private static final double SELF_SOLDIER_CHARGE = 2.0;
 
   protected final Controller controller;
 
@@ -43,70 +37,20 @@ public abstract class AbstractRobot implements Robot {
   protected abstract void runHelper();
 
   /**
-   * Attacks the lowest {@code target} in range.
+   * Returns the direction to the enemy HQ.
    *
-   * @return {@code true} if a robot was attacked
+   * @return direction to enemy HQ
    */
-  protected boolean attackLowest() {
-    RobotInfo[] enemies = controller.nearbyAttackableEnemies();
-    if (enemies.length == 0) {
-      return false;
-    }
-
-    int indexToAttack = 0;
-    double minHealth = Double.POSITIVE_INFINITY;
-
-    for (int i = enemies.length; --i >= 0;) {
-      double health = enemies[i].health;
-      if (health < minHealth) {
-        indexToAttack = i;
-        minHealth = health;
-      }
-    }
-    return controller.attack(enemies[indexToAttack]);
-  }
-
-  protected int teammatesOfType(RobotType type) {
-    RobotInfo[] robots = controller.getNearbyRobots();
-
-    int counter = 0;
-    for (int i = robots.length; --i >= 0;) {
-      if (type == robots[i].type && controller.getTeam() == robots[i].team) {
-        counter++;
-      }
-    }
-    return counter;
+  protected Direction getEnemyHQDirection() {
+    return getLocation().directionTo(controller.getEnemyHQLocation());
   }
 
   /**
-   * Returns the direction to the enemy spawn location.
+   * Returns the current location of this robot.
    *
-   * @return direction to enemy spawn location
+   * @return current location
    */
-  protected Direction enemyDirection() {
-    return controller.getLocation().directionTo(controller.enemySpawn());
-  }
-
-  /**
-   * Computes the influence of the specified map location.
-   *
-   * @param loc map location
-   */
-  protected double getInfluence(MapLocation loc) {
-    double myInfluence = 0;
-    RobotInfo[] robots = controller.getNearbyRobots();
-
-    Team myTeam = controller.getTeam();
-    for (int i = robots.length; --i >= 0;) {
-      int teamFactor = myTeam == robots[i].team ? 1 : -1;
-      myInfluence += influenceHelper(loc, robots[i].location) * teamFactor;
-    }
-
-    return myInfluence + SELF_SOLDIER_CHARGE;
-  }
-
-  private double influenceHelper(MapLocation loc, MapLocation sourceLoc) {
-    int d = sourceLoc.distanceSquaredTo(loc);
-    return SOLDIER_CHARGE * (1.0 / d + 1);
+  protected MapLocation getLocation() {
+    return controller.getLocation();
   }
 }

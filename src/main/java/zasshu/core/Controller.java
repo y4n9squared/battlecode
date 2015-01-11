@@ -5,8 +5,6 @@
 
 package zasshu.core;
 
-import zasshu.util.MapLocationQueue;
-
 import battlecode.common.*;
 
 /**
@@ -19,24 +17,12 @@ import battlecode.common.*;
  */
 public final class Controller {
 
-  private static int startByteCount;
-  private static int startRound;
-
   private final RobotController rc;
-  private final RobotType type;
-  private final Team myTeam;
-  private final Team opponentTeam;
-  private final MapLocation enemySpawn;
-  private final MapLocation mySpawn;
-  private final MapLocation[] enemyTowers;
-  private final MapLocation[] myTowers;
-  private RobotInfo[] nearbyRobots;
 
-  /**
-   * Tracks the past {@code MAX_TRAIL_LENGTH} locations, including the current
-   * location.
-   */
-  private MapLocationQueue trail;
+  private MapLocation enemyHQLocation;
+  private MapLocation[] towerLocations;
+  private MapLocation[] enemyTowerLocations;
+  private RobotInfo[] nearbyRobots;
 
   /**
    * Constructs a {@code Controller}.
@@ -45,84 +31,24 @@ public final class Controller {
    */
   public Controller(RobotController rc) {
     this.rc = rc;
-    type = rc.getType();
-    myTeam = rc.getTeam();
-    opponentTeam = myTeam.opponent();
-    mySpawn = rc.senseHQLocation();
-    enemySpawn = rc.senseEnemyHQLocation();
-    myTowers = rc.senseTowerLocations();
-    enemyTowers = rc.senseEnemyTowerLocations();
-    trail = new MapLocationQueue();
   }
 
-  public RobotInfo[] getNearbyRobots() {
-    if (nearbyRobots == null) {
-      nearbyRobots = rc.senseNearbyRobots();
-    }
-    return nearbyRobots;
-  }
-
+  /**
+   * Returns the team of this robot.
+   *
+   * @return team of this robot
+   */
   public Team getTeam() {
-    return myTeam;
+    return rc.getTeam();
   }
 
+  /**
+   * Returns the opponent team.
+   *
+   * @return opponent team
+   */
   public Team getOpponentTeam() {
     return rc.getTeam().opponent();
-  }
-
-  /**
-   * Starts the controller clock to begin measuring the number of bytecodes
-   * executed.
-   */
-  public void startBytecodeCounter() {
-    startByteCount = Clock.getBytecodeNum();
-    startRound = Clock.getRoundNum();
-  }
-
-  /**
-   * Stops the controller clock and returns the number of bytecodes executed
-   * since started.
-   */
-  public int stopBytecodeCounter() {
-    return (type.bytecodeLimit - startByteCount)
-      + (Clock.getRoundNum() - startRound - 1) * type.bytecodeLimit
-      + Clock.getBytecodeNum();
-  }
-
-  /**
-   * Attacks the map location occupied by {@code target} if in range.
-   *
-   * @param target object to attack
-   * @return {@code true} if attack was successful
-   */
-  public boolean attack(RobotInfo target) {
-    MapLocation targetLoc = target.location;
-    return attack(targetLoc);
-  }
-
-  /**
-   * Attacks the specified map location.
-   *
-   * @param loc location to attack
-   * @return {@code true} if attack was successful
-   */
-  public boolean attack(MapLocation loc) {
-    try {
-      rc.attackLocation(loc);
-      return true;
-    } catch (GameActionException e) {
-      e.printStackTrace();
-    }
-    return false;
-  }
-
-  /**
-   * Computes the nearest map location in the specified direction.
-   *
-   * @return nearest map location in the specified direction
-   */
-  public MapLocation getLocationInDirection(Direction dir) {
-    return getLocation().add(dir);
   }
 
   /**
@@ -135,126 +61,79 @@ public final class Controller {
   }
 
   /**
-   * Returns the map location of the enemy spawn.
+   * Returns the location of our HQ.
    *
-   * @return map location of enemy spawn
+   * @return location of our HQ
    */
-  public MapLocation enemySpawn() {
-    return enemySpawn;
+  public MapLocation getHQLocation() {
+    return rc.senseHQLocation();
   }
 
   /**
-   * Returns the map location of our spawn.
+   * Returns the location of the enemy HQ.
    *
-   * @return map location of our spawn
+   * @return location of enemy HQ
    */
-  public MapLocation mySpawn() {
-    return mySpawn;
-  }
-
-  /**
-   * Returns whether robot can move in a direction.
-   *
-   * @return {@code true} if robot can move in that direction
-   */
-  public boolean canMove(Direction dir) {
-    return rc.canMove(dir);
-  }
-
-  /**
-   * Attempt to move in the specified direction.
-   *
-   * @return {@code true} if move was successful
-   */
-  public boolean move(Direction dir) {
-    try {
-      if (rc.canMove(dir)) {
-        // TODO: Seeing some exceptions being thrown here despite checking
-        // location prior to moving. If our robot runs out of bytecodes here, it
-        // could cause an exception to be thrown. Checking and moving need to be
-        // performed atomically.
-        rc.move(dir);
-        updateTrail();
-        return true;
-      }
-    } catch (GameActionException e) {
-      e.printStackTrace();
+  public MapLocation getEnemyHQLocation() {
+    if (enemyHQLocation == null) {
+      enemyHQLocation = rc.senseEnemyHQLocation();
     }
-    return false;
+    return enemyHQLocation;
   }
 
   /**
-   * Try to spawn a robot in a given direction.  It will continue by rotating
-   * the spawn direction until it can spawn a robot.
+   * Returns the locations of our towers.
    *
-   * @return {@code true} if robot was spawned
+   * @return locations of our towers
    */
-  public boolean spawn(Direction dir, RobotType type) {
-    try {
-      for (int i = 8; --i >= 0;) {
-        if (rc.canSpawn(dir, type)) {
-          rc.spawn(dir, type);
-          return true;
-        }
-        dir = dir.rotateRight();
-      }
-    } catch (GameActionException e) {
-      e.printStackTrace();
+  public MapLocation[] getTowerLocations() {
+    if (towerLocations == null) {
+      towerLocations = rc.senseTowerLocations();
     }
-    return false;
+    return towerLocations;
   }
 
-  public void mine() {
-    try {
-      rc.mine();
-    } catch (GameActionException e) {
-      e.printStackTrace();
+  /**
+   * Returns and caches the location of enemy towers.
+   *
+   * @return locations of enemy towers
+   */
+  public MapLocation[] getEnemyTowerLocations() {
+    if (enemyTowerLocations == null) {
+      enemyTowerLocations = rc.senseEnemyTowerLocations();
     }
+    return enemyTowerLocations;
   }
 
-  public boolean canBuild(Direction dir, RobotType type) {
-    return rc.canBuild(dir, type);
+  /**
+   * Returns and caches information about all robots in vision.
+   *
+   * @return information about all robots in vision
+   */
+  public RobotInfo[] getNearbyRobots() {
+    if (nearbyRobots == null) {
+      nearbyRobots = rc.senseNearbyRobots();
+    }
+    return nearbyRobots;
   }
 
+  /**
+   * Returns the amount of ore at the specified map location.
+   *
+   * @param loc map location
+   * @return amount of ore
+   */
   public double senseOre(MapLocation loc) {
     return rc.senseOre(loc);
   }
 
-  public boolean canAffordToBuild(RobotType type) {
-    return rc.getTeamOre() > type.oreCost;
-  }
-
-  public void build(Direction dir, RobotType type) {
-    try {
-      rc.build(dir, type);
-    } catch (GameActionException e) {
-      e.printStackTrace();
-    }
-  }
-
   /**
-   * Transfer supplies to a robot at a given location.
+   * Returns the amount of our our team currently owns.
    *
-   * @param supply amount of supply to transfer
-   * @param loc location of robot
+   * @return amount of ore we own
    */
-  public void transferSupplies(int supply, MapLocation loc) {
-    if (rc.getSupplyLevel() == 0) {
-      return;
-    }
-
-    try {
-      rc.transferSupplies(supply, loc);
-    } catch (GameActionException e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * Yield execution of this robot.
-   */
-  public void yield() {
-    rc.yield();
+  public double getTeamOre() {
+    return rc.getTeamOre();
   }
 
   /**
@@ -276,152 +155,132 @@ public final class Controller {
   }
 
   /**
-   * Returns the attack radius squared of this robot.
+   * Attacks the map location occupied by {@code target}.
    *
-   * @return attack radius squared
+   * @param target object to attack
+   * @return {@code true} if attack was successful
    */
-  public int getAttackRadiusSquared() {
-    return type.attackRadiusSquared;
+  public boolean attack(RobotInfo target) {
+    return attack(target.location);
   }
 
   /**
-   * Returns an array of {@code MapLocation}s corresponding to the locations of
-   * enemy robots within sensor radius.
+   * Attacks the specified map location.
    *
-   * @return locations of enemy robots
+   * @param loc location to attack
+   * @return {@code true} if attack was successful
    */
-  public MapLocation[] nearbyEnemyLocations() {
-    return nearbyRobotLocationsOfTeam(opponentTeam);
-  }
-
-  /**
-   * Returns an array of {@code MapLocation}s corresponding to the locations of
-   * teammate robots within sensor radius.
-   *
-   * @return locations of enemy robots
-   */
-  public MapLocation[] nearbyTeammateLocations() {
-    return nearbyRobotLocationsOfTeam(myTeam);
-  }
-
-  public RobotInfo[] nearbyAttackableEnemies() {
-    return rc.senseNearbyRobots(type.attackRadiusSquared, opponentTeam);
-  }
-
-  /**
-   * Broadcasts an object to the {@code RobotController}'s channels.
-   *
-   * <p>The object is serialzed into a byte stream and saved to channels in
-   * 4-byte pieces. The total bytecode usage is proportional to the size of the
-   * object, plus a constant serialization overhead.
-   *
-   * <p>If an error occurs, the return value will be -1.
-   *
-   * @param start start channel
-   * @param obj object to broadcast
-   * @return number of channels written
-   */
-  public int writeChannels(int start, Object obj) {
-    byte[] arr = Serialization.toByteArray(obj);
-    // TODO(Yang): Need to do some check here to determine if the array being
-    // passed is too large (i.e. will overflow channel buffer).
-    int numChannelsWritten = 0;
-    for (int i = arr.length / 4; --i >= 0;) {
-      byte[] tmp = new byte[4];
-      System.arraycopy(arr, 4 * i, tmp, 0, 4);
-      int data = pack(tmp);
+  public boolean attack(MapLocation loc) {
+    if (rc.isWeaponReady() && rc.canAttackLocation(loc)) {
       try {
-        rc.broadcast(start + i, data);
-        ++numChannelsWritten;
+        rc.attackLocation(loc);
+        return true;
       } catch (GameActionException e) {
         e.printStackTrace();
-        return -1;
       }
     }
-    return numChannelsWritten;
+    return false;
   }
 
   /**
-   * Reads an object from the {@code RobotController}'s channels.
+   * Attempt to move in the specified direction.
    *
-   * <p>The object is reconstructed from its byte stream via deserialization.
-   * Bytecode usage is proportional to the size of the object, plus a constant
-   * deserialization overhead.
-   *
-   * <p>If an error occurs, the return value will be {@code null}.
-   *
-   * @param start start channel
-   * @param size number of channels to read
+   * @return {@code true} if move was successful
    */
-  public Object readChannels(int start, int size) {
-    byte[] arr = new byte[size * 4];
-    for (int i = 0; i < size; ++i) {
-      byte[] val;
+  public boolean move(Direction dir) {
+    if (rc.isCoreReady() && rc.canMove(dir)) {
       try {
-        val = unpack(rc.readBroadcast(start + i));
+        rc.move(dir);
+        return true;
       } catch (GameActionException e) {
         e.printStackTrace();
-        return null;
-      }
-      arr[4 * i] = val[0];
-      arr[4 * i + 1] = val[1];
-      arr[4 * i + 2] = val[2];
-      arr[4 * i + 3] = val[3];
-    }
-    return Serialization.fromByteArray(arr);
-  }
-
-  /**
-   * Converts 4 bytes into an int.
-   *
-   * <p>Cost: 33 bytecodes
-   *
-   * @param arr byte array of length 4
-   */
-  static int pack(byte[] arr) {
-    return (((0xFF & arr[0]) << 24) | ((0xFF & arr[1]) << 16)
-        | ((0xFF & arr[2]) << 8) | (0xFF & arr[3]));
-  }
-
-  /**
-   * Returns a byte array of length 4 representing the specified integer.
-   *
-   * @param val integer value to convert
-   */
-  static byte[] unpack(int val) {
-    byte[] arr = new byte[4];
-    arr[0] = (byte) (val >> 24);
-    arr[1] = (byte) (val >> 16);
-    arr[2] = (byte) (val >> 8);
-    arr[3] = (byte) val;
-    return arr;
-  }
-
-  private MapLocation[] nearbyRobotLocationsOfTeam(Team team) {
-    MapLocation[] locations;
-
-    RobotInfo[] enemies = rc.senseNearbyRobots(type.sensorRadiusSquared, team);
-    locations = new MapLocation[enemies.length];
-    for (int i = enemies.length; --i >= 0;) {
-      locations[i] = enemies[i].location;
-    }
-    return locations;
-  }
-
-  /**
-   * Adds {loc} to {@code trail} if it is not equal to the previous location. If
-   * the trail is larger than {@code MAX_TRAIL_LENGTH}, the oldest location is
-   * removed.
-   *
-   * @param loc current location
-   */
-  private void updateTrail() {
-    MapLocation loc = getLocation();
-    if (trail.isEmpty() || !trail.back().equals(loc)) {
-      trail.add(loc);
-      while (trail.size() > 3) {
-        trail.remove();
       }
     }
+    return false;
+  }
+
+  /**
+   * Try to spawn a robot in a given direction.  It will continue by rotating
+   * the spawn direction until it can spawn a robot.
+   *
+   * @return {@code true} if robot was spawned
+   */
+  public boolean spawn(Direction dir, RobotType type) {
+    try {
+      for (int i = 8; --i >= 0;) {
+        if (rc.isCoreReady() && rc.canSpawn(dir, type)) {
+          rc.spawn(dir, type);
+          return true;
+        }
+        dir = dir.rotateRight();
+      }
+    } catch (GameActionException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  /**
+   * Try to mine at the current location.
+   *
+   * @return {@code true} if mining was successful
+   */
+  public boolean mine() {
+    if (rc.isCoreReady() && rc.canMine()) {
+      try {
+        rc.mine();
+        return true;
+      } catch (GameActionException e) {
+        e.printStackTrace();
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Try to build a robot in the specified direction.
+   *
+   * @param dir direction to build
+   * @param type type of robot to build
+   * @return {@code true} if build is started
+   */
+  public boolean build(Direction dir, RobotType type) {
+    if (rc.isCoreReady() && rc.canBuild(dir, type)) {
+      try {
+        rc.build(dir, type);
+        return true;
+      } catch (GameActionException e) {
+        e.printStackTrace();
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Transfer supplies to a robot.
+   *
+   * @param supply amount of supply to transfer
+   * @param robot robot to recieve supplies
+   * @return {@code true} if a transfer was made
+   *
+   */
+  public boolean transferSupplies(int supply, RobotInfo robot) {
+    if (getLocation().distanceSquaredTo(robot.location) <= 15) {
+      try {
+        rc.transferSupplies(supply, robot.location);
+        return true;
+      } catch (GameActionException e) {
+        e.printStackTrace();
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Yield execution of this robot and flush cache.
+   */
+  public void yield() {
+    rc.yield();
+    nearbyRobots = null;
   }
 }
