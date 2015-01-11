@@ -8,9 +8,6 @@ package zasshu;
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 
-import battlecode.common.Direction;
-import battlecode.common.RobotType;
-
 public final class Tower extends AbstractRobot {
 
   public Tower(Controller controller) {
@@ -18,8 +15,6 @@ public final class Tower extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
-    if (controller.isWeaponReady()) {
-      attackLowest();
-    }
+    // TODO: Attack intelligently
   }
 }

@@ -13,7 +13,7 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 
-public final class Soldier extends Unit {
+public final class Soldier extends AbstractRobot {
 
   public Soldier(Controller c) {
     super(c);
@@ -21,19 +21,25 @@ public final class Soldier extends Unit {
 
   @Override protected void runHelper() {
     if (getInfluence(controller.getLocation()) > 0) {
-      attack();
+      if (controller.isWeaponReady()) {
+        // TODO: Attack intelligently
+      }
+      if (controller.isCoreReady()) {
+        // TODO: Move according to potential gradient. Gradient should be
+        // direction of engagement.
+      }
     } else {
-      retreat();
+      // TODO: Move according to influence gradient. Gradient should be the
+      // direction of retreat.
     }
   }
 
-  @Override protected double getPotential(MapLocation loc) {
+  private double getPotential(MapLocation loc) {
     double positive = 0;
     double negative = 0;
-
-    RobotInfo[] units = controller.getNearbyRobots();
-    for (int i = units.length; --i >= 0;) {
-      double force = computeForce(loc, units[i]);
+    RobotInfo[] robots = controller.getNearbyRobots();
+    for (int i = robots.length; --i >= 0;) {
+      double force = computeForce(loc, robots[i]);
       if (force > 0) {
         positive = Math.max(positive, force);
       } else {
@@ -43,11 +49,11 @@ public final class Soldier extends Unit {
     return positive + negative;
   }
 
-  private double computeForce(MapLocation loc, RobotInfo unit) {
+  private double computeForce(MapLocation loc, RobotInfo robot) {
     double potential = 0;
-    int d = loc.distanceSquaredTo(unit.location);
-    if (unit.team == controller.getOpponentTeam()) {
-      switch (unit.type) {
+    int d = loc.distanceSquaredTo(robot.location);
+    if (robot.team == controller.getOpponentTeam()) {
+      switch (robot.type) {
         case BEAVER:
         case SOLDIER:
         case BASHER:
@@ -68,29 +74,5 @@ public final class Soldier extends Unit {
 
   private double computeNegativeForce(int d) {
     return -5.0 / d;
-  }
-
-  private void attack() {
-    boolean attacked = false;
-    if (controller.isWeaponReady()) {
-      attacked = attackLowest();
-    }
-
-    if (!attacked && controller.isCoreReady()) {
-      MapLocation myLoc = controller.getLocation();
-      Direction[] dirs = Direction.values();
-      for (int i = 8; --i >= 0;) {
-        if (!controller.canMove(dirs[i])) {
-          dirs[i] = Direction.NONE;
-        }
-      }
-
-      Direction dir = getNextStep(controller.getLocation(), dirs);
-      controller.move(dir);
-    }
-  }
-
-  /* TODO */
-  private void retreat() {
   }
 }
