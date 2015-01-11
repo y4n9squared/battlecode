@@ -42,6 +42,12 @@ public class RobotPlayer {
       case BARRACKS:
         robot = new Barracks(controller);
         break;
+      case MINER:
+        robot = new Miner(controller);
+        break;
+      case MINERFACTORY:
+        robot = new MinerFactory(controller);
+        break;
       default:
         // Should never happen
         return;

@@ -27,13 +27,19 @@ public final class Beaver extends AbstractRobot {
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
       // TODO: Build if tech tree is not satisfied.
-      DependencyProgress progress =
-          controller.getDependencyProgress(RobotType.BARRACKS);
-      if (progress == DependencyProgress.NONE) {
+
+      if (!doesRobotExist(RobotType.MINERFACTORY)) {
+        controller.build(getEnemyHQDirection(), RobotType.MINERFACTORY);
+      } else if (!doesRobotExist(RobotType.BARRACKS)) {
         controller.build(getEnemyHQDirection(), RobotType.BARRACKS);
       }
 
       // If enemies are close, flee from danger. Otherwise, mine.
     }
+  }
+
+  private boolean doesRobotExist(RobotType type) {
+    DependencyProgress progress = controller.getDependencyProgress(type);
+    return progress != DependencyProgress.NONE;
   }
 }
