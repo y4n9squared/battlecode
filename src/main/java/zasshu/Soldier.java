@@ -85,9 +85,6 @@ public final class Soldier extends Unit {
         }
       }
 
-      gameState.updateVision(
-          controller.nearbyAttackableEnemies(), new MapLocation[0]);
-
       Direction dir = getNextStep(controller.getLocation(), dirs);
       controller.move(dir);
     }

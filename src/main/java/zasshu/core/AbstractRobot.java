@@ -23,11 +23,9 @@ public abstract class AbstractRobot implements Robot {
   private static final double SELF_SOLDIER_CHARGE = 2.0;
 
   protected final Controller controller;
-  protected final GameState gameState;
 
   protected AbstractRobot(Controller ctrl) {
     controller = ctrl;
-    gameState = new GameState();
   }
 
   @Override public void run() {

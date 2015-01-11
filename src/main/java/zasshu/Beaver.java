@@ -72,12 +72,10 @@ public final class Beaver extends Unit {
   }
 
   @Override protected double getPotential(MapLocation loc) {
-    return gameState.lookupOre(loc);
+    return 0;
   }
 
   private void move() {
-    updateOreState();
-
     MapLocation myLoc = controller.getLocation();
     Direction[] dirs = Direction.values();
     for (int i = 8; --i >= 0;) {
@@ -85,20 +83,7 @@ public final class Beaver extends Unit {
         dirs[i] = Direction.NONE;
       }
     }
-
     Direction dir = getNextStep(controller.getLocation(), dirs);
     controller.move(dir);
-  }
-
-  private void updateOreState() {
-    MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(
-        controller.getLocation(), 2);
-    double[] oreValues = new double[locs.length];
-
-    for (int i = locs.length; --i >= 0;) {
-      oreValues[i] = controller.senseOre(locs[i]);
-    }
-
-    gameState.updateOre(locs, oreValues);
   }
 }
