@@ -43,6 +43,7 @@ public final class PotentialField {
   public double potential(MapLocation loc) {
     switch (config.getRobotType()) {
       case BEAVER:
+      case MINER:
         return potentialForBeaver(loc);
       default:
         double positive = 0;
