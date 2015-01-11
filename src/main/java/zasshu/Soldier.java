@@ -25,13 +25,25 @@ public final class Soldier extends AbstractRobot {
         // TODO: Attack intelligently
       }
       if (controller.isCoreReady()) {
-        // TODO: Move according to potential gradient. Gradient should be
-        // direction of engagement.
-        //
-        // There's actually a troubling issue with this strategy. If potential
-        // brings you into range of an enemy, influence could be negative next
-        // round. It's possible the robot will just alternate between attacking
-        // and retreating mindlessly until allies catch up.
+        MapLocation myLoc = controller.getLocation();
+        MapLocation[] locs =
+            MapLocation.getAllMapLocationsWithinRadiusSq(myLoc, 2);
+        double maxPotential = Double.NEGATIVE_INFINITY;
+        MapLocation maxLoc = myLoc;
+
+        for (int i = 8; --i >= 0;) {
+          if (getInfluence(locs[i]) > 0) {
+            double potential = getPotential(locs[i]);
+
+            if (maxPotential < potential) {
+              maxPotential = potential;
+              maxLoc = locs[i];
+            }
+          }
+        }
+
+        Direction dir = myLoc.directionTo(maxLoc);
+        controller.move(dir);
       }
     } else {
       // TODO: Move according to influence gradient. Gradient should be the
