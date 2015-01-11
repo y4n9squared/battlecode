@@ -59,7 +59,7 @@ public final class Miner extends AbstractRobot {
         mineCounter = 0;
       } else {
         controller.mine();
-        mineCounter++;
+        ++mineCounter;
       }
     }
   }
