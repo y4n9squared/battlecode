@@ -23,18 +23,18 @@ public final class HQ extends AbstractRobot {
     boolean attacked = false;
 
     if (controller.isWeaponReady()) {
-      attacked = controller.attackLowest();
+      attacked = attackLowest();
     }
 
     if (!attacked && controller.isCoreReady()) {
-      Direction dir = controller.enemyDirection();
+      Direction dir = enemyDirection();
 
-      if (controller.teammatesOfType(RobotType.BEAVER) < 4) {
+      if (teammatesOfType(RobotType.BEAVER) < 4) {
         controller.spawn(dir, RobotType.BEAVER);
       }
     }
 
-    RobotInfo[] robotsToSupply = controller.nearbyRobotsToSupply();
+    RobotInfo[] robotsToSupply = nearbyRobotsToSupply();
     for (int i = robotsToSupply.length; --i >= 0;) {
       int upkeep = robotsToSupply[i].type.supplyUpkeep;
 
@@ -42,5 +42,11 @@ public final class HQ extends AbstractRobot {
         controller.transferSupplies(upkeep * 10, robotsToSupply[i].location);
       }
     }
+  }
+
+  private RobotInfo[] nearbyRobotsToSupply() {
+    // TODO: Filter by (getLocation(),
+    // GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED, myTeam);
+    return controller.getNearbyRobots();
   }
 }

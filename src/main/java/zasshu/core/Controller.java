@@ -30,6 +30,7 @@ public final class Controller {
   private final MapLocation mySpawn;
   private final MapLocation[] enemyTowers;
   private final MapLocation[] myTowers;
+  private RobotInfo[] nearbyRobots;
 
   /**
    * Tracks the past {@code MAX_TRAIL_LENGTH} locations, including the current
@@ -54,6 +55,13 @@ public final class Controller {
     trail = new MapLocationQueue();
   }
 
+  public RobotInfo[] getNearbyRobots() {
+    if (nearbyRobots == null) {
+      nearbyRobots = rc.senseNearbyRobots();
+    }
+    return nearbyRobots;
+  }
+
   public Team getTeam() {
     return myTeam;
   }
@@ -75,30 +83,6 @@ public final class Controller {
     return (type.bytecodeLimit - startByteCount)
       + (Clock.getRoundNum() - startRound - 1) * type.bytecodeLimit
       + Clock.getBytecodeNum();
-  }
-
-  /**
-   * Attacks the lowest {@code target} in range.
-   *
-   * @return {@code true} if a robot was attacked
-   */
-  public boolean attackLowest() {
-    RobotInfo[] enemies = nearbyAttackableEnemies();
-    if (enemies.length == 0) {
-      return false;
-    }
-
-    int indexToAttack = 0;
-    double minHealth = Double.POSITIVE_INFINITY;
-
-    for (int i = enemies.length; --i >= 0;) {
-      double health = enemies[i].health;
-      if (health < minHealth) {
-        indexToAttack = i;
-        minHealth = health;
-      }
-    }
-    return attack(enemies[indexToAttack]);
   }
 
   /**
@@ -144,15 +128,6 @@ public final class Controller {
    */
   public MapLocation getLocation() {
     return rc.getLocation();
-  }
-
-  /**
-   * Returns the direction to the enemy spawn location.
-   *
-   * @return direction to enemy spawn location
-   */
-  public Direction enemyDirection() {
-    return getLocation().directionTo(enemySpawn());
   }
 
   /**
@@ -327,23 +302,6 @@ public final class Controller {
 
   public RobotInfo[] nearbyAttackableEnemies() {
     return rc.senseNearbyRobots(type.attackRadiusSquared, opponentTeam);
-  }
-
-  public RobotInfo[] nearbyRobotsToSupply() {
-    return rc.senseNearbyRobots(
-        getLocation(), GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED, myTeam);
-  }
-
-  public int teammatesOfType(RobotType type) {
-    RobotInfo[] robots = rc.senseNearbyRobots();
-
-    int counter = 0;
-    for (int i = robots.length; --i >= 0;) {
-      if (type == robots[i].type && myTeam == robots[i].team) {
-        counter++;
-      }
-    }
-    return counter;
   }
 
   /**
