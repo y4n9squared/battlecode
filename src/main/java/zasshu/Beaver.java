@@ -7,7 +7,6 @@ package zasshu;
 
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
-import zasshu.core.FieldConfiguration;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
