@@ -10,15 +10,13 @@ import zasshu.core.Controller;
 import zasshu.core.FieldConfiguration;
 import zasshu.core.InfluenceField;
 import zasshu.core.PotentialField;
-import zasshu.core.PotentialNavigator;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotType;
 
-public final class Beaver extends AbstractRobot {
+public final class Beaver extends Unit {
 
-  private final PotentialNavigator navigator;
   private final PotentialField potentialField;
   private final InfluenceField influenceField;
 
@@ -34,7 +32,6 @@ public final class Beaver extends AbstractRobot {
     potentialField = new PotentialField(gameState, new FieldConfiguration(
           c.getTeam(), c.getAttackRadiusSquared(), RobotType.BEAVER));
     influenceField = new InfluenceField();
-    navigator = new PotentialNavigator(potentialField);
   }
 
   @Override protected void runHelper() {
@@ -96,7 +93,7 @@ public final class Beaver extends AbstractRobot {
       }
     }
 
-    Direction dir = navigator.getNextStep(controller.getLocation(), dirs);
+    Direction dir = getNextStep(potentialField, controller.getLocation(), dirs);
     controller.move(dir);
   }
 
