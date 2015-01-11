@@ -118,6 +118,24 @@ public final class Controller {
   }
 
   /**
+   * Returns robots within a radius squared of robot.
+   *
+   * @return robots within a radius squared of robot
+   */
+  public RobotInfo[] getNearbyRobots(int radiusSquared) {
+    return rc.senseNearbyRobots(radiusSquared);
+  }
+
+  /**
+   * Returns robots within a radius squared of robot and of a given team.
+   *
+   * @return robots within a radius squared of robot and of a given team
+   */
+  public RobotInfo[] getNearbyRobots(int radiusSquared, Team team) {
+    return rc.senseNearbyRobots(radiusSquared, team);
+  }
+
+  /**
    * Returns the amount of ore at the specified map location.
    *
    * @param loc map location
