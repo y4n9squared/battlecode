@@ -3,27 +3,19 @@
  * Copyright © 2014-2015 Holman Gao, Yang Yang. All Rights Reserved.
  */
 
-package zasshu.core;
+package zasshu;
+
+import zasshu.core.AbstractRobot;
+import zasshu.core.Controller;
+import zasshu.core.PotentialField;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 
-/**
- * A navigator that directs the caller in the direction of maximal potential.
- *
- * @author Yang Yang
- */
-public final class PotentialNavigator {
+public abstract class Unit extends AbstractRobot {
 
-  private final PotentialField field;
-
-  /**
-   * Constructs a {@code PotentialNavigator}.
-   *
-   * @param f potential field
-   */
-  public PotentialNavigator(PotentialField f) {
-    field = f;
+  public Unit(Controller c) {
+    super(c);
   }
 
   /**
@@ -31,7 +23,7 @@ public final class PotentialNavigator {
    *
    * @param loc current location
    */
-  public Direction getNextStep(MapLocation loc,
+  protected Direction getNextStep(PotentialField field, MapLocation loc,
       Direction[] possibleDirections) {
 
     double maxPotential = Double.NEGATIVE_INFINITY;

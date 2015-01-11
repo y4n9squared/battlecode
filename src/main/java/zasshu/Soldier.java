@@ -10,15 +10,13 @@ import zasshu.core.Controller;
 import zasshu.core.FieldConfiguration;
 import zasshu.core.InfluenceField;
 import zasshu.core.PotentialField;
-import zasshu.core.PotentialNavigator;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotType;
 
-public final class Soldier extends AbstractRobot {
+public final class Soldier extends Unit {
 
-  private final PotentialNavigator navigator;
   private final PotentialField potentialField;
   private final InfluenceField influenceField;
 
@@ -27,7 +25,6 @@ public final class Soldier extends AbstractRobot {
     potentialField = new PotentialField(gameState, new FieldConfiguration(
           c.getTeam(), c.getAttackRadiusSquared(), RobotType.SOLDIER));
     influenceField = new InfluenceField();
-    navigator = new PotentialNavigator(potentialField);
   }
 
   @Override protected void runHelper() {
@@ -58,7 +55,8 @@ public final class Soldier extends AbstractRobot {
       gameState.updateVision(
           controller.nearbyAttackableEnemies(), new MapLocation[0]);
 
-      Direction dir = navigator.getNextStep(controller.getLocation(), dirs);
+      Direction dir = getNextStep(
+          potentialField, controller.getLocation(), dirs);
       controller.move(dir);
     }
   }
