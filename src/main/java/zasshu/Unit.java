@@ -7,7 +7,6 @@ package zasshu;
 
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
-import zasshu.core.PotentialField;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
@@ -23,8 +22,8 @@ public abstract class Unit extends AbstractRobot {
    *
    * @param loc current location
    */
-  protected Direction getNextStep(PotentialField field, MapLocation loc,
-      Direction[] possibleDirections) {
+  protected Direction getNextStep(
+      MapLocation loc, Direction[] possibleDirections) {
 
     double maxPotential = Double.NEGATIVE_INFINITY;
     int idx = 0;
@@ -35,12 +34,16 @@ public abstract class Unit extends AbstractRobot {
         continue;
       }
 
-      double potential = field.potential(loc.add(dir));
+      double potential = getPotential(loc.add(dir));
       if (potential > maxPotential) {
         maxPotential = potential;
         idx = i;
       }
     }
     return possibleDirections[idx];
+  }
+
+  protected double getPotential(MapLocation loc) {
+    return 0.0;
   }
 }

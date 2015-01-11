@@ -9,21 +9,18 @@ import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 import zasshu.core.FieldConfiguration;
 import zasshu.core.InfluenceField;
-import zasshu.core.PotentialField;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
+import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 
 public final class Soldier extends Unit {
 
-  private final PotentialField potentialField;
   private final InfluenceField influenceField;
 
   public Soldier(Controller c) {
     super(c);
-    potentialField = new PotentialField(gameState, new FieldConfiguration(
-          c.getTeam(), c.getAttackRadiusSquared(), RobotType.SOLDIER));
     influenceField = new InfluenceField();
   }
 
@@ -35,6 +32,49 @@ public final class Soldier extends Unit {
     } else {
       retreat();
     }
+  }
+
+  @Override protected double getPotential(MapLocation loc) {
+    double positive = 0;
+    double negative = 0;
+
+    RobotInfo[] units = controller.getNearbyRobots();
+    for (int i = units.length; --i >= 0;) {
+      double force = computeForce(loc, units[i]);
+      if (force > 0) {
+        positive = Math.max(positive, force);
+      } else {
+        negative += force;
+      }
+    }
+    return positive + negative;
+  }
+
+  private double computeForce(MapLocation loc, RobotInfo unit) {
+    double potential = 0;
+    int d = loc.distanceSquaredTo(unit.location);
+    if (unit.team == controller.getOpponentTeam()) {
+      switch (unit.type) {
+        case BEAVER:
+        case SOLDIER:
+        case BASHER:
+          return computePositiveForce(d);
+        case TOWER:
+          return 10 * computePositiveForce(d);
+        default:
+          return 0;
+      }
+    }
+    return computeNegativeForce(d);
+  }
+
+  private double computePositiveForce(int d) {
+    // TODO use attackRadiusSquared
+    return 10.0 / (Math.abs(d - 4.0) + 1);
+  }
+
+  private double computeNegativeForce(int d) {
+    return -5.0 / d;
   }
 
   private void attack() {
@@ -55,8 +95,7 @@ public final class Soldier extends Unit {
       gameState.updateVision(
           controller.nearbyAttackableEnemies(), new MapLocation[0]);
 
-      Direction dir = getNextStep(
-          potentialField, controller.getLocation(), dirs);
+      Direction dir = getNextStep(controller.getLocation(), dirs);
       controller.move(dir);
     }
   }

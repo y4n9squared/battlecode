@@ -66,6 +66,10 @@ public final class Controller {
     return myTeam;
   }
 
+  public Team getOpponentTeam() {
+    return rc.getTeam().opponent();
+  }
+
   /**
    * Starts the controller clock to begin measuring the number of bytecodes
    * executed.
