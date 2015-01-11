@@ -20,8 +20,6 @@ import battlecode.common.*;
  */
 public final class InfluenceField {
 
-  private static final double SOLDIER_CHARGE = 1.0;
-  private static final double SELF_SOLDIER_CHARGE = 2.0;
 
   private final MapLocationSet teammates;
   private final MapLocationSet enemies;
@@ -60,28 +58,5 @@ public final class InfluenceField {
     enemies.clear();
   }
 
-  /**
-   * Computes the influence of the specified map location.
-   *
-   * @param loc map location
-   */
-  public double influence(MapLocation loc) {
-    double myInfluence = 0;
-    MapLocation[] arr = teammates.toArray();
-    for (int i = arr.length; --i >= 0;) {
-      myInfluence += influenceHelper(loc, arr[i]);
-    }
-    arr = enemies.toArray();
-    for (int i = arr.length; --i >= 0;) {
-      myInfluence -= influenceHelper(loc, arr[i]);
-    }
-
-    return myInfluence + SELF_SOLDIER_CHARGE;
-  }
-
-  private double influenceHelper(MapLocation loc, MapLocation sourceLoc) {
-    int d = sourceLoc.distanceSquaredTo(loc);
-    return SOLDIER_CHARGE * (1.0 / d + 1);
-  }
 }
 

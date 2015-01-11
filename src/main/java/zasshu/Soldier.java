@@ -8,7 +8,6 @@ package zasshu;
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 import zasshu.core.FieldConfiguration;
-import zasshu.core.InfluenceField;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
@@ -17,17 +16,12 @@ import battlecode.common.RobotType;
 
 public final class Soldier extends Unit {
 
-  private final InfluenceField influenceField;
-
   public Soldier(Controller c) {
     super(c);
-    influenceField = new InfluenceField();
   }
 
   @Override protected void runHelper() {
-    updateInfluenceField();
-
-    if (influenceField.influence(controller.getLocation()) > 0) {
+    if (getInfluence(controller.getLocation()) > 0) {
       attack();
     } else {
       retreat();
@@ -102,20 +96,5 @@ public final class Soldier extends Unit {
 
   /* TODO */
   private void retreat() {
-  }
-
-  private void updateInfluenceField() {
-    influenceField.clear();
-    influenceField.addTeammate(controller.mySpawn());
-    MapLocation[] teammates = controller.nearbyTeammateLocations();
-    for (int i = teammates.length; --i >= 0;) {
-      influenceField.addTeammate(teammates[i]);
-    }
-
-    influenceField.addEnemy(controller.enemySpawn());
-    MapLocation[] enemies = controller.nearbyEnemyLocations();
-    for (int i = enemies.length; --i >= 0;) {
-      influenceField.addEnemy(enemies[i]);
-    }
   }
 }

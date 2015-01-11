@@ -6,8 +6,10 @@
 package zasshu.core;
 
 import battlecode.common.Direction;
+import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
+import battlecode.common.Team;
 
 /**
  * Abstract skeletal implementation of the {@code Robot} interface.
@@ -16,6 +18,9 @@ import battlecode.common.RobotType;
  * @author Yang Yang
  */
 public abstract class AbstractRobot implements Robot {
+
+  private static final double SOLDIER_CHARGE = 1.0;
+  private static final double SELF_SOLDIER_CHARGE = 2.0;
 
   protected final Controller controller;
   protected final GameState gameState;
@@ -84,4 +89,26 @@ public abstract class AbstractRobot implements Robot {
     return controller.getLocation().directionTo(controller.enemySpawn());
   }
 
+  /**
+   * Computes the influence of the specified map location.
+   *
+   * @param loc map location
+   */
+  protected double getInfluence(MapLocation loc) {
+    double myInfluence = 0;
+    RobotInfo[] robots = controller.getNearbyRobots();
+
+    Team myTeam = controller.getTeam();
+    for (int i = robots.length; --i >= 0;) {
+      int teamFactor = myTeam == robots[i].team ? 1 : -1;
+      myInfluence += influenceHelper(loc, robots[i].location) * teamFactor;
+    }
+
+    return myInfluence + SELF_SOLDIER_CHARGE;
+  }
+
+  private double influenceHelper(MapLocation loc, MapLocation sourceLoc) {
+    int d = sourceLoc.distanceSquaredTo(loc);
+    return SOLDIER_CHARGE * (1.0 / d + 1);
+  }
 }
