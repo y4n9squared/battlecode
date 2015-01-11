@@ -15,6 +15,11 @@ import battlecode.common.RobotType;
 
 public final class Miner extends AbstractRobot {
 
+  /**
+   * A square is considered to have low ore if its ore is below this number.
+   */
+  private static double LOW_ORE = 1.0;
+
   private int mineCounter = 0;
 
   /**
@@ -28,16 +33,15 @@ public final class Miner extends AbstractRobot {
 
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
+      boolean moved = false;
+      MapLocation myLoc = controller.getLocation();
+
       // For now, let's have a mine:move ratio of 3:1
-      if (mineCounter < 3) {
-        controller.mine();
-        mineCounter++;
-      } else {
+      if (mineCounter == 3 || controller.senseOre(myLoc) < LOW_ORE) {
         double maxOre = 0.0;
         MapLocation maxLoc = null;
-        MapLocation myLoc = controller.getLocation();
-        MapLocation locs =
-            MapLocation.getAllMapLocationsWithinRadiusSq(myLoc);
+        MapLocation[] locs =
+            MapLocation.getAllMapLocationsWithinRadiusSq(myLoc, 2);
 
         for (int i = 8; --i >= 0;) {
           double ore = controller.senseOre(locs[i]);
@@ -47,12 +51,15 @@ public final class Miner extends AbstractRobot {
           }
         }
 
-        Direction dir = myloc.directionTo(maxLoc);
-        if (controller.move(dir)) {
-          mineCounter = 0;
-        } else {
-          controller.mine();
-        }
+        Direction dir = myLoc.directionTo(maxLoc);
+        moved = controller.move(dir);
+      }
+
+      if (moved) {
+        mineCounter = 0;
+      } else {
+        controller.mine();
+        mineCounter++;
       }
     }
   }
