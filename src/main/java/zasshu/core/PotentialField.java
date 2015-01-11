@@ -41,22 +41,23 @@ public final class PotentialField {
    * @return potential value
    */
   public double potential(MapLocation loc) {
-    if (config.getRobotType() == RobotType.BEAVER) {
-      return potentialForBeaver(loc);
+    switch (config.getRobotType()) {
+      case BEAVER:
+        return potentialForBeaver(loc);
+      default:
+        double positive = 0;
+        double negative = 0;
+        RobotInfo[] units = state.nearbyUnits();
+        for (int i = units.length; --i >= 0;) {
+          double force = computeForce(loc, units[i]);
+          if (force > 0) {
+            positive = Math.max(positive, force);
+          } else {
+            negative += force;
+          }
+        }
+        return positive + negative;
     }
-
-    double positive = 0;
-    double negative = 0;
-    RobotInfo[] units = state.nearbyUnits();
-    for (int i = units.length; --i >= 0;) {
-      double force = computeForce(loc, units[i]);
-      if (force > 0) {
-        positive = Math.max(positive, force);
-      } else {
-        negative += force;
-      }
-    }
-    return positive + negative;
   }
 
   private double potentialForBeaver(MapLocation loc) {
