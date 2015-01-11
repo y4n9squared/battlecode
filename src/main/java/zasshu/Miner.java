@@ -34,19 +34,21 @@ public final class Miner extends AbstractRobot {
         mineCounter++;
       } else {
         double maxOre = 0.0;
-        Direction maxDir = null;
+        MapLocation maxLoc = null;
         MapLocation myLoc = controller.getLocation();
-        Direction[] dirs = Direction.values();
+        MapLocation locs =
+            MapLocation.getAllMapLocationsWithinRadiusSq(myLoc);
 
         for (int i = 8; --i >= 0;) {
-          double ore = controller.senseOre(myLoc.add(dirs[i]));
+          double ore = controller.senseOre(locs[i]);
           if (ore > maxOre) {
             maxOre = ore;
-            maxDir = dirs[i];
+            maxLoc = locs[i];
           }
         }
 
-        if (controller.move(maxDir)) {
+        Direction dir = myloc.directionTo(maxLoc);
+        if (controller.move(dir)) {
           mineCounter = 0;
         } else {
           controller.mine();
