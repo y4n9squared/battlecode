@@ -9,7 +9,6 @@ import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 import zasshu.core.FieldConfiguration;
 import zasshu.core.InfluenceField;
-import zasshu.core.PotentialField;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
@@ -17,7 +16,6 @@ import battlecode.common.RobotType;
 
 public final class Beaver extends Unit {
 
-  private final PotentialField potentialField;
   private final InfluenceField influenceField;
 
   private int buildCounter = 0;
@@ -29,8 +27,6 @@ public final class Beaver extends Unit {
    */
   public Beaver(Controller c) {
     super(c);
-    potentialField = new PotentialField(gameState, new FieldConfiguration(
-          c.getTeam(), c.getAttackRadiusSquared(), RobotType.BEAVER));
     influenceField = new InfluenceField();
   }
 
@@ -82,6 +78,10 @@ public final class Beaver extends Unit {
     controller.build(bestDir, type);
   }
 
+  @Override protected double getPotential(MapLocation loc) {
+    return gameState.lookupOre(loc);
+  }
+
   private void move() {
     updateOreState();
 
@@ -93,7 +93,7 @@ public final class Beaver extends Unit {
       }
     }
 
-    Direction dir = getNextStep(potentialField, controller.getLocation(), dirs);
+    Direction dir = getNextStep(controller.getLocation(), dirs);
     controller.move(dir);
   }
 
