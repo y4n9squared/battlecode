@@ -40,7 +40,7 @@ public final class Soldier extends Unit {
   private void attack() {
     boolean attacked = false;
     if (controller.isWeaponReady()) {
-      attacked = controller.attackLowest();
+      attacked = attackLowest();
     }
 
     if (!attacked && controller.isCoreReady()) {
