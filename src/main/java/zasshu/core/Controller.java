@@ -155,6 +155,22 @@ public final class Controller {
   }
 
   /**
+   * Returns {@code true} if the specified location is occupied by another
+   * robot.
+   *
+   * @param loc map location
+   * @return {@code true} if location is occupied
+   */
+  public boolean isLocationOccupied(MapLocation loc) {
+    try {
+      return rc.isLocationOccupied(loc);
+    } catch (GameActionException e) {
+      e.printStackTrace();
+    }
+    return true;
+  }
+
+  /**
    * Whether or not this robot can perform a core action.
    *
    * @return {@code true} if robot can perform a core action
@@ -170,6 +186,10 @@ public final class Controller {
    */
   public boolean isWeaponReady() {
     return rc.isWeaponReady();
+  }
+
+  public boolean canMove(Direction dir) {
+    return rc.canMove(dir);
   }
 
   /**
@@ -206,7 +226,7 @@ public final class Controller {
    * @return {@code true} if move was successful
    */
   public boolean move(Direction dir) {
-    if (rc.isCoreReady() && rc.canMove(dir)) {
+    if (rc.isCoreReady() && canMove(dir)) {
       try {
         rc.move(dir);
         return true;
