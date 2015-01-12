@@ -8,6 +8,8 @@ package zasshu;
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 
+import battlecode.common.Clock;
+import battlecode.common.GameConstants;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 
@@ -78,6 +80,18 @@ public final class HQ extends AbstractRobot {
       }
     }
 
-    // TODO: Transfer supply
+    if (Clock.getRoundNum() % 50 == 0) {
+      RobotInfo[] robots = controller.getNearbyRobots(
+          GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,
+          controller.getTeam());
+      for (int i = robots.length; --i >= 0;) {
+        if (robots[i].type.canBuild()) {
+          controller.transferSupplies(1500, robots[i]);
+        } else if (robots[i].type == RobotType.BEAVER) {
+          controller.transferSupplies(
+              50 * robots[i].type.supplyUpkeep, robots[i]);
+        }
+      }
+    }
   }
 }
