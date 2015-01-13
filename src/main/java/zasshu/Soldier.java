@@ -19,83 +19,95 @@ public final class Soldier extends AbstractRobot {
    * This is the order in which the soldier attacks enemys.
    */
   private enum AttackPriority {
-    LAUNCHER, COMMANDER, TANK, DRONE, BASHER, SOLDIER, MINER, BEAVER, COMPUTER,
-    MISSILE;
+    TOWER, HQ, LAUNCHER, COMMANDER, TANK, DRONE, BASHER, SOLDIER, MINER, BEAVER,
+    COMPUTER, MISSILE;
   }
+
+  private boolean attackTarget = false;
 
   public Soldier(Controller c) {
     super(c);
   }
 
   @Override protected void runHelper() {
-    if (getInfluence(controller.getLocation()) > 0) {
-      if (controller.isWeaponReady()) {
-        RobotInfo[] enemies = controller.getNearbyRobots(
-            RobotType.SOLDIER.attackRadiusSquared,
-            controller.getOpponentTeam());
+    if (controller.isWeaponReady()) {
+      RobotInfo[] enemies = controller.getNearbyRobots(
+          RobotType.SOLDIER.attackRadiusSquared,
+          controller.getOpponentTeam());
 
-        RobotInfo target = null;
-        int maxPriority = AttackPriority.MISSILE.ordinal();
+      RobotInfo target = null;
+      int maxPriority = AttackPriority.MISSILE.ordinal();
 
-        for (int i = enemies.length; --i >= 0;) {
-          // Calling Enum.valueOf is potentially dangerous here - if the enemy
-          // RobotType.toString conversion does not match an AttackPriority
-          // enum, the method will throw IllegalArgumentException.
-          int p = AttackPriority.valueOf(enemies[i].type.toString()).ordinal();
-          if (target == null || p < maxPriority
-              || (p == maxPriority && enemies[i].health > target.health)) {
-            target = enemies[i];
-          }
-        }
-        if (target != null) {
-          controller.attack(target);
+      for (int i = enemies.length; --i >= 0;) {
+        // Calling Enum.valueOf is potentially dangerous here - if the enemy
+        // RobotType.toString conversion does not match an AttackPriority
+        // enum, the method will throw IllegalArgumentException.
+        int p = AttackPriority.valueOf(enemies[i].type.toString()).ordinal();
+        if (target == null || p < maxPriority
+            || (p == maxPriority && enemies[i].health > target.health)) {
+          target = enemies[i];
         }
       }
-      if (controller.isCoreReady()) {
-        MapLocation myLoc = controller.getLocation();
-        MapLocation[] locs =
-            MapLocation.getAllMapLocationsWithinRadiusSq(myLoc, 2);
-        double maxPotential = Double.NEGATIVE_INFINITY;
-        MapLocation maxLoc = myLoc;
-
-        for (int i = 8; --i >= 0;) {
-          if (getInfluence(locs[i]) > 0) {
-            double potential = getPotential(locs[i]);
-
-            if (maxPotential < potential) {
-              maxPotential = potential;
-              maxLoc = locs[i];
-            }
-          }
-        }
-
-        Direction dir = myLoc.directionTo(maxLoc);
-        controller.move(dir);
+      if (target != null) {
+        controller.attack(target);
       }
-    } else {
-      // TODO: Move according to influence gradient. Gradient should be the
-      // direction of retreat.
     }
-  }
+    if (controller.isCoreReady()) {
+      MapLocation myLoc = controller.getLocation();
+      MapLocation[] locs =
+          MapLocation.getAllMapLocationsWithinRadiusSq(myLoc, 2);
+      double maxPotential = Double.NEGATIVE_INFINITY;
+      Direction maxDir = Direction.NONE;
 
-  private double getInfluence(MapLocation loc) {
-    // TODO: Implement
-    return 0;
-  }
-
-  private double getPotential(MapLocation loc) {
-    double positive = 0;
-    double negative = 0;
-    RobotInfo[] robots = controller.getNearbyRobots();
-    for (int i = robots.length; --i >= 0;) {
-      double force = computeForce(loc, robots[i]);
-      if (force > 0) {
-        positive = Math.max(positive, force);
+      MapLocation[] towers = controller.getEnemyTowerLocations();
+      MapLocation target;
+      if (towers.length == 0) {
+        target = controller.getEnemyHQLocation();
       } else {
-        negative += force;
+        target = controller.getEnemyTowerLocations()[0];
       }
+
+      RobotInfo[] enemies = controller.getNearbyRobots(
+          RobotType.SOLDIER.sensorRadiusSquared,
+          controller.getOpponentTeam());
+
+      RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
+          target,
+          26,
+          controller.getTeam());
+
+      if (teammatesAroundTarget.length >= 10) {
+        attackTarget = true;
+      } else if (teammatesAroundTarget.length < 5) {
+        attackTarget = false;
+      }
+
+      for (int i = 8; --i >= 0;) {
+        Direction dir = myLoc.directionTo(locs[i]);
+        if (controller.canMove(dir)) {
+          int distanceToTarget = locs[i].distanceSquaredTo(target);
+          double potential = 10 * computePositiveForce(distanceToTarget);
+
+          if (!attackTarget && distanceToTarget <= 24) {
+            continue;
+          }
+
+          for (int j = enemies.length; --j >= 0;) {
+            double force = computeForce(locs[i], enemies[j]);
+            potential = Math.max(potential, force);
+          }
+
+          if (maxPotential < potential) {
+            maxPotential = potential;
+            maxDir = dir;
+          }
+        }
+      }
+
+      controller.move(maxDir);
     }
-    return positive + negative;
+    // TODO: Add a retreat strategy that moves according to influence gradient.
+    // Gradient should be the direction of retreat.
   }
 
   private double computeForce(MapLocation loc, RobotInfo robot) {
@@ -107,8 +119,6 @@ public final class Soldier extends AbstractRobot {
         case SOLDIER:
         case BASHER:
           return computePositiveForce(d);
-        case TOWER:
-          return 10 * computePositiveForce(d);
         default:
           return 0;
       }
