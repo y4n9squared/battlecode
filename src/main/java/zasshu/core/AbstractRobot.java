@@ -5,6 +5,8 @@
 
 package zasshu.core;
 
+import zasshu.util.Timer;
+
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 
@@ -17,9 +19,11 @@ import battlecode.common.MapLocation;
 public abstract class AbstractRobot implements Robot {
 
   protected final Controller controller;
+  protected final Timer timer;
 
   protected AbstractRobot(Controller ctrl) {
     controller = ctrl;
+    timer = new Timer(controller.getType());
   }
 
   @Override public void run() {

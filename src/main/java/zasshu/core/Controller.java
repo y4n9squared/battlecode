@@ -325,6 +325,15 @@ public final class Controller {
   }
 
   /**
+   * Returns this robot's type.
+   *
+   * @return type
+   */
+  public RobotType getType() {
+    return rc.getType();
+  }
+
+  /**
    * Yield execution of this robot and flush cache.
    */
   public void yield() {
