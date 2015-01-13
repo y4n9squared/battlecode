@@ -15,6 +15,14 @@ import battlecode.common.RobotType;
 
 public final class Soldier extends AbstractRobot {
 
+  /**
+   * This is the order in which the soldier attacks enemys.
+   */
+  private enum AttackPriority {
+    LAUNCHER, COMMANDER, TANK, DRONE, BASHER, SOLDIER, MINER, BEAVER, COMPUTER,
+    MISSILE;
+  }
+
   public Soldier(Controller c) {
     super(c);
   }
@@ -22,7 +30,26 @@ public final class Soldier extends AbstractRobot {
   @Override protected void runHelper() {
     if (getInfluence(controller.getLocation()) > 0) {
       if (controller.isWeaponReady()) {
-        // TODO: Attack intelligently
+        RobotInfo[] enemies = controller.getNearbyRobots(
+            RobotType.SOLDIER.attackRadiusSquared,
+            controller.getOpponentTeam());
+
+        RobotInfo target = null;
+        int maxPriority = AttackPriority.MISSILE.ordinal();
+
+        for (int i = enemies.length; --i >= 0;) {
+          // Calling Enum.valueOf is potentially dangerous here - if the enemy
+          // RobotType.toString conversion does not match an AttackPriority
+          // enum, the method will throw IllegalArgumentException.
+          int p = AttackPriority.valueOf(enemies[i].type.toString()).ordinal();
+          if (target == null || p < maxPriority
+              || (p == maxPriority && enemies[i].health > target.health)) {
+            target = enemies[i];
+          }
+        }
+        if (target != null) {
+          controller.attack(target);
+        }
       }
       if (controller.isCoreReady()) {
         MapLocation myLoc = controller.getLocation();
