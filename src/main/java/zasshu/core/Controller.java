@@ -303,7 +303,8 @@ public final class Controller {
    *
    */
   public boolean transferSupplies(int supply, RobotInfo robot) {
-    if (getLocation().distanceSquaredTo(robot.location) <= 15) {
+    if (getLocation().distanceSquaredTo(robot.location)
+        <= GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED) {
       try {
         rc.transferSupplies(supply, robot.location);
         return true;
