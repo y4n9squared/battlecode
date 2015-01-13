@@ -20,7 +20,7 @@ public final class HQ extends AbstractRobot {
    * be set at minimum to 1, so that we can build structures, but not too large
    * as to waste ore.
    */
-  private static int NUM_BEAVER_TARGET = 1;
+  private static int NUM_BEAVER_TARGET = 3;
 
   /**
    * This is the order in which the HQ attacks enemys.
