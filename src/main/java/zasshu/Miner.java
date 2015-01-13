@@ -39,20 +39,24 @@ public final class Miner extends AbstractRobot {
       // For now, let's have a mine:move ratio of 3:1
       if (mineCounter == 3 || controller.senseOre(myLoc) < LOW_ORE) {
         double maxOre = 0.0;
-        MapLocation maxLoc = myLoc;
+        Direction maxDir = Direction.NONE;
         MapLocation[] locs =
             MapLocation.getAllMapLocationsWithinRadiusSq(myLoc, 2);
 
         for (int i = 8; --i >= 0;) {
+          Direction dir = myLoc.directionTo(locs[i]);
+          if (!controller.canMove(dir)) {
+            continue;
+          }
+
           double ore = controller.senseOre(locs[i]);
           if (ore > maxOre) {
             maxOre = ore;
-            maxLoc = locs[i];
+            maxDir = dir;
           }
         }
 
-        Direction dir = myLoc.directionTo(maxLoc);
-        moved = controller.move(dir);
+        moved = controller.move(maxDir);
       }
 
       if (moved) {
