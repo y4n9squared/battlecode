@@ -65,6 +65,10 @@ public final class Beaver extends AbstractRobot {
           isMovingToBuild = true;
           buildType = RobotType.BARRACKS;
           destination = getConstructionLocation();
+        } else if (!doesRobotExist(RobotType.HELIPAD)) {
+          isMovingToBuild = true;
+          buildType = RobotType.HELIPAD;
+          destination = getConstructionLocation();
         }
       }
 

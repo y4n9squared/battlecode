@@ -48,6 +48,9 @@ public class RobotPlayer {
       case MINERFACTORY:
         robot = new MinerFactory(controller);
         break;
+      case HELIPAD:
+        robot = new Helipad(controller);
+        break;
       default:
         // Should never happen
         return;
