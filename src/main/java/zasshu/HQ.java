@@ -85,8 +85,8 @@ public final class HQ extends AbstractRobot {
           GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,
           controller.getTeam());
       for (int i = robots.length; --i >= 0;) {
-        if (robots[i].type.canBuild()) {
-          controller.transferSupplies(1500, robots[i]);
+        if (robots[i].type.canSpawn()) {
+          controller.transferSupplies(2000, robots[i]);
         } else if (robots[i].type == RobotType.BEAVER) {
           controller.transferSupplies(
               50 * robots[i].type.supplyUpkeep, robots[i]);
