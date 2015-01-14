@@ -6,6 +6,7 @@
 package zasshu;
 
 import zasshu.core.AbstractRobot;
+import zasshu.core.Channels;
 import zasshu.core.Controller;
 
 import battlecode.common.DependencyProgress;
@@ -53,6 +54,9 @@ public final class Beaver extends AbstractRobot {
     if (pastLocations[head] != myLoc) {
       pastLocations[head++] = myLoc;
     }
+    int numBeavers = controller.readBroadcast(Channels.NUM_BEAVERS);
+    controller.broadcast(Channels.NUM_BEAVERS, numBeavers + 1);
+
     if (controller.isCoreReady()) {
       // TODO: If enemies are close, flee from danger.
       if (!isMovingToBuild) {

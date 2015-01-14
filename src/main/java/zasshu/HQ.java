@@ -6,6 +6,7 @@
 package zasshu;
 
 import zasshu.core.AbstractRobot;
+import zasshu.core.Channels;
 import zasshu.core.Controller;
 
 import battlecode.common.Clock;
@@ -64,20 +65,12 @@ public final class HQ extends AbstractRobot {
     }
 
     if (controller.isCoreReady()) {
-      RobotInfo[] robots = controller.getNearbyRobots();
-
       // Check for the number of beavers on the map that we own.
-      int numBeavers = 0;
-      for (int i = robots.length; --i >= 0;) {
-        if (robots[i].type == RobotType.BEAVER
-            && robots[i].team == controller.getTeam()) {
-          ++numBeavers;
-        }
-      }
-
+      int numBeavers = controller.readBroadcast(Channels.NUM_BEAVERS);
       if (numBeavers < NUM_BEAVER_TARGET) {
         controller.spawn(getEnemyHQDirection(), RobotType.BEAVER);
       }
+      controller.broadcast(Channels.NUM_BEAVERS, 0);
     }
 
     if (Clock.getRoundNum() % 50 == 0) {
