@@ -181,6 +181,21 @@ public final class Controller {
   }
 
   /**
+   * Returns the value stored on the specified channel.
+   *
+   * @param channel channel number
+   * @return value on channel
+   */
+  public int readBroadcast(int channel) {
+    try {
+      return rc.readBroadcast(channel);
+    } catch (GameActionException e) {
+      e.printStackTrace();
+    }
+    return 0;
+  }
+
+  /**
    * Whether or not this robot can perform a core action.
    *
    * @return {@code true} if robot can perform a core action
@@ -341,6 +356,23 @@ public final class Controller {
    */
   public RobotType getType() {
     return rc.getType();
+  }
+
+  /**
+   * Broadcasts the value {@code data} to the specific channel.
+   *
+   * @param channel channel number
+   * @param data value to broadcast
+   * @return {@code true} if broadcast was successful
+   */
+  public boolean broadcast(int channel, int data) {
+    try {
+      rc.broadcast(channel, data);
+      return true;
+    } catch (GameActionException e) {
+      e.printStackTrace();
+    }
+    return false;
   }
 
   /**
