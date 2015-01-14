@@ -8,6 +8,7 @@ package zasshu;
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 
+import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameConstants;
 import battlecode.common.RobotInfo;
@@ -46,9 +47,12 @@ public final class MinerFactory extends AbstractRobot {
         GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,
         controller.getTeam());
     for (int i = robots.length; --i >= 0;) {
+      if (Clock.getBytecodesLeft() < 600) {
+        break;
+      }
       int supplyUpkeep = robots[i].type.supplyUpkeep;
       if (robots[i].supplyLevel < 5 * supplyUpkeep) {
-        controller.transferSupplies(50 * supplyUpkeep, robots[i]);
+        controller.transferSupplies(100 * supplyUpkeep, robots[i]);
       }
     }
   }
