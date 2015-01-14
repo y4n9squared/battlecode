@@ -51,6 +51,9 @@ public class RobotPlayer {
       case HELIPAD:
         robot = new Helipad(controller);
         break;
+      case DRONE:
+        robot = new Drone(controller);
+        break;
       default:
         // Should never happen
         return;
