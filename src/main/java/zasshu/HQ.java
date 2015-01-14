@@ -89,14 +89,21 @@ public final class HQ extends AbstractRobot {
     }
 
     MapLocation[] enemyTowers = controller.getEnemyTowerLocations();
+    MapLocation target;
     if (enemyTowers.length > 0) {
       // TODO choose the closest tower
-      controller.broadcast(Channels.ATTACK_TARGET_X, enemyTowers[0].x);
-      controller.broadcast(Channels.ATTACK_TARGET_Y, enemyTowers[0].y);
+      target = enemyTowers[0];
     } else {
-      MapLocation enemyHQ = controller.getEnemyHQLocation();
-      controller.broadcast(Channels.ATTACK_TARGET_X, enemyHQ.x);
-      controller.broadcast(Channels.ATTACK_TARGET_Y, enemyHQ.y);
+      target = controller.getEnemyHQLocation();
+    }
+
+    int existingTargetX = controller.readBroadcast(Channels.ATTACK_TARGET_X);
+    if (target.x != existingTargetX) {
+      controller.broadcast(Channels.ATTACK_TARGET_X, target.x);
+    }
+    int existingTargetY = controller.readBroadcast(Channels.ATTACK_TARGET_Y);
+    if (target.y != existingTargetY) {
+      controller.broadcast(Channels.ATTACK_TARGET_Y, target.y);
     }
   }
 }
