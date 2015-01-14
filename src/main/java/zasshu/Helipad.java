@@ -8,6 +8,7 @@ package zasshu;
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 
+import battlecode.common.Direction;
 import battlecode.common.GameConstants;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
@@ -24,6 +25,11 @@ public final class Helipad extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
+    if (controller.isCoreReady()) {
+      Direction dir = getEnemyHQDirection();
+      controller.spawn(dir, RobotType.DRONE);
+    }
+
     RobotInfo[] robots = controller.getNearbyRobots(
         GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,
         controller.getTeam());
