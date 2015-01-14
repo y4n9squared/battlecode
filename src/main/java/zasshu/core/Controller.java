@@ -20,8 +20,6 @@ public final class Controller {
   private final RobotController rc;
 
   private MapLocation enemyHQLocation;
-  private MapLocation[] towerLocations;
-  private MapLocation[] enemyTowerLocations;
   private RobotInfo[] nearbyRobots;
 
   /**
@@ -87,10 +85,7 @@ public final class Controller {
    * @return locations of our towers
    */
   public MapLocation[] getTowerLocations() {
-    if (towerLocations == null) {
-      towerLocations = rc.senseTowerLocations();
-    }
-    return towerLocations;
+    return rc.senseTowerLocations();
   }
 
   /**
@@ -99,10 +94,7 @@ public final class Controller {
    * @return locations of enemy towers
    */
   public MapLocation[] getEnemyTowerLocations() {
-    if (enemyTowerLocations == null) {
-      enemyTowerLocations = rc.senseEnemyTowerLocations();
-    }
-    return enemyTowerLocations;
+    return rc.senseEnemyTowerLocations();
   }
 
   /**
