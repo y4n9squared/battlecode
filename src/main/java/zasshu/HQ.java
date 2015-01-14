@@ -11,6 +11,7 @@ import zasshu.core.Controller;
 
 import battlecode.common.Clock;
 import battlecode.common.GameConstants;
+import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 
@@ -85,6 +86,17 @@ public final class HQ extends AbstractRobot {
               50 * robots[i].type.supplyUpkeep, robots[i]);
         }
       }
+    }
+
+    MapLocation[] enemyTowers = controller.getEnemyTowerLocations();
+    if (enemyTowers.length > 0) {
+      // TODO choose the closest tower
+      controller.broadcast(Channels.ATTACK_TARGET_X, enemyTowers[0].x);
+      controller.broadcast(Channels.ATTACK_TARGET_Y, enemyTowers[0].y);
+    } else {
+      MapLocation enemyHQ = controller.getEnemyHQLocation();
+      controller.broadcast(Channels.ATTACK_TARGET_X, enemyHQ.x);
+      controller.broadcast(Channels.ATTACK_TARGET_Y, enemyHQ.y);
     }
   }
 }

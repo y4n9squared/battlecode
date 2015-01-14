@@ -6,6 +6,7 @@
 package zasshu;
 
 import zasshu.core.AbstractRobot;
+import zasshu.core.Channels;
 import zasshu.core.Controller;
 
 import battlecode.common.Direction;
@@ -60,12 +61,9 @@ public final class Soldier extends AbstractRobot {
       Direction maxDir = Direction.NONE;
 
       MapLocation[] towers = controller.getEnemyTowerLocations();
-      MapLocation target;
-      if (towers.length == 0) {
-        target = controller.getEnemyHQLocation();
-      } else {
-        target = controller.getEnemyTowerLocations()[0];
-      }
+      MapLocation target = new MapLocation(
+          controller.readBroadcast(Channels.ATTACK_TARGET_X),
+          controller.readBroadcast(Channels.ATTACK_TARGET_Y));
 
       RobotInfo[] enemies = controller.getNearbyRobots(
           RobotType.SOLDIER.sensorRadiusSquared,
