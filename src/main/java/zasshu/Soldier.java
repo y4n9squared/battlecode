@@ -15,6 +15,8 @@ import battlecode.common.RobotType;
 
 public final class Soldier extends AbstractRobot {
 
+  private static final RobotType ROBOT_TYPE = RobotType.SOLDIER;
+
   /**
    * This is the order in which the soldier attacks enemys.
    */
@@ -32,7 +34,7 @@ public final class Soldier extends AbstractRobot {
   @Override protected void runHelper() {
     if (controller.isWeaponReady()) {
       RobotInfo[] enemies = controller.getNearbyRobots(
-          RobotType.SOLDIER.attackRadiusSquared,
+          ROBOT_TYPE.attackRadiusSquared,
           controller.getOpponentTeam());
 
       RobotInfo target = null;
@@ -68,7 +70,7 @@ public final class Soldier extends AbstractRobot {
       }
 
       RobotInfo[] enemies = controller.getNearbyRobots(
-          RobotType.SOLDIER.sensorRadiusSquared,
+          ROBOT_TYPE.sensorRadiusSquared,
           controller.getOpponentTeam());
 
       RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
@@ -127,8 +129,7 @@ public final class Soldier extends AbstractRobot {
   }
 
   private double computePositiveForce(int d) {
-    // TODO use attackRadiusSquared
-    return 10.0 / (Math.abs(d - 4.0) + 1);
+    return ROBOT_TYPE.attackRadiusSquared / (Math.abs(d - 4.0) + 1);
   }
 
   private double computeNegativeForce(int d) {
