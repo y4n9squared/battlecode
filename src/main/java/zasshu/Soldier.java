@@ -23,7 +23,9 @@ public final class Soldier extends AbstractRobot {
    */
   private enum AttackPriority {
     TOWER, HQ, LAUNCHER, COMMANDER, TANK, DRONE, BASHER, SOLDIER, MINER, BEAVER,
-    COMPUTER, MISSILE;
+    COMPUTER, MISSILE, AEROSPACELAB, BARRACKS, HELIPAD, MINERFACTORY,
+    SUPPLYDEPOT, TANKFACTORY, TECHNOLOGYINSTITUTE, TRAININGFIELD,
+    HANDWASHSTATION;
   }
 
   private boolean attackTarget = false;
