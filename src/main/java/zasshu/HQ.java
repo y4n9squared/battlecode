@@ -24,6 +24,8 @@ public final class HQ extends AbstractRobot {
    */
   private static int NUM_BEAVER_TARGET = 3;
 
+  private boolean attackTarget = false;
+
   /**
    * This is the order in which the HQ attacks enemys.
    */
@@ -104,6 +106,22 @@ public final class HQ extends AbstractRobot {
     int existingTargetY = controller.readBroadcast(Channels.ATTACK_TARGET_Y);
     if (target.y != existingTargetY) {
       controller.broadcast(Channels.ATTACK_TARGET_Y, target.y);
+    }
+
+    RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
+        target,
+        26,
+        controller.getTeam());
+
+    if (teammatesAroundTarget.length >= 10) {
+      attackTarget = true;
+    } else if (teammatesAroundTarget.length < 5) {
+      attackTarget = false;
+    }
+    boolean existingAttackTarget =
+        controller.readBroadcast(Channels.SHOULD_ATTACK_TARGET) != 0;
+    if (existingAttackTarget != attackTarget) {
+      controller.broadcast(Channels.SHOULD_ATTACK_TARGET, attackTarget ? 1 : 0);
     }
   }
 }
