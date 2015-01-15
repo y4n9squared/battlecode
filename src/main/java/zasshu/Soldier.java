@@ -28,8 +28,6 @@ public final class Soldier extends AbstractRobot {
     HANDWASHSTATION;
   }
 
-  private boolean attackTarget = false;
-
   public Soldier(Controller c) {
     super(c);
   }
@@ -73,16 +71,8 @@ public final class Soldier extends AbstractRobot {
           ROBOT_TYPE.sensorRadiusSquared,
           controller.getOpponentTeam());
 
-      RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
-          target,
-          26,
-          controller.getTeam());
-
-      if (teammatesAroundTarget.length >= 10) {
-        attackTarget = true;
-      } else if (teammatesAroundTarget.length < 5) {
-        attackTarget = false;
-      }
+      boolean attackTarget =
+          controller.readBroadcast(Channels.SHOULD_ATTACK_TARGET) != 0;
 
       for (int i = 8; --i >= 0;) {
         Direction dir = myLoc.directionTo(locs[i]);
