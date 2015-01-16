@@ -76,20 +76,6 @@ public final class HQ extends AbstractRobot {
       controller.broadcast(Channels.NUM_BEAVERS, 0);
     }
 
-    if (Clock.getRoundNum() % 50 == 0) {
-      RobotInfo[] robots = controller.getNearbyRobots(
-          GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,
-          controller.getTeam());
-      for (int i = robots.length; --i >= 0;) {
-        if (robots[i].type.canSpawn()) {
-          controller.transferSupplies(2000, robots[i]);
-        } else if (robots[i].type == RobotType.BEAVER) {
-          controller.transferSupplies(
-              50 * robots[i].type.supplyUpkeep, robots[i]);
-        }
-      }
-    }
-
     MapLocation[] enemyTowers = controller.getEnemyTowerLocations();
     MapLocation target;
     if (enemyTowers.length > 0) {
@@ -122,6 +108,21 @@ public final class HQ extends AbstractRobot {
         controller.readBroadcast(Channels.SHOULD_ATTACK_TARGET) != 0;
     if (existingAttackTarget != attackTarget) {
       controller.broadcast(Channels.SHOULD_ATTACK_TARGET, attackTarget ? 1 : 0);
+    }
+
+    // Keep this last in runHelper
+    if (Clock.getRoundNum() % 50 == 0) {
+      RobotInfo[] robots = controller.getNearbyRobots(
+          GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,
+          controller.getTeam());
+      for (int i = robots.length; --i >= 0;) {
+        if (robots[i].type.canSpawn()) {
+          controller.transferSupplies(2000, robots[i]);
+        } else if (robots[i].type == RobotType.BEAVER) {
+          controller.transferSupplies(
+              50 * robots[i].type.supplyUpkeep, robots[i]);
+        }
+      }
     }
   }
 }
