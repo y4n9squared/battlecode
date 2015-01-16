@@ -22,9 +22,15 @@ public final class HQ extends AbstractRobot {
    * be set at minimum to 1, so that we can build structures, but not too large
    * as to waste ore.
    */
-  private static int NUM_BEAVER_TARGET = 3;
+  private static final int NUM_BEAVER_TARGET = 3;
 
-  private boolean attackTarget = false;
+  /**
+   * The distance at which to swarm the attack target.
+   */
+  private static final int SWARM_RADIUS_SQUARED =
+      RobotType.HQ.sensorRadiusSquared;
+
+  private int attackDistance = SWARM_RADIUS_SQUARED;
 
   /**
    * This is the order in which the HQ attacks enemys.
@@ -96,18 +102,18 @@ public final class HQ extends AbstractRobot {
 
     RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
         target,
-        26,
+        SWARM_RADIUS_SQUARED + 5,
         controller.getTeam());
 
     if (teammatesAroundTarget.length >= 10) {
-      attackTarget = true;
+      attackDistance = 0;
     } else if (teammatesAroundTarget.length < 5) {
-      attackTarget = false;
+      attackDistance = SWARM_RADIUS_SQUARED;
     }
-    boolean existingAttackTarget =
-        controller.readBroadcast(Channels.SHOULD_ATTACK_TARGET) != 0;
-    if (existingAttackTarget != attackTarget) {
-      controller.broadcast(Channels.SHOULD_ATTACK_TARGET, attackTarget ? 1 : 0);
+    int existingAttackDistance =
+        controller.readBroadcast(Channels.ATTACK_DISTANCE);
+    if (existingAttackDistance != attackDistance) {
+      controller.broadcast(Channels.ATTACK_DISTANCE, attackDistance);
     }
 
     // Keep this last in runHelper
