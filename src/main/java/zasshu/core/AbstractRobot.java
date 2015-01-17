@@ -8,7 +8,9 @@ package zasshu.core;
 import zasshu.util.Timer;
 
 import battlecode.common.Direction;
+import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
+import battlecode.common.RobotInfo;
 
 /**
  * Abstract skeletal implementation of the {@code Robot} interface.
@@ -56,5 +58,34 @@ public abstract class AbstractRobot implements Robot {
    */
   protected MapLocation getLocation() {
     return controller.getLocation();
+  }
+
+  /**
+   * Transfers supply to the robot with lowest supply, if our supply level is
+   * above the average supply level.
+   *
+   * @param robots list of robots to consider supplying
+   */
+  protected void propogateSupply() {
+    RobotInfo[] robots = controller.getNearbyRobots(
+        GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED, controller.getTeam());
+
+    double mySupply = controller.getSupplyLevel();
+    RobotInfo target = null;
+    double maxDifference = 0;
+    double totalSupply = 0;
+
+    for (int i = robots.length; --i >= 0;) {
+      totalSupply += robots[i].supplyLevel;
+      double supplyDifference = mySupply - robots[i].supplyLevel;
+      if (supplyDifference > maxDifference) {
+        maxDifference = supplyDifference;
+        target = robots[i];
+      }
+    }
+    double avgSupply = totalSupply / robots.length;
+    if (mySupply > avgSupply) {
+      controller.transferSupplies((int) (mySupply - avgSupply), target);
+    }
   }
 }
