@@ -9,13 +9,13 @@ import zasshu.core.AbstractRobot;
 import zasshu.core.Channels;
 import zasshu.core.Controller;
 
+import battlecode.common.Clock;
 import battlecode.common.DependencyProgress;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotType;
 
 public final class Beaver extends AbstractRobot {
-
 
   /**
    * Whether or not this robot is currently traveling to its build location.
@@ -50,13 +50,9 @@ public final class Beaver extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
-    MapLocation myLoc = getLocation();
-    if (pastLocations[head] != myLoc) {
-      pastLocations[head++] = myLoc;
+    if (Clock.getRoundNum() % RobotType.BEAVER.buildTurns == 0) {
+      broadcastAlive();
     }
-    int numBeavers = controller.readBroadcast(Channels.NUM_BEAVERS);
-    controller.broadcast(Channels.NUM_BEAVERS, numBeavers + 1);
-
     if (controller.isCoreReady()) {
       // TODO: If enemies are close, flee from danger.
       if (!isMovingToBuild) {
@@ -77,6 +73,10 @@ public final class Beaver extends AbstractRobot {
       }
 
       if (isMovingToBuild) {
+        MapLocation myLoc = getLocation();
+        if (pastLocations[head] != myLoc) {
+          pastLocations[head++] = myLoc;
+        }
         if (myLoc.distanceSquaredTo(destination) <= 2) {
           isMovingToBuild = false;
           controller.build(myLoc.directionTo(destination), buildType);
@@ -140,5 +140,13 @@ public final class Beaver extends AbstractRobot {
   private boolean doesRobotExist(RobotType type) {
     DependencyProgress progress = controller.getDependencyProgress(type);
     return progress != DependencyProgress.NONE;
+  }
+
+  /**
+   * Broadcast that we are allive by incrementing the beaver channel.
+   */
+  private void broadcastAlive() {
+    int numBeavers = controller.readBroadcast(Channels.NUM_BEAVERS);
+    controller.broadcast(Channels.NUM_BEAVERS, numBeavers + 1);
   }
 }

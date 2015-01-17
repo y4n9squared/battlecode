@@ -65,11 +65,13 @@ public final class HQ extends AbstractRobot {
 
     if (controller.isCoreReady()) {
       // Check for the number of beavers on the map that we own.
-      int numBeavers = controller.readBroadcast(Channels.NUM_BEAVERS);
-      if (numBeavers < NUM_BEAVER_TARGET) {
-        controller.spawn(getEnemyHQDirection(), RobotType.BEAVER);
+      if (Clock.getRoundNum() % RobotType.BEAVER.buildTurns == 1) {
+        int numBeavers = controller.readBroadcast(Channels.NUM_BEAVERS);
+        if (numBeavers < NUM_BEAVER_TARGET) {
+          controller.spawn(getEnemyHQDirection(), RobotType.BEAVER);
+        }
+        controller.broadcast(Channels.NUM_BEAVERS, 0);
       }
-      controller.broadcast(Channels.NUM_BEAVERS, 0);
     }
 
     MapLocation[] enemyTowers = controller.getEnemyTowerLocations();
