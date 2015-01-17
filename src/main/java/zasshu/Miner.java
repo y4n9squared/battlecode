@@ -66,5 +66,6 @@ public final class Miner extends AbstractRobot {
         ++mineCounter;
       }
     }
+    propogateSupply();
   }
 }

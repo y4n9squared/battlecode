@@ -157,6 +157,15 @@ public final class Controller {
   }
 
   /**
+   * Returns the amount of supply this robot has.
+   *
+   * @return amount of supply this robot has
+   */
+  public double getSupplyLevel() {
+    return rc.getSupplyLevel();
+  }
+
+  /**
    * Returns {@code true} if the specified location is occupied by another
    * robot.
    *
@@ -323,8 +332,10 @@ public final class Controller {
     if (getLocation().distanceSquaredTo(robot.location)
         <= GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED) {
       try {
-        rc.transferSupplies(supply, robot.location);
-        return true;
+        if (rc.getSupplyLevel() >= supply) {
+          rc.transferSupplies(supply, robot.location);
+          return true;
+        }
       } catch (GameActionException e) {
         e.printStackTrace();
       }

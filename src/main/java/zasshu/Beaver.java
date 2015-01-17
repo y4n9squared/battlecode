@@ -85,6 +85,7 @@ public final class Beaver extends AbstractRobot {
         }
       }
     }
+    propogateSupply();
   }
 
   private Direction computeGradient() {

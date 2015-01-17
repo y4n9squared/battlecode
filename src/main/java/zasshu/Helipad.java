@@ -29,15 +29,5 @@ public final class Helipad extends AbstractRobot {
       Direction dir = getEnemyHQDirection();
       controller.spawn(dir, RobotType.DRONE);
     }
-
-    RobotInfo[] robots = controller.getNearbyRobots(
-        GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,
-        controller.getTeam());
-    for (int i = robots.length; --i >= 0;) {
-      int supplyUpkeep = robots[i].type.supplyUpkeep;
-      if (robots[i].supplyLevel < 5 * supplyUpkeep) {
-        controller.transferSupplies(50 * supplyUpkeep, robots[i]);
-      }
-    }
   }
 }

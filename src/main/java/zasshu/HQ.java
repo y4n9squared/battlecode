@@ -43,7 +43,6 @@ public final class HQ extends AbstractRobot {
     super(controller);
   }
 
-
   @Override protected void runHelper() {
     if (controller.isWeaponReady()) {
       RobotInfo[] enemies = controller.getNearbyRobots(
@@ -53,9 +52,6 @@ public final class HQ extends AbstractRobot {
       int maxPriority = AttackPriority.COMPUTER.ordinal();
 
       for (int i = enemies.length; --i >= 0;) {
-        // Calling Enum.valueOf is potentially dangerous here - if the enemy
-        // RobotType.toString conversion does not match an AttackPriority enum,
-        // the method will throw IllegalArgumentException.
         int p = AttackPriority.valueOf(enemies[i].type.toString()).ordinal();
         if (target == null || p < maxPriority
             || (p == maxPriority && enemies[i].health > target.health)) {
@@ -110,19 +106,6 @@ public final class HQ extends AbstractRobot {
       controller.broadcast(Channels.SHOULD_ATTACK_TARGET, attackTarget ? 1 : 0);
     }
 
-    // Keep this last in runHelper
-    if (Clock.getRoundNum() % 50 == 0) {
-      RobotInfo[] robots = controller.getNearbyRobots(
-          GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,
-          controller.getTeam());
-      for (int i = robots.length; --i >= 0;) {
-        if (robots[i].type.canSpawn()) {
-          controller.transferSupplies(2000, robots[i]);
-        } else if (robots[i].type == RobotType.BEAVER) {
-          controller.transferSupplies(
-              50 * robots[i].type.supplyUpkeep, robots[i]);
-        }
-      }
-    }
+    propogateSupply();
   }
 }
