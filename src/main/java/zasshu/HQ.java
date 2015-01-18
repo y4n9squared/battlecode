@@ -119,7 +119,5 @@ public final class HQ extends AbstractRobot {
     if (existingAttackDistance != attackDistance) {
       controller.broadcast(Channels.ATTACK_DISTANCE, attackDistance);
     }
-
-    propogateSupply();
   }
 }

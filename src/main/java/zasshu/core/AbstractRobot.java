@@ -35,6 +35,7 @@ public abstract class AbstractRobot implements Robot {
       } catch (Exception e) {
         e.printStackTrace();
       } finally {
+        propogateSupply();
         controller.yield();
       }
     }
@@ -67,7 +68,7 @@ public abstract class AbstractRobot implements Robot {
    *
    * @param robots list of robots to consider supplying
    */
-  protected void propogateSupply() {
+  private void propogateSupply() {
     RobotInfo[] robots = controller.getNearbyRobots(
         GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED, controller.getTeam());
 
