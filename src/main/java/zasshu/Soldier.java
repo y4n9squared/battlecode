@@ -14,6 +14,12 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 
+/**
+ * AI for the Soldier robot type.
+ *
+ * @author Holman Gao
+ * @author Yang Yang
+ */
 public final class Soldier extends AbstractRobot {
 
   private static final RobotType ROBOT_TYPE = RobotType.SOLDIER;
@@ -28,6 +34,11 @@ public final class Soldier extends AbstractRobot {
     HANDWASHSTATION;
   }
 
+  /**
+   * Constructs a {@code Soldier} object.
+   *
+   * @param c controller
+   */
   public Soldier(Controller c) {
     super(c);
   }
