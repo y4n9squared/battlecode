@@ -83,8 +83,18 @@ public final class HQ extends AbstractRobot {
     MapLocation[] enemyTowers = controller.getEnemyTowerLocations();
     MapLocation target;
     if (enemyTowers.length > 0) {
-      // TODO choose the closest tower
-      target = enemyTowers[0];
+      MapLocation myLoc = controller.getLocation();
+      double closestDistance = Double.POSITIVE_INFINITY;
+      int closestIndex = 0;
+      for (int i = enemyTowers.length; --i >= 0;) {
+        double distance = myLoc.distanceSquaredTo(enemyTowers[i]);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = i;
+        }
+      }
+
+      target = enemyTowers[closestIndex];
     } else {
       target = controller.getEnemyHQLocation();
     }
