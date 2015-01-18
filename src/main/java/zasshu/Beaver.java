@@ -143,6 +143,17 @@ public final class Beaver extends AbstractRobot {
     return null;
   }
 
+  /**
+   * Determine if a location is a safe place to build a structure.
+   *
+   * <p>A location is safe if there is no possibility of blocking units from
+   * passing through. Since units can travel diagonally, building in a
+   * checkerboard pattern will always guarentee passage so long as no tiles of
+   * the opposite parity are VOID terrain.
+   *
+   * @param loc map location to build
+   * @return {@code true} if the location is safe to build
+   */
   private boolean isLocationSafeToBuild(MapLocation loc) {
     if (controller.getTerrain(loc) != TerrainTile.NORMAL) {
       return false;
@@ -150,6 +161,12 @@ public final class Beaver extends AbstractRobot {
     if (buildOnEven && (loc.x + loc.y) % 2 == 1
         || !buildOnEven && (loc.x + loc.y) % 2 == 0) {
       return false;
+    }
+    MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(loc, 1);
+    for (int i = locs.length; --i >= 0;) {
+      if (controller.getTerrain(loc) == TerrainTile.VOID) {
+        return false;
+      }
     }
     return true;
   }
