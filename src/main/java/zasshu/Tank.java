@@ -28,8 +28,8 @@ public final class Tank extends AbstractRobot {
    * This is the order in which the tank attacks enemys.
    */
   private enum AttackPriority {
-    TOWER, HQ, LAUNCHER, COMMANDER, TANK, DRONE, BASHER, SOLDIER, MINER, BEAVER,
-    COMPUTER, MISSILE, AEROSPACELAB, BARRACKS, HELIPAD, MINERFACTORY,
+    TOWER, HQ, MISSILE, LAUNCHER, COMMANDER, TANK, DRONE, BASHER, SOLDIER,
+    MINER, BEAVER, COMPUTER, AEROSPACELAB, BARRACKS, HELIPAD, MINERFACTORY,
     SUPPLYDEPOT, TANKFACTORY, TECHNOLOGYINSTITUTE, TRAININGFIELD,
     HANDWASHSTATION;
   }
@@ -50,7 +50,7 @@ public final class Tank extends AbstractRobot {
           controller.getOpponentTeam());
 
       RobotInfo target = null;
-      int maxPriority = AttackPriority.MISSILE.ordinal();
+      int maxPriority = AttackPriority.HANDWASHSTATION.ordinal();
 
       for (int i = enemies.length; --i >= 0;) {
         // Calling Enum.valueOf is potentially dangerous here - if the enemy

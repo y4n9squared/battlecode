@@ -34,6 +34,7 @@ public final class AttackPriorityTest {
       = new ArrayList<Class<? extends AbstractRobot>>() {{
     add(Drone.class);
     add(Soldier.class);
+    add(Tank.class);
   }};
   // CHECKSTYLE.ON
 
