@@ -31,7 +31,7 @@ public final class AlgorithmsTest {
       new RobotInfo(1, Team.A, RobotType.SOLDIER, new MapLocation(1, 0), 0.0,
           0.0, 100.0, 0.0, 0, 0, null, null)
     };
-    int[] count = getRobotCount(robots);
+    int[] count = getRobotCount(robots, Team.A);
     assertEquals("Incorrect HQ count.", 1, count[RobotType.HQ.ordinal()]);
     assertEquals(
         "Incorrect SOLDIER count.", 2, count[RobotType.SOLDIER.ordinal()]);

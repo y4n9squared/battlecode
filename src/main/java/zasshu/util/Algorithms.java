@@ -7,6 +7,7 @@ package zasshu.util;
 
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
+import battlecode.common.Team;
 
 /**
  * A static library of useful algorithms.
@@ -19,16 +20,19 @@ public final class Algorithms {
   }
 
   /**
-   * Returns the number of robots by type. The number of robots of type {@code
-   * t} is {@code count[t.ordinal()]}.
+   * Returns the number of robots of the specified team by type. The number of
+   * robots of type {@code t} is {@code count[t.ordinal()]}.
    *
    * @param robots robots to count
+   * @param team team to filter by
    * @return number of robots by type
    */
-  public static int[] getRobotCount(RobotInfo[] robots) {
+  public static int[] getRobotCount(RobotInfo[] robots, Team team) {
     int[] count = new int[RobotType.values().length];
     for (int i = robots.length; --i >= 0;) {
-      ++count[robots[i].type.ordinal()];
+      if (robots[i].team == team) {
+        ++count[robots[i].type.ordinal()];
+      }
     }
     return count;
   }

@@ -54,6 +54,15 @@ public class RobotPlayer {
       case DRONE:
         robot = new Drone(controller);
         break;
+      case SUPPLYDEPOT:
+        robot = new SupplyDepot(controller);
+        break;
+      case TANKFACTORY:
+        robot = new TankFactory(controller);
+        break;
+      case AEROSPACELAB:
+        robot = new AerospaceLab(controller);
+        break;
       default:
         // Should never happen
         return;
