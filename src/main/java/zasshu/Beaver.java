@@ -5,6 +5,8 @@
 
 package zasshu;
 
+import static zasshu.util.Algorithms.*;
+
 import zasshu.core.AbstractRobot;
 import zasshu.core.Channels;
 import zasshu.core.Controller;
@@ -13,9 +15,20 @@ import battlecode.common.Clock;
 import battlecode.common.DependencyProgress;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
+import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
+import battlecode.common.TerrainTile;
 
 public final class Beaver extends AbstractRobot {
+
+  private static final RobotType[] BUILD_ORDER = new RobotType[] {
+    RobotType.MINERFACTORY, RobotType.BARRACKS, RobotType.TANKFACTORY,
+    RobotType.HELIPAD, RobotType.AEROSPACELAB, RobotType.SUPPLYDEPOT
+  };
+
+  private static final int[] BUILD_COUNT = new int[] {
+    1, 1, 2, 1, 1, 5
+  };
 
   /**
    * Whether or not this robot is currently traveling to its build location.
@@ -35,6 +48,12 @@ public final class Beaver extends AbstractRobot {
   private RobotType buildType = null;
 
   /**
+   * If {@code buildOnEven} is {@code true}, Beavers can only build at map
+   * locations where x + y is even.
+   */
+  private boolean buildOnEven;
+
+  /**
    * A list of previous map locations that this robot moved to.
    */
   private MapLocation[] pastLocations = new MapLocation[10000];
@@ -47,6 +66,12 @@ public final class Beaver extends AbstractRobot {
    */
   public Beaver(Controller c) {
     super(c);
+    MapLocation hqLocation = controller.getHQLocation();
+    if ((hqLocation.x + hqLocation.y) % 2 == 0) {
+      buildOnEven = true;
+    } else {
+      buildOnEven = false;
+    }
   }
 
   @Override protected void runHelper() {
@@ -56,20 +81,7 @@ public final class Beaver extends AbstractRobot {
     if (controller.isCoreReady()) {
       // TODO: If enemies are close, flee from danger.
       if (!isMovingToBuild) {
-        // Figure out what to build next.
-        if (!doesRobotExist(RobotType.MINERFACTORY)) {
-          isMovingToBuild = true;
-          buildType = RobotType.MINERFACTORY;
-          destination = getConstructionLocation();
-        } else if (!doesRobotExist(RobotType.BARRACKS)) {
-          isMovingToBuild = true;
-          buildType = RobotType.BARRACKS;
-          destination = getConstructionLocation();
-        } else if (!doesRobotExist(RobotType.HELIPAD)) {
-          isMovingToBuild = true;
-          buildType = RobotType.HELIPAD;
-          destination = getConstructionLocation();
-        }
+        buildNextStructure();
       }
 
       if (isMovingToBuild) {
@@ -118,9 +130,8 @@ public final class Beaver extends AbstractRobot {
   }
 
   private MapLocation getConstructionLocation() {
-    MapLocation hqLocation = controller.getHQLocation();
     MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(
-        hqLocation, 4);
+        controller.getLocation(), 16);
     for (int i = locs.length; --i >= 0;) {
       if (!controller.isLocationOccupied(locs[i])
           && isLocationSafeToBuild(locs[i])) {
@@ -133,13 +144,14 @@ public final class Beaver extends AbstractRobot {
   }
 
   private boolean isLocationSafeToBuild(MapLocation loc) {
-    // TODO: Implement
+    if (controller.getTerrain(loc) != TerrainTile.NORMAL) {
+      return false;
+    }
+    if (buildOnEven && (loc.x + loc.y) % 2 == 1
+        || !buildOnEven && (loc.x + loc.y) % 2 == 0) {
+      return false;
+    }
     return true;
-  }
-
-  private boolean doesRobotExist(RobotType type) {
-    DependencyProgress progress = controller.getDependencyProgress(type);
-    return progress != DependencyProgress.NONE;
   }
 
   /**
@@ -148,5 +160,32 @@ public final class Beaver extends AbstractRobot {
   private void broadcastAlive() {
     int numBeavers = controller.readBroadcast(Channels.NUM_BEAVERS);
     controller.broadcast(Channels.NUM_BEAVERS, numBeavers + 1);
+  }
+
+  /**
+   * Determine which structure to build.
+   *
+   * <p>If a structure is selected for construction, the type is stored in
+   * {@code buildType} and the location is set in {@code destination}. {@code
+   * isMovingToBuild} will be set to {@code true}.
+   */
+  private void buildNextStructure() {
+    // Figure out what to build next.
+
+    RobotInfo[] robots = controller.getNearbyRobots();
+    int[] count = getRobotCount(robots, controller.getTeam());
+
+    buildType = null;
+    for (int i = 0; i < BUILD_ORDER.length; ++i) {
+      RobotType type = BUILD_ORDER[i];
+      if (count[type.ordinal()] < BUILD_COUNT[i]) {
+        buildType = type;
+        break;
+      }
+    }
+    if (buildType != null) {
+      isMovingToBuild = true;
+      destination = getConstructionLocation();
+    }
   }
 }

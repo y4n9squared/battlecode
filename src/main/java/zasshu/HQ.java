@@ -22,7 +22,7 @@ public final class HQ extends AbstractRobot {
    * be set at minimum to 1, so that we can build structures, but not too large
    * as to waste ore.
    */
-  private static final int NUM_BEAVER_TARGET = 3;
+  private static final int NUM_BEAVER_TARGET = 2;
 
   /**
    * The distance at which to swarm the attack target.

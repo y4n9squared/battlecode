@@ -40,7 +40,8 @@ public abstract class AbstractRobot implements Robot {
     }
   }
 
-  protected abstract void runHelper();
+  protected void runHelper() {
+  }
 
   /**
    * Returns the direction to the enemy HQ.

@@ -182,6 +182,16 @@ public final class Controller {
   }
 
   /**
+   * Returns the terrain type at the specified location.
+   *
+   * @param loc map location
+   * @return terrain type
+   */
+  public TerrainTile getTerrain(MapLocation loc) {
+    return rc.senseTerrainTile(loc);
+  }
+
+  /**
    * Returns the value stored on the specified channel.
    *
    * @param channel channel number
