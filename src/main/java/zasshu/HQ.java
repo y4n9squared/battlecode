@@ -82,38 +82,34 @@ public final class HQ extends AbstractRobot {
 
     MapLocation[] enemyTowers = controller.getEnemyTowerLocations();
     MapLocation target;
+    int targetIndex = 0;
     if (enemyTowers.length > 0) {
       MapLocation myLoc = controller.getLocation();
       double closestDistance = Double.POSITIVE_INFINITY;
-      int closestIndex = 0;
       for (int i = enemyTowers.length; --i >= 0;) {
         double distance = myLoc.distanceSquaredTo(enemyTowers[i]);
         if (distance < closestDistance) {
           closestDistance = distance;
-          closestIndex = i;
+          targetIndex = i + 1;
         }
       }
-
-      target = enemyTowers[closestIndex];
+      target = enemyTowers[targetIndex - 1];
     } else {
       target = controller.getEnemyHQLocation();
     }
 
-    int existingTargetX = controller.readBroadcast(Channels.ATTACK_TARGET_X);
-    if (target.x != existingTargetX) {
-      controller.broadcast(Channels.ATTACK_TARGET_X, target.x);
-    }
-    int existingTargetY = controller.readBroadcast(Channels.ATTACK_TARGET_Y);
-    if (target.y != existingTargetY) {
-      controller.broadcast(Channels.ATTACK_TARGET_Y, target.y);
+    int existingTargetIndex =
+        controller.readBroadcast(Channels.ATTACK_TARGET_INDEX);
+    if (existingTargetIndex != targetIndex) {
+      controller.broadcast(Channels.ATTACK_TARGET_INDEX, targetIndex);
     }
 
     RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
         target,
-        SWARM_RADIUS_SQUARED + 5,
+        SWARM_RADIUS_SQUARED + 10,
         controller.getTeam());
 
-    if (teammatesAroundTarget.length >= 10) {
+    if (teammatesAroundTarget.length >= 12) {
       attackDistance = 0;
     } else if (teammatesAroundTarget.length < 5) {
       attackDistance = SWARM_RADIUS_SQUARED;
