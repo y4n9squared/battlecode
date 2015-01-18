@@ -88,4 +88,15 @@ public abstract class AbstractRobot implements Robot {
       controller.transferSupplies((int) (mySupply - avgSupply), target);
     }
   }
+
+  protected MapLocation[] getAttackTargets() {
+    MapLocation hq = controller.getEnemyHQLocation();
+    MapLocation[] towers = controller.getEnemyTowerLocations();
+
+    MapLocation[] targets = new MapLocation[towers.length + 1];
+    targets[0] = hq;
+    System.arraycopy(towers, 0, targets, 1, towers.length);
+
+    return targets;
+  }
 }

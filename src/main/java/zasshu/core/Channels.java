@@ -13,8 +13,14 @@ package zasshu.core;
 public class Channels {
 
   public static final int NUM_BEAVERS = 100;
-  public static final int ATTACK_TARGET_X = 200;
-  public static final int ATTACK_TARGET_Y = 201;
+
+  /*
+   * This is either:
+   * - 0 signifying to attack HQ
+   * - index of tower starting at 1, so 1 => tower[0]
+   */
+  public static final int ATTACK_TARGET_INDEX = 200;
+
   public static final int ATTACK_DISTANCE = 202;
 
   private Channels() {

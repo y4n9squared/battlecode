@@ -73,10 +73,9 @@ public final class Drone extends AbstractRobot {
       double maxPotential = Double.NEGATIVE_INFINITY;
       Direction maxDir = Direction.NONE;
 
-      MapLocation[] towers = controller.getEnemyTowerLocations();
-      MapLocation target = new MapLocation(
-          controller.readBroadcast(Channels.ATTACK_TARGET_X),
-          controller.readBroadcast(Channels.ATTACK_TARGET_Y));
+      MapLocation[] targets = getAttackTargets();
+      MapLocation target =
+          targets[controller.readBroadcast(Channels.ATTACK_TARGET_INDEX)];
 
       RobotInfo[] enemies = controller.getNearbyRobots(
           ROBOT_TYPE.sensorRadiusSquared,
