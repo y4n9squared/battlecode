@@ -82,8 +82,7 @@ public final class Drone extends AbstractRobot {
           ROBOT_TYPE.sensorRadiusSquared,
           controller.getOpponentTeam());
 
-      boolean attackTarget =
-          controller.readBroadcast(Channels.SHOULD_ATTACK_TARGET) != 0;
+      int attackDistance = controller.readBroadcast(Channels.ATTACK_DISTANCE);
 
       for (int i = 8; --i >= 0;) {
         Direction dir = myLoc.directionTo(locs[i]);
@@ -91,7 +90,7 @@ public final class Drone extends AbstractRobot {
           int distanceToTarget = locs[i].distanceSquaredTo(target);
           double potential = 10 * computePositiveForce(distanceToTarget);
 
-          if (!attackTarget && distanceToTarget <= 24) {
+          if (distanceToTarget <= attackDistance) {
             continue;
           }
 
