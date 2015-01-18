@@ -74,8 +74,7 @@ public final class Drone extends AbstractRobot {
       Direction maxDir = Direction.NONE;
 
       MapLocation[] targets = getAttackTargets();
-      MapLocation target =
-          targets[controller.readBroadcast(Channels.ATTACK_TARGET_INDEX)];
+      int targetIndex = controller.readBroadcast(Channels.ATTACK_TARGET_INDEX);
 
       RobotInfo[] enemies = controller.getNearbyRobots(
           ROBOT_TYPE.sensorRadiusSquared,
@@ -86,10 +85,26 @@ public final class Drone extends AbstractRobot {
       for (int i = 8; --i >= 0;) {
         Direction dir = myLoc.directionTo(locs[i]);
         if (controller.canMove(dir)) {
-          int distanceToTarget = locs[i].distanceSquaredTo(target);
-          double potential = 10 * computePositiveForce(distanceToTarget);
+          double potential = 0.0;
+          boolean badDir = false;
 
-          if (distanceToTarget <= attackDistance) {
+          for (int j = targets.length; --j >= 0;) {
+            MapLocation possibleTarget = targets[j];
+            int distanceToTarget = locs[i].distanceSquaredTo(possibleTarget);
+
+            if (j == targetIndex) {
+              potential += 10 * computePositiveForce(distanceToTarget);
+
+              if (distanceToTarget <= attackDistance) {
+                badDir = true;
+                break;
+              }
+            } else if (distanceToTarget <= 24) {
+              badDir = true;
+              break;
+            }
+          }
+          if (badDir) {
             continue;
           }
 
