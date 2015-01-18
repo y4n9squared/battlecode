@@ -15,7 +15,7 @@ public class Channels {
   public static final int NUM_BEAVERS = 100;
   public static final int ATTACK_TARGET_X = 200;
   public static final int ATTACK_TARGET_Y = 201;
-  public static final int SHOULD_ATTACK_TARGET = 202;
+  public static final int ATTACK_DISTANCE = 202;
 
   private Channels() {
   }
