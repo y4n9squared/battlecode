@@ -19,7 +19,7 @@ public final class MinerFactory extends AbstractRobot {
   /**
    * The number of miners to maintain on the map.
    */
-  private static int NUM_MINER_TARGET = 4;
+  private static int NUM_MINER_TARGET = 8;
 
   public MinerFactory(Controller controller) {
     super(controller);
