@@ -31,6 +31,8 @@ public final class HQ extends AbstractRobot {
       RobotType.HQ.sensorRadiusSquared;
 
   private int attackDistance = SWARM_RADIUS_SQUARED;
+  private MapLocation currentTarget = null;
+  private int numTowers = -1;
 
   /**
    * This is the order in which the HQ attacks enemys.
@@ -80,33 +82,11 @@ public final class HQ extends AbstractRobot {
       }
     }
 
-    MapLocation[] enemyTowers = controller.getEnemyTowerLocations();
-    MapLocation target;
-    int targetIndex = 0;
-    if (enemyTowers.length > 0) {
-      MapLocation myLoc = controller.getLocation();
-      double closestDistance = Double.POSITIVE_INFINITY;
-      for (int i = enemyTowers.length; --i >= 0;) {
-        double distance = myLoc.distanceSquaredTo(enemyTowers[i]);
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          targetIndex = i + 1;
-        }
-      }
-      target = enemyTowers[targetIndex - 1];
-    } else {
-      target = controller.getEnemyHQLocation();
-    }
-
-    int existingTargetIndex =
-        controller.readBroadcast(Channels.ATTACK_TARGET_INDEX);
-    if (existingTargetIndex != targetIndex) {
-      controller.broadcast(Channels.ATTACK_TARGET_INDEX, targetIndex);
-    }
+    computeAttackTarget();
 
     RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
-        target,
-        SWARM_RADIUS_SQUARED + 10,
+        currentTarget,
+        SWARM_RADIUS_SQUARED + 20,
         controller.getTeam());
 
     if (teammatesAroundTarget.length >= 12) {
@@ -119,5 +99,37 @@ public final class HQ extends AbstractRobot {
     if (existingAttackDistance != attackDistance) {
       controller.broadcast(Channels.ATTACK_DISTANCE, attackDistance);
     }
+  }
+
+  private void computeAttackTarget() {
+    MapLocation[] enemyTowers = controller.getEnemyTowerLocations();
+
+    if (numTowers == enemyTowers.length) {
+      return;
+    }
+
+    MapLocation locToSearchAround;
+    if (numTowers == -1) {
+      locToSearchAround = controller.getLocation();
+    } else {
+      locToSearchAround = currentTarget;
+    }
+    numTowers = enemyTowers.length;
+
+    int targetIndex = 0;
+    if (numTowers > 0) {
+      double closestDistance = Double.POSITIVE_INFINITY;
+      for (int i = numTowers; --i >= 0;) {
+        double distance = locToSearchAround.distanceSquaredTo(enemyTowers[i]);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          targetIndex = i + 1;
+        }
+      }
+      currentTarget = enemyTowers[targetIndex - 1];
+    } else {
+      currentTarget = controller.getEnemyHQLocation();
+    }
+    controller.broadcast(Channels.ATTACK_TARGET_INDEX, targetIndex);
   }
 }
