@@ -87,13 +87,14 @@ public final class Soldier extends AbstractRobot {
         if (controller.canMove(dir)) {
           double potential = 0.0;
           boolean badDir = false;
+          MapLocation loc = locs[i];
 
           for (int j = targets.length; --j >= 0;) {
             MapLocation possibleTarget = targets[j];
-            int distanceToTarget = locs[i].distanceSquaredTo(possibleTarget);
+            int distanceToTarget = loc.distanceSquaredTo(possibleTarget);
 
             if (j == targetIndex) {
-              potential += 10 * computePositiveForce(distanceToTarget);
+              potential += 50 * computePositiveForce(distanceToTarget);
 
               if (distanceToTarget <= attackDistance) {
                 badDir = true;
@@ -109,8 +110,15 @@ public final class Soldier extends AbstractRobot {
           }
 
           for (int j = enemies.length; --j >= 0;) {
-            double force = computeForce(locs[i], enemies[j]);
+            double force = computeForce(loc, enemies[j]);
             potential = Math.max(potential, force);
+          }
+
+          MapLocation[] trail = controller.getTrail();
+          for (int j = trail.length; --j >= 0;) {
+            if (loc.distanceSquaredTo(trail[j]) <= 3) {
+              potential -= 0.001;
+            }
           }
 
           if (maxPotential < potential) {

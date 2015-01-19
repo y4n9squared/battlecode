@@ -5,6 +5,8 @@
 
 package zasshu.core;
 
+import zasshu.util.MapLocationQueue;
+
 import battlecode.common.*;
 
 /**
@@ -17,9 +19,15 @@ import battlecode.common.*;
  */
 public final class Controller {
 
+  /**
+   * Number of locations to keep in trail.
+   */
+  private static final int MAX_TRAIL_SIZE = 3;
+
   private final RobotController rc;
 
   private MapLocation enemyHQLocation;
+  private MapLocationQueue trail;
   private RobotInfo[] nearbyRobots;
 
   /**
@@ -29,6 +37,7 @@ public final class Controller {
    */
   public Controller(RobotController rc) {
     this.rc = rc;
+    trail = new MapLocationQueue();
   }
 
   /**
@@ -265,6 +274,12 @@ public final class Controller {
     if (rc.isCoreReady() && canMove(dir)) {
       try {
         rc.move(dir);
+
+        if (trail.size() == MAX_TRAIL_SIZE) {
+          trail.remove();
+        }
+        trail.add(getLocation().add(dir));
+
         return true;
       } catch (GameActionException e) {
         e.printStackTrace();
@@ -369,6 +384,15 @@ public final class Controller {
    */
   public RobotType getType() {
     return rc.getType();
+  }
+
+  /**
+   * Returns this robot's trail.
+   *
+   * @return trail
+   */
+  public MapLocation[] getTrail() {
+    return trail.toArray();
   }
 
   /**
