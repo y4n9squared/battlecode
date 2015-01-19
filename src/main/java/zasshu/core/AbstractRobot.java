@@ -75,7 +75,7 @@ public abstract class AbstractRobot implements Robot {
     double mySupply = controller.getSupplyLevel();
     RobotInfo target = null;
     double maxDifference = 0;
-    double totalSupply = 0;
+    double totalSupply = mySupply;
 
     for (int i = robots.length; --i >= 0;) {
       totalSupply += robots[i].supplyLevel;
@@ -85,7 +85,7 @@ public abstract class AbstractRobot implements Robot {
         target = robots[i];
       }
     }
-    double avgSupply = totalSupply / robots.length;
+    double avgSupply = totalSupply / (robots.length + 1);
     if (mySupply > avgSupply) {
       controller.transferSupplies((int) (mySupply - avgSupply), target);
     }
