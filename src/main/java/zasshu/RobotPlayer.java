@@ -63,6 +63,9 @@ public class RobotPlayer {
       case AEROSPACELAB:
         robot = new AerospaceLab(controller);
         break;
+      case TANK:
+        robot = new Tank(controller);
+        break;
       default:
         // Should never happen
         return;

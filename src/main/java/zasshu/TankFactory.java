@@ -8,6 +8,9 @@ package zasshu;
 import zasshu.core.AbstractRobot;
 import zasshu.core.Controller;
 
+import battlecode.common.Direction;
+import battlecode.common.RobotType;
+
 /**
  * A Tank Factory robot.
  *
@@ -17,5 +20,12 @@ public final class TankFactory extends AbstractRobot {
 
   public TankFactory(Controller controller) {
     super(controller);
+  }
+
+  @Override protected void runHelper() {
+    if (controller.isCoreReady()) {
+      Direction dir = getEnemyHQDirection();
+      controller.spawn(dir, RobotType.TANK);
+    }
   }
 }
