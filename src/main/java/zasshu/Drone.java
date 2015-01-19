@@ -124,7 +124,6 @@ public final class Drone extends AbstractRobot {
     }
     // TODO: Add a retreat strategy that moves according to influence gradient.
     // Gradient should be the direction of retreat.
-    propogateSupply();
   }
 
   private double computeForce(MapLocation loc, RobotInfo robot) {

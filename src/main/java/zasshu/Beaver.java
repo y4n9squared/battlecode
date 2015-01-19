@@ -90,14 +90,16 @@ public final class Beaver extends AbstractRobot {
           pastLocations[head++] = myLoc;
         }
         if (myLoc.distanceSquaredTo(destination) <= 2) {
-          isMovingToBuild = false;
-          controller.build(myLoc.directionTo(destination), buildType);
+          boolean success = controller.build(
+              myLoc.directionTo(destination), buildType);
+          if (success) {
+            isMovingToBuild = false;
+          }
         } else {
           controller.move(computeGradient());
         }
       }
     }
-    propogateSupply();
   }
 
   private Direction computeGradient() {

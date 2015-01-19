@@ -55,7 +55,6 @@ public final class Miner extends AbstractRobot {
             maxDir = dir;
           }
         }
-
         moved = controller.move(maxDir);
       }
 
@@ -66,6 +65,5 @@ public final class Miner extends AbstractRobot {
         ++mineCounter;
       }
     }
-    propogateSupply();
   }
 }
