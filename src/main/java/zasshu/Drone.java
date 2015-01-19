@@ -50,7 +50,7 @@ public final class Drone extends AbstractRobot {
           controller.getOpponentTeam());
 
       RobotInfo target = null;
-      int maxPriority = AttackPriority.MISSILE.ordinal();
+      int maxPriority = AttackPriority.HANDWASHSTATION.ordinal();
 
       for (int i = enemies.length; --i >= 0;) {
         // Calling Enum.valueOf is potentially dangerous here - if the enemy
