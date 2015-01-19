@@ -23,13 +23,6 @@ public final class AttackPriorityTest {
 
   // CHECKSTYLE.OFF: False positives for double-brace initilization
   @SuppressWarnings("serial")
-  public static final Set<String> requiredTypes = new HashSet<String>() {{
-    for (RobotType t : RobotType.values()) {
-      add(t.name());
-    }
-  }};
-
-  @SuppressWarnings("serial")
   public static final List<Class<? extends AbstractRobot>> robotTypes
       = new ArrayList<Class<? extends AbstractRobot>>() {{
     add(Drone.class);
@@ -44,8 +37,14 @@ public final class AttackPriorityTest {
       for (Class<?> cls : classes) {
         if (cls.getName().contains("$AttackPriority")) {
           Class<?> enumCls = Class.forName(cls.getName());
+
+          HashSet<String> myTypes = new HashSet<String>();
           for (Object obj : enumCls.getEnumConstants()) {
-            assertTrue(requiredTypes.contains(obj.toString()));
+            myTypes.add(obj.toString());
+          }
+
+          for (RobotType t : RobotType.values()) {
+            assertTrue(myTypes.contains(t.name()));
           }
         }
       }
