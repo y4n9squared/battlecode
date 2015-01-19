@@ -14,8 +14,8 @@ public class Channels {
 
   public static final int NUM_BEAVERS = 100;
 
-  /*
-   * This is either:
+  /**
+   * Following choices exist for value in this channel.
    * - 0 signifying to attack HQ
    * - index of tower starting at 1, so 1 => tower[0]
    */
