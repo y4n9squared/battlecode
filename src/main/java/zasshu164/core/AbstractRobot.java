@@ -3,9 +3,9 @@
  * Copyright © 2014-2015 Holman Gao, Yang Yang. All Rights Reserved.
  */
 
-package zasshu.core;
+package zasshu164.core;
 
-import zasshu.util.Timer;
+import zasshu164.util.Timer;
 
 import battlecode.common.Direction;
 import battlecode.common.GameConstants;

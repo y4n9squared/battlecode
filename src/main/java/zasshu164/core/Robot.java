@@ -3,7 +3,7 @@
  * Copyright © 2014-2015 Holman Gao, Yang Yang. All Rights Reserved.
  */
 
-package zasshu.core;
+package zasshu164.core;
 
 /**
  * Interface for a {@code Robot}.

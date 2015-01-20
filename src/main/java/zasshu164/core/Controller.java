@@ -3,9 +3,9 @@
  * Copyright © 2014-2015 Holman Gao, Yang Yang. All Rights Reserved.
  */
 
-package zasshu.core;
+package zasshu164.core;
 
-import zasshu.util.MapLocationQueue;
+import zasshu164.util.MapLocationQueue;
 
 import battlecode.common.*;
 
