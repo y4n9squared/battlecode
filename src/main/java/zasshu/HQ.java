@@ -38,6 +38,7 @@ public final class HQ extends AbstractRobot {
   private int attackDistance = SWARM_RADIUS_SQUARED;
   private MapLocation currentTarget = null;
   private int numTowers = -1;
+  private RobotInfo[] teammatesAroundTarget = null;
 
   /**
    * This is the order in which the HQ attacks enemys.
@@ -87,12 +88,15 @@ public final class HQ extends AbstractRobot {
       }
     }
 
+    teammatesAroundTarget = null;
     computeAttackTarget();
 
-    RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
-        currentTarget,
-        SWARM_RADIUS_SQUARED + 20,
-        controller.getTeam());
+    if (teammatesAroundTarget == null) {
+      teammatesAroundTarget = controller.getNearbyRobots(
+          currentTarget,
+          SWARM_RADIUS_SQUARED + 20,
+          controller.getTeam());
+    }
 
     if (Clock.getRoundNum() < MIN_ATTACK_ROUND) {
       attackDistance =
@@ -111,33 +115,65 @@ public final class HQ extends AbstractRobot {
 
   private void computeAttackTarget() {
     MapLocation[] enemyTowers = controller.getEnemyTowerLocations();
+    int targetIndex = 0;
 
     if (numTowers == enemyTowers.length) {
-      return;
-    }
+      // See if we should switch target
+      if (numTowers == 1) {
+        return;
+      }
 
-    MapLocation locToSearchAround;
-    if (numTowers == -1) {
-      locToSearchAround = controller.getLocation();
-    } else {
-      locToSearchAround = currentTarget;
-    }
-    numTowers = enemyTowers.length;
+      teammatesAroundTarget = controller.getNearbyRobots(
+          currentTarget,
+          SWARM_RADIUS_SQUARED + 20,
+          controller.getTeam());
 
-    int targetIndex = 0;
-    if (numTowers > 0) {
-      double closestDistance = Double.POSITIVE_INFINITY;
+      boolean targetChanged = false;
       for (int i = numTowers; --i >= 0;) {
-        double distance = locToSearchAround.distanceSquaredTo(enemyTowers[i]);
-        if (distance < closestDistance) {
-          closestDistance = distance;
+        if (enemyTowers[i].equals(currentTarget)) {
+          continue;
+        }
+
+        RobotInfo[] teammatesAroundOther = controller.getNearbyRobots(
+            enemyTowers[i],
+            SWARM_RADIUS_SQUARED + 20,
+            controller.getTeam());
+
+        if (teammatesAroundTarget.length + 10 < teammatesAroundOther.length) {
           targetIndex = i + 1;
+          targetChanged = true;
         }
       }
-      currentTarget = enemyTowers[targetIndex - 1];
+
+      if (!targetChanged) {
+        return;
+      } else {
+        currentTarget = enemyTowers[targetIndex - 1];
+      }
     } else {
-      currentTarget = controller.getEnemyHQLocation();
+      MapLocation locToSearchAround;
+      if (numTowers == -1) {
+        locToSearchAround = controller.getLocation();
+      } else {
+        locToSearchAround = currentTarget;
+      }
+      numTowers = enemyTowers.length;
+
+      if (numTowers > 0) {
+        double closestDistance = Double.POSITIVE_INFINITY;
+        for (int i = numTowers; --i >= 0;) {
+          double distance = locToSearchAround.distanceSquaredTo(enemyTowers[i]);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            targetIndex = i + 1;
+          }
+        }
+        currentTarget = enemyTowers[targetIndex - 1];
+      } else {
+        currentTarget = controller.getEnemyHQLocation();
+      }
     }
+
     controller.broadcast(Channels.ATTACK_TARGET_INDEX, targetIndex);
   }
 }
