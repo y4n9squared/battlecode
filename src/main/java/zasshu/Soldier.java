@@ -151,7 +151,8 @@ public final class Soldier extends AbstractRobot {
   }
 
   private double computePositiveForce(int d) {
-    return ROBOT_TYPE.attackRadiusSquared / (Math.abs(d - 4.0) + 1);
+    return ROBOT_TYPE.attackRadiusSquared
+        / (Math.abs(d - ROBOT_TYPE.attackRadiusSquared) + 1);
   }
 
   private double computeNegativeForce(int d) {
