@@ -87,13 +87,15 @@ public final class Drone extends AbstractRobot {
         if (controller.canMove(dir)) {
           double potential = 0.0;
           boolean badDir = false;
+          MapLocation loc = locs[i];
 
           for (int j = targets.length; --j >= 0;) {
             MapLocation possibleTarget = targets[j];
-            int distanceToTarget = locs[i].distanceSquaredTo(possibleTarget);
+            int distanceToTarget = loc.distanceSquaredTo(possibleTarget);
 
             if (j == targetIndex) {
-              potential += 10 * computePositiveForce(distanceToTarget);
+              potential +=
+                50 * computePositiveForce(distanceToTarget, attackDistance);
 
               if (distanceToTarget <= attackDistance) {
                 badDir = true;
@@ -109,7 +111,7 @@ public final class Drone extends AbstractRobot {
           }
 
           for (int j = enemies.length; --j >= 0;) {
-            double force = computeForce(locs[i], enemies[j]);
+            double force = computeForce(loc, enemies[j]);
             potential = Math.max(potential, force);
           }
 
@@ -145,6 +147,11 @@ public final class Drone extends AbstractRobot {
   private double computePositiveForce(int d) {
     return ROBOT_TYPE.attackRadiusSquared
         / (Math.abs(d - ROBOT_TYPE.attackRadiusSquared) + 1);
+  }
+
+  private double computePositiveForce(int d, int optimalDistance) {
+    return ROBOT_TYPE.attackRadiusSquared
+        / (Math.abs(d - optimalDistance) + 1.0);
   }
 
   private double computeNegativeForce(int d) {
