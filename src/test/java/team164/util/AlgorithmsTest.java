@@ -3,10 +3,10 @@
  * Copyright © 2014-2015 Holman Gao, Yang Yang. All Rights Reserved.
  */
 
-package zasshu164.util;
+package team164.util;
 
 import static org.junit.Assert.*;
-import static zasshu164.util.Algorithms.*;
+import static team164.util.Algorithms.*;
 
 import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;

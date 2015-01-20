@@ -3,11 +3,11 @@
  * Copyright © 2014-2015 Holman Gao, Yang Yang. All Rights Reserved.
  */
 
-package zasshu164;
+package team164;
 
-import zasshu164.core.AbstractRobot;
-import zasshu164.core.Channels;
-import zasshu164.core.Controller;
+import team164.core.AbstractRobot;
+import team164.core.Channels;
+import team164.core.Controller;
 
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
@@ -15,31 +15,31 @@ import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 
 /**
- * AI for the Soldier robot type.
+ * AI for the Tank robot type.
  *
  * @author Holman Gao
  * @author Yang Yang
  */
-public final class Soldier extends AbstractRobot {
+public final class Tank extends AbstractRobot {
 
   private static final RobotType ROBOT_TYPE = RobotType.SOLDIER;
 
   /**
-   * This is the order in which the soldier attacks enemys.
+   * This is the order in which the tank attacks enemys.
    */
   private enum AttackPriority {
-    TOWER, HQ, LAUNCHER, COMMANDER, TANK, DRONE, BASHER, SOLDIER, MINER, BEAVER,
-    COMPUTER, MISSILE, AEROSPACELAB, BARRACKS, HELIPAD, MINERFACTORY,
+    TOWER, HQ, MISSILE, LAUNCHER, COMMANDER, TANK, DRONE, BASHER, SOLDIER,
+    MINER, BEAVER, COMPUTER, AEROSPACELAB, BARRACKS, HELIPAD, MINERFACTORY,
     SUPPLYDEPOT, TANKFACTORY, TECHNOLOGYINSTITUTE, TRAININGFIELD,
     HANDWASHSTATION;
   }
 
   /**
-   * Constructs a {@code Soldier} object.
+   * Constructs a {@code Tank} object.
    *
    * @param c controller
    */
-  public Soldier(Controller c) {
+  public Tank(Controller c) {
     super(c);
   }
 
@@ -113,13 +113,6 @@ public final class Soldier extends AbstractRobot {
           for (int j = enemies.length; --j >= 0;) {
             double force = computeForce(loc, enemies[j]);
             potential = Math.max(potential, force);
-          }
-
-          MapLocation[] trail = controller.getTrail();
-          for (int j = trail.length; --j >= 0;) {
-            if (loc.distanceSquaredTo(trail[j]) <= 3) {
-              potential -= 0.001;
-            }
           }
 
           if (maxPotential < potential) {

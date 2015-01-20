@@ -1,4 +1,4 @@
-package zasshu164.util;
+package team164.util;
 
 import battlecode.common.Clock;
 import battlecode.common.RobotType;
