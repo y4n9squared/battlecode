@@ -3,11 +3,11 @@
  * Copyright © 2014-2015 Holman Gao, Yang Yang. All Rights Reserved.
  */
 
-package zasshu164;
+package team164;
 
 import static org.junit.Assert.*;
 
-import zasshu164.core.AbstractRobot;
+import team164.core.AbstractRobot;
 
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;

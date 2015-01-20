@@ -3,7 +3,7 @@
  * Copyright © 2014-2015 Holman Gao, Yang Yang. All Rights Reserved.
  */
 
-package zasshu164.util;
+package team164.util;
 
 import battlecode.common.MapLocation;
 

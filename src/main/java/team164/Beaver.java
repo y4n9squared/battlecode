@@ -3,13 +3,13 @@
  * Copyright © 2014-2015 Holman Gao, Yang Yang. All Rights Reserved.
  */
 
-package zasshu164;
+package team164;
 
-import static zasshu164.util.Algorithms.*;
+import static team164.util.Algorithms.*;
 
-import zasshu164.core.AbstractRobot;
-import zasshu164.core.Channels;
-import zasshu164.core.Controller;
+import team164.core.AbstractRobot;
+import team164.core.Channels;
+import team164.core.Controller;
 
 import battlecode.common.Clock;
 import battlecode.common.DependencyProgress;

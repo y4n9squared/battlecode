@@ -3,10 +3,10 @@
  * Copyright © 2014-2015 Holman Gao, Yang Yang. All Rights Reserved.
  */
 
-package zasshu164;
+package team164;
 
-import zasshu164.core.Controller;
-import zasshu164.core.Robot;
+import team164.core.Controller;
+import team164.core.Robot;
 
 import battlecode.common.RobotController;
 
