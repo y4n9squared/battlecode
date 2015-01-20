@@ -32,6 +32,15 @@ public final class Controller {
   }
 
   /**
+   * Returns the ID for this robot.
+   *
+   * @return ID of this robot
+   */
+  public int getID() {
+    return rc.getID();
+  }
+
+  /**
    * Returns the team of this robot.
    *
    * @return team of this robot
