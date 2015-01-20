@@ -30,6 +30,11 @@ public final class HQ extends AbstractRobot {
   private static final int SWARM_RADIUS_SQUARED =
       RobotType.HQ.sensorRadiusSquared;
 
+  /**
+   * The round on which to start attacking.
+   */
+  private static final int MIN_ATTACK_ROUND = 500;
+
   private int attackDistance = SWARM_RADIUS_SQUARED;
   private MapLocation currentTarget = null;
   private int numTowers = -1;
@@ -89,7 +94,10 @@ public final class HQ extends AbstractRobot {
         SWARM_RADIUS_SQUARED + 20,
         controller.getTeam());
 
-    if (teammatesAroundTarget.length >= 12) {
+    if (Clock.getRoundNum() < MIN_ATTACK_ROUND) {
+      attackDistance =
+          controller.getLocation().distanceSquaredTo(currentTarget) - 24;
+    } else if (teammatesAroundTarget.length >= 12) {
       attackDistance = 0;
     } else if (teammatesAroundTarget.length < 5) {
       attackDistance = SWARM_RADIUS_SQUARED;
