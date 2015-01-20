@@ -3,29 +3,31 @@
  * Copyright © 2014-2015 Holman Gao, Yang Yang. All Rights Reserved.
  */
 
-package zasshu;
+package zasshu164;
 
-import zasshu.core.AbstractRobot;
-import zasshu.core.Controller;
+import zasshu164.core.AbstractRobot;
+import zasshu164.core.Controller;
 
 import battlecode.common.Direction;
+import battlecode.common.GameConstants;
+import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 
 /**
- * A Tank Factory robot.
+ * A Helipad structure for spawning drones and launchers.
  *
  * @author Yang Yang
  */
-public final class TankFactory extends AbstractRobot {
+public final class Helipad extends AbstractRobot {
 
-  public TankFactory(Controller controller) {
+  public Helipad(Controller controller) {
     super(controller);
   }
 
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
       Direction dir = getEnemyHQDirection();
-      controller.spawn(dir, RobotType.TANK);
+      controller.spawn(dir, RobotType.DRONE);
     }
   }
 }
