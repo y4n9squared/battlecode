@@ -116,14 +116,16 @@ public final class Soldier extends AbstractRobot {
       double potential = 0.0;
       boolean badDir = false;
 
+      // Add computations for target
+      potential +=
+        computeTargetForce(loc.distanceSquaredTo(target), attackDistance);
+
+      // Add computations for targets
       for (int j = targets.length; --j >= 0;) {
         MapLocation possibleTarget = targets[j];
         int distanceToTarget = loc.distanceSquaredTo(possibleTarget);
 
         if (targets[j].equals(target)) {
-          potential +=
-            50 * computePositiveForce(distanceToTarget, attackDistance);
-
           if (distanceToTarget <= attackDistance) {
             badDir = true;
             break;
@@ -133,6 +135,7 @@ public final class Soldier extends AbstractRobot {
           break;
         }
       }
+
       if (badDir) {
         continue;
       }
@@ -175,8 +178,8 @@ public final class Soldier extends AbstractRobot {
         / (Math.abs(d - ROBOT_TYPE.attackRadiusSquared) + 1);
   }
 
-  private double computePositiveForce(int d, int optimalDistance) {
-    return ROBOT_TYPE.attackRadiusSquared
+  private double computeTargetForce(int d, int optimalDistance) {
+    return 5 * ROBOT_TYPE.attackRadiusSquared
         / (Math.abs(d - optimalDistance) + 1.0);
   }
 
