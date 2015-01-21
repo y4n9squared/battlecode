@@ -74,7 +74,7 @@ public final class Tank extends AbstractRobot {
       Direction maxDir = Direction.NONE;
 
       MapLocation[] targets = getAttackTargets();
-      int targetIndex = controller.readBroadcast(Channels.ATTACK_TARGET_INDEX);
+      MapLocation target = readMapLocationBroadcast(Channels.TARGET_LOCATION);
 
       RobotInfo[] enemies = controller.getNearbyRobots(
           ROBOT_TYPE.sensorRadiusSquared,
@@ -93,7 +93,7 @@ public final class Tank extends AbstractRobot {
             MapLocation possibleTarget = targets[j];
             int distanceToTarget = loc.distanceSquaredTo(possibleTarget);
 
-            if (j == targetIndex) {
+            if (targets[j].equals(target)) {
               potential +=
                 50 * computePositiveForce(distanceToTarget, attackDistance);
 

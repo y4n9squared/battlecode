@@ -138,6 +138,6 @@ public final class HQ extends AbstractRobot {
     } else {
       currentTarget = controller.getEnemyHQLocation();
     }
-    controller.broadcast(Channels.ATTACK_TARGET_INDEX, targetIndex);
+    broadcastMapLocation(Channels.TARGET_LOCATION, currentTarget);
   }
 }
