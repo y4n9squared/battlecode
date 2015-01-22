@@ -5,6 +5,8 @@
 
 package team164.core;
 
+import static team164.util.Algorithms.*;
+
 import team164.util.Timer;
 
 import battlecode.common.Direction;

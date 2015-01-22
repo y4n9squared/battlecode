@@ -5,6 +5,8 @@
 
 package team164;
 
+import static team164.util.Algorithms.*;
+
 import team164.core.AbstractRobot;
 import team164.core.Channels;
 import team164.core.Controller;
@@ -138,6 +140,7 @@ public final class HQ extends AbstractRobot {
     } else {
       currentTarget = controller.getEnemyHQLocation();
     }
-    controller.broadcast(Channels.ATTACK_TARGET_INDEX, targetIndex);
+    controller.broadcast(Channels.TARGET_LOCATION,
+        locationToInt(currentTarget, controller.getLocation()));
   }
 }

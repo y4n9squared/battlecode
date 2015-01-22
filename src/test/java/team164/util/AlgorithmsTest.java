@@ -38,4 +38,20 @@ public final class AlgorithmsTest {
     assertEquals(
         "Incorrect BEAVER count.", 0, count[RobotType.BEAVER.ordinal()]);
   }
+
+  @Test public void testLocationIntConversion() {
+    MapLocation hq = new MapLocation(10723, 13241);
+    MapLocation[] locs = {
+      new MapLocation(10723, 13241),  // (0, 0)
+      new MapLocation(10597, 13241),  // (-130, 0)
+      new MapLocation(10723, 13111),  // (0, -130)
+      new MapLocation(10597, 13111),  // (-130, -130)
+      new MapLocation(10853, 13371)   // (130, 130)
+    };
+
+    for (MapLocation loc : locs) {
+      assertTrue("Inconsistent conversion " + loc,
+          intToLocation(locationToInt(loc, hq), hq).equals(loc));
+    }
+  }
 }
