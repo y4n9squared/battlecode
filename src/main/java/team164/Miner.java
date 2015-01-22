@@ -48,6 +48,12 @@ public final class Miner extends AbstractRobot {
    */
   private final MapLocationSet dangerousLocations = new MapLocationSet();
 
+  /**
+   * A cache of map locations visited with no ore. A Miner will not revisit
+   * these locations on its random walk.
+   */
+  private final MapLocationSet noOreLocations = new MapLocationSet();
+
   private MapLocation myLoc;
   private MapLocation[] adjacentSquares;
 
@@ -149,14 +155,24 @@ public final class Miner extends AbstractRobot {
     } else if (maxOre > 0) {
       controller.mine();
     } else {
+      noOreLocations.add(myLoc);
       Direction[] dirs = Direction.values();
       boolean loop = true;
+      int failures = 0;
       while (loop) {
+        if (failures > 10) {
+          // Probably stuck. Clear cache.
+          noOreLocations.clear();
+        }
         int i = rnd.nextInt(8);
+        MapLocation loc = myLoc.add(dirs[i]);
         if (controller.canMove(dirs[i])
-            && !dangerousLocations.contains(myLoc.add(dirs[i]))) {
+            && !noOreLocations.contains(loc)
+            && !dangerousLocations.contains(loc)) {
           controller.move(dirs[i]);
           loop = false;
+        } else {
+          ++failures;
         }
       }
     }
