@@ -5,6 +5,8 @@
 
 package team164.core;
 
+import static team164.util.Algorithms.*;
+
 import team164.util.Timer;
 
 import battlecode.common.Direction;
@@ -103,15 +105,12 @@ public abstract class AbstractRobot implements Robot {
   }
 
   protected void broadcastMapLocation(int channel, MapLocation loc) {
-    // TODO make into one broadcast
-    controller.broadcast(channel, loc.x);
-    controller.broadcast(channel + 1, loc.y);
+    controller.broadcast(channel, locationToInt(loc,
+          controller.getHQLocation()));
   }
 
   protected MapLocation readMapLocationBroadcast(int channel) {
-    // TODO make into one broadcast
-    return new MapLocation(
-      controller.readBroadcast(channel),
-      controller.readBroadcast(channel + 1));
+    return intToMapLocation(controller.readBroadcast(channel),
+        controller.getHQLocation());
   }
 }

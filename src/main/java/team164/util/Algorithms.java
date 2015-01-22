@@ -5,6 +5,7 @@
 
 package team164.util;
 
+import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 import battlecode.common.Team;
@@ -35,5 +36,27 @@ public final class Algorithms {
       }
     }
     return count;
+  }
+
+  /**
+   * Converts a map location to a unique 32-bit integer.
+   *
+   * @param loc map location to convert
+   * @param hq map location of HQ
+   * @see #intToMapLocation(int, MapLocation)
+   */
+  public static int locationToInt(MapLocation loc, MapLocation hq) {
+    return ((loc.x - hq.x) << 16) | ((loc.y - hq.y) & 0xFFFF);
+  }
+
+  /**
+   * Converts an integer into a map location.
+   *
+   * @param int integer to convert
+   * @param hq map location of HQ
+   * @see #locationToInt(MapLocation, MapLocation)
+   */
+  public static MapLocation intToMapLocation(int x, MapLocation hq) {
+    return new MapLocation((x >> 16) + hq.x, (short) (x & 0xFFFF) + hq.y);
   }
 }
