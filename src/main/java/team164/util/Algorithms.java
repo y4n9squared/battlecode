@@ -43,7 +43,7 @@ public final class Algorithms {
    *
    * @param loc map location to convert
    * @param hq map location of HQ
-   * @see #intToMapLocation(int, MapLocation)
+   * @see #intToLocation(int, MapLocation)
    */
   public static int locationToInt(MapLocation loc, MapLocation hq) {
     return ((loc.x - hq.x) << 16) | ((loc.y - hq.y) & 0xFFFF);
@@ -56,7 +56,7 @@ public final class Algorithms {
    * @param hq map location of HQ
    * @see #locationToInt(MapLocation, MapLocation)
    */
-  public static MapLocation intToMapLocation(int x, MapLocation hq) {
+  public static MapLocation intToLocation(int x, MapLocation hq) {
     return new MapLocation((x >> 16) + hq.x, (short) (x & 0xFFFF) + hq.y);
   }
 }

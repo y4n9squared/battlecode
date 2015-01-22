@@ -5,6 +5,8 @@
 
 package team164;
 
+import static team164.util.Algorithms.*;
+
 import team164.core.AbstractRobot;
 import team164.core.Channels;
 import team164.core.Controller;
@@ -74,7 +76,9 @@ public final class Soldier extends AbstractRobot {
       Direction maxDir = Direction.NONE;
 
       MapLocation[] targets = getAttackTargets();
-      MapLocation target = readMapLocationBroadcast(Channels.TARGET_LOCATION);
+      MapLocation target = intToLocation(
+          controller.readBroadcast(Channels.TARGET_LOCATION),
+          controller.getHQLocation());
 
       RobotInfo[] enemies = controller.getNearbyRobots(
           ROBOT_TYPE.sensorRadiusSquared,

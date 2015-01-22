@@ -51,7 +51,7 @@ public final class AlgorithmsTest {
 
     for (MapLocation loc : locs) {
       assertTrue("Inconsistent conversion " + loc,
-          intToMapLocation(locationToInt(loc, hq), hq).equals(loc));
+          intToLocation(locationToInt(loc, hq), hq).equals(loc));
     }
   }
 }

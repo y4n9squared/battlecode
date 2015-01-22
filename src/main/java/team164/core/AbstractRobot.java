@@ -103,14 +103,4 @@ public abstract class AbstractRobot implements Robot {
 
     return targets;
   }
-
-  protected void broadcastMapLocation(int channel, MapLocation loc) {
-    controller.broadcast(channel, locationToInt(loc,
-          controller.getHQLocation()));
-  }
-
-  protected MapLocation readMapLocationBroadcast(int channel) {
-    return intToMapLocation(controller.readBroadcast(channel),
-        controller.getHQLocation());
-  }
 }
