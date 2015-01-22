@@ -13,6 +13,7 @@ import battlecode.common.Direction;
 import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
+import battlecode.common.TerrainTile;
 
 /**
  * Abstract skeletal implementation of the {@code Robot} interface.
@@ -62,6 +63,30 @@ public abstract class AbstractRobot implements Robot {
    */
   protected MapLocation getLocation() {
     return controller.getLocation();
+  }
+
+  /**
+   * Returns a list of map locations to which the robot is available to move,
+   * including the robot's current location.
+   *
+   * @return list of available locations for robot to move
+   */
+  protected MapLocation[] getTraversableAdjacentMapLocations() {
+    MapLocation myLoc = getLocation();
+    MapLocation[] arr = new MapLocation[9];
+    MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(
+        getLocation(), 2);
+    int count = 0;
+    for (int i = locs.length; --i >= 0;) {
+      MapLocation loc = locs[i];
+      if (controller.canMove(myLoc.directionTo(loc))
+          || loc.equals(myLoc)) {
+        arr[count++] = loc;
+      }
+    }
+    MapLocation[] returnLocs = new MapLocation[count];
+    System.arraycopy(arr, 0, returnLocs, 0, count);
+    return returnLocs;
   }
 
   /**

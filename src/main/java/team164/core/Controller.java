@@ -156,6 +156,24 @@ public final class Controller {
   }
 
   /**
+   * Returns the robot at the specified location, or {@code null} if no robot is
+   * present.
+   *
+   * @param loc location to sense
+   * @return robot at location
+   */
+  public RobotInfo getRobotAtLocation(MapLocation loc) {
+    if (rc.canSenseLocation(loc)) {
+      try {
+        return rc.senseRobotAtLocation(loc);
+      } catch (GameActionException e) {
+        e.printStackTrace();
+      }
+    }
+    return null;
+  }
+
+  /**
    * Returns the amount of ore at the specified map location.
    *
    * @param loc map location
@@ -207,6 +225,15 @@ public final class Controller {
    */
   public TerrainTile getTerrain(MapLocation loc) {
     return rc.senseTerrainTile(loc);
+  }
+
+  /**
+   * Returns the number of missiles this robot has.
+   *
+   * @return number of missiles this robot has
+   */
+  public int getMissileCount() {
+    return rc.getMissileCount();
   }
 
   /**
@@ -346,6 +373,24 @@ public final class Controller {
     if (rc.isCoreReady() && rc.canBuild(dir, type)) {
       try {
         rc.build(dir, type);
+        return true;
+      } catch (GameActionException e) {
+        e.printStackTrace();
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Try to launch a missile.
+   *
+   * @param dir direction to launch missile
+   * @return {@code true} if successful
+   */
+  public boolean launchMissile(Direction dir) {
+    if (rc.canLaunch(dir)) {
+      try {
+        rc.launchMissile(dir);
         return true;
       } catch (GameActionException e) {
         e.printStackTrace();
