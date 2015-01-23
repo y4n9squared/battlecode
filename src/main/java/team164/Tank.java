@@ -70,8 +70,7 @@ public final class Tank extends AbstractRobot {
     }
     if (controller.isCoreReady()) {
       MapLocation myLoc = controller.getLocation();
-      MapLocation[] locs =
-          MapLocation.getAllMapLocationsWithinRadiusSq(myLoc, 2);
+      MapLocation[] locs = getTraversableAdjacentMapLocations();
       double maxPotential = Double.NEGATIVE_INFINITY;
       Direction maxDir = Direction.NONE;
 
@@ -86,43 +85,41 @@ public final class Tank extends AbstractRobot {
 
       int attackDistance = controller.readBroadcast(Channels.ATTACK_DISTANCE);
 
-      for (int i = 8; --i >= 0;) {
+      for (int i = locs.length; --i >= 0;) {
         Direction dir = myLoc.directionTo(locs[i]);
-        if (controller.canMove(dir)) {
-          double potential = 0.0;
-          boolean badDir = false;
-          MapLocation loc = locs[i];
+        double potential = 0.0;
+        boolean badDir = false;
+        MapLocation loc = locs[i];
 
-          for (int j = targets.length; --j >= 0;) {
-            MapLocation possibleTarget = targets[j];
-            int distanceToTarget = loc.distanceSquaredTo(possibleTarget);
+        for (int j = targets.length; --j >= 0;) {
+          MapLocation possibleTarget = targets[j];
+          int distanceToTarget = loc.distanceSquaredTo(possibleTarget);
 
-            if (targets[j].equals(target)) {
-              potential +=
-                50 * computePositiveForce(distanceToTarget, attackDistance);
+          if (targets[j].equals(target)) {
+            potential +=
+              50 * computePositiveForce(distanceToTarget, attackDistance);
 
-              if (distanceToTarget <= attackDistance) {
-                badDir = true;
-                break;
-              }
-            } else if (distanceToTarget <= 24) {
+            if (distanceToTarget <= attackDistance) {
               badDir = true;
               break;
             }
+          } else if (distanceToTarget <= 24) {
+            badDir = true;
+            break;
           }
-          if (badDir) {
-            continue;
-          }
+        }
+        if (badDir) {
+          continue;
+        }
 
-          for (int j = enemies.length; --j >= 0;) {
-            double force = computeForce(loc, enemies[j]);
-            potential = Math.max(potential, force);
-          }
+        for (int j = enemies.length; --j >= 0;) {
+          double force = computeForce(loc, enemies[j]);
+          potential = Math.max(potential, force);
+        }
 
-          if (maxPotential < potential) {
-            maxPotential = potential;
-            maxDir = dir;
-          }
+        if (maxPotential < potential) {
+          maxPotential = potential;
+          maxDir = dir;
         }
       }
 
