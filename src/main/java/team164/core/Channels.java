@@ -13,6 +13,7 @@ package team164.core;
 public class Channels {
 
   public static final int NUM_BEAVERS = 100;
+  public static final int NUM_MINERS = 101;
 
   public static final int TARGET_LOCATION = 200;
   public static final int ATTACK_DISTANCE = 202;

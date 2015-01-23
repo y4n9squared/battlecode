@@ -5,12 +5,14 @@
 
 package team164;
 
+import static team164.core.Channels.*;
 import static team164.util.Algorithms.*;
 
 import team164.core.AbstractRobot;
 import team164.core.Controller;
 import team164.util.MapLocationSet;
 
+import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
@@ -81,6 +83,10 @@ public final class Miner extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
+    if (Clock.getRoundNum() % RobotType.MINER.buildTurns == 0) {
+      int numMiners = controller.readBroadcast(NUM_MINERS);
+      controller.broadcast(NUM_MINERS, numMiners + 1);
+    }
     if (controller.isCoreReady()) {
       myLoc = getLocation();
       adjacentSquares = MapLocation.getAllMapLocationsWithinRadiusSq(myLoc, 2);

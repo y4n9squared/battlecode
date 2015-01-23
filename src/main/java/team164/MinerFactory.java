@@ -5,6 +5,8 @@
 
 package team164;
 
+import static team164.core.Channels.*;
+
 import team164.core.AbstractRobot;
 import team164.core.Controller;
 
@@ -27,19 +29,11 @@ public final class MinerFactory extends AbstractRobot {
 
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
-      RobotInfo[] robots = controller.getNearbyRobots();
-
-      // Check for the number of miners on the map that we own.
-      int numMiners = 0;
-      for (int i = robots.length; --i >= 0;) {
-        if (robots[i].type == RobotType.MINER
-            && robots[i].team == controller.getTeam()) {
-          ++numMiners;
+      if (Clock.getRoundNum() % RobotType.MINER.buildTurns == 1) {
+        int numMiners = controller.readBroadcast(NUM_MINERS);
+        if (numMiners < NUM_MINER_TARGET) {
+          controller.spawn(getEnemyHQDirection(), RobotType.MINER);
         }
-      }
-
-      if (numMiners < NUM_MINER_TARGET) {
-        controller.spawn(getEnemyHQDirection(), RobotType.MINER);
       }
     }
   }
