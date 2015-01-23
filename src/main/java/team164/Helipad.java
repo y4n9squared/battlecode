@@ -27,7 +27,7 @@ public final class Helipad extends AbstractRobot {
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
       Direction dir = getEnemyHQDirection();
-      controller.spawn(dir, RobotType.DRONE);
+      // controller.spawn(dir, RobotType.DRONE);
     }
   }
 }

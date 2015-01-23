@@ -59,4 +59,53 @@ public final class Algorithms {
   public static MapLocation intToLocation(int x, MapLocation hq) {
     return new MapLocation((x >> 16) + hq.x, (short) (x & 0xFFFF) + hq.y);
   }
+
+  /**
+   * Returns an array of map locations corresponding to the locations of the
+   * specified robots.
+   *
+   * @param robots array of robots
+   * @return robot locations
+   */
+  public static MapLocation[] getRobotLocations(RobotInfo[] robots) {
+    MapLocation[] locs = new MapLocation[robots.length];
+    for (int i = robots.length; --i >= 0;) {
+      locs[i] = robots[i].location;
+    }
+    return locs;
+  }
+
+  /**
+   * Computes the map location with the highest potential.
+   *
+   * <p>Elements in {@code trail} will contribute minor amounts of negative
+   * charge to prevent the robot from getting stuck in a local maximum.
+   *
+   * @param locs map locations to consider
+   * @param pos map locations with positive charges
+   * @param neg map locations with negative charges
+   * @param trail map location of previous locations for this robot
+   */
+  public static MapLocation computeMaximumPotentialGradient(
+      MapLocation[] locs, MapLocation[] pos, MapLocation[] neg,
+      MapLocation[] trail) {
+    MapLocation target = null;
+    double maxPotential = Double.NEGATIVE_INFINITY;
+    for (int i = locs.length; --i >= 0;) {
+      double potential = 0;
+      for (int j = pos.length; --j >= 0;) {
+        int d = locs[i].distanceSquaredTo(pos[j]);
+        potential = Math.max(potential, 1.0 / d);
+      }
+      for (int j = neg.length; --j >= 0;) {
+        int d = locs[i].distanceSquaredTo(neg[j]);
+        potential -= 1.0 / d;
+      }
+      if (potential > maxPotential) {
+        maxPotential = potential;
+        target = locs[i];
+      }
+    }
+    return target;
+  }
 }

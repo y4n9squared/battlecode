@@ -66,6 +66,9 @@ public class RobotPlayer {
       case TANK:
         robot = new Tank(controller);
         break;
+      case LAUNCHER:
+        robot = new Launcher(controller);
+        break;
       default:
         // Should never happen
         return;
