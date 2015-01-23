@@ -52,6 +52,7 @@ public final class MinerFactory extends AbstractRobot {
         if (numMiners < numTargetMiners) {
           controller.spawn(getEnemyHQDirection(), RobotType.MINER);
         }
+        controller.broadcast(NUM_MINERS, 0);
       }
     }
   }
