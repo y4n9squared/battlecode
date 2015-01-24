@@ -26,6 +26,8 @@ public final class Soldier extends AbstractRobot {
 
   private static final RobotType ROBOT_TYPE = RobotType.SOLDIER;
 
+  private RobotInfo[] enemies;
+
   /**
    * This is the order in which the soldier attacks enemys.
    */
@@ -69,24 +71,43 @@ public final class Soldier extends AbstractRobot {
       }
     }
     if (controller.isCoreReady()) {
-      MapLocation myLoc = controller.getLocation();
-      MapLocation[] locs = getTraversableAdjacentMapLocations();
-      double maxPotential = Double.NEGATIVE_INFINITY;
-      Direction maxDir = Direction.NONE;
+      enemies = controller.getNearbyRobots(
+        ROBOT_TYPE.sensorRadiusSquared,
+        controller.getOpponentTeam());
 
-      MapLocation[] targets = getAttackTargets();
-      MapLocation target = intToLocation(
-          controller.readBroadcast(Channels.TARGET_LOCATION),
-          controller.getHQLocation());
+      if (enemies.length > 0) {
+        useBugNavigator = false;
+      }
+      // if target has changed, turn off bug navigator
+      // if you are screwed, turn on bug navigator
 
-      RobotInfo[] enemies = controller.getNearbyRobots(
-          ROBOT_TYPE.sensorRadiusSquared,
-          controller.getOpponentTeam());
+      if (useBugNavigator) {
+        moveLikeABug();
+      } else {
+        moveWithPotential();
+      }
+    }
+    // TODO: Add a retreat strategy that moves according to influence gradient.
+    // Gradient should be the direction of retreat.
+  }
 
-      int attackDistance = controller.readBroadcast(Channels.ATTACK_DISTANCE);
+  private void moveWithPotential() {
+    MapLocation myLoc = controller.getLocation();
+    MapLocation[] locs = getTraversableAdjacentMapLocations();
+    double maxPotential = Double.NEGATIVE_INFINITY;
+    Direction maxDir = Direction.NONE;
+    RobotInfo[] enemies = this.enemies;
 
-      for (int i = locs.length; --i >= 0;) {
-        Direction dir = myLoc.directionTo(locs[i]);
+    MapLocation[] targets = getAttackTargets();
+    MapLocation target = intToLocation(
+        controller.readBroadcast(Channels.TARGET_LOCATION),
+        controller.getHQLocation());
+
+    int attackDistance = controller.readBroadcast(Channels.ATTACK_DISTANCE);
+
+    for (int i = locs.length; --i >= 0;) {
+      Direction dir = myLoc.directionTo(locs[i]);
+      if (controller.canMove(dir)) {
         double potential = 0.0;
         boolean badDir = false;
         MapLocation loc = locs[i];
@@ -129,11 +150,9 @@ public final class Soldier extends AbstractRobot {
           maxDir = dir;
         }
       }
-
-      controller.move(maxDir);
     }
-    // TODO: Add a retreat strategy that moves according to influence gradient.
-    // Gradient should be the direction of retreat.
+
+    controller.move(maxDir);
   }
 
   private double computeForce(MapLocation loc, RobotInfo robot) {

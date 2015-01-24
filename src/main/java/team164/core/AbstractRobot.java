@@ -26,6 +26,12 @@ public abstract class AbstractRobot implements Robot {
   protected final Controller controller;
   protected final Timer timer;
 
+  protected MapLocation target;
+  protected MapLocation myLoc;
+  protected boolean useBugNavigator = false;
+  protected Direction bugHeading;
+  protected int bugInitialDistanceSquared;
+
   protected AbstractRobot(Controller ctrl) {
     controller = ctrl;
     timer = new Timer(controller.getType());
@@ -127,5 +133,18 @@ public abstract class AbstractRobot implements Robot {
     System.arraycopy(towers, 0, targets, 1, towers.length);
 
     return targets;
+  }
+
+  protected void startBugNavigation() {
+    // calculate direction to target
+    // bugHeading = rotate clockwise until you find a non void space;
+    // set bugInitialDistanceSquared;
+  }
+
+  protected void moveLikeABug() {
+    // start in direction opposite bugHeading
+    // keep rotating until you find an open space (but dont factor in robots)
+    // try to move there
+    // observe Caterpies
   }
 }
