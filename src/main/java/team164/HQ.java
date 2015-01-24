@@ -39,14 +39,19 @@ public final class HQ extends AbstractRobot {
       RobotType.HQ.sensorRadiusSquared / 2;
 
   /**
-   * The round on which to start attacking.
+   * The rounds it takes to spawn an army.
    */
-  private static final int MIN_ATTACK_ROUND = 500;
+  private static final int ROUNDS_UNTIL_ATTACK = 100;
 
   private int attackDistance = SWARM_RADIUS_SQUARED;
   private MapLocation currentTarget = null;
   private int numTowers = -1;
   private boolean attacking = false;
+
+  /**
+   * We start this so we will start attacking on some arbitrary turn.
+   */
+  private int attackRoundCounter = ROUNDS_UNTIL_ATTACK - 500;
 
   /**
    * This is the order in which the HQ attacks enemys.
@@ -96,7 +101,7 @@ public final class HQ extends AbstractRobot {
       }
     }
 
-    if (Clock.getRoundNum() < MIN_ATTACK_ROUND) {
+    if (++attackRoundCounter < ROUNDS_UNTIL_ATTACK) {
       if (attacking) {
         attacking = false;
         numTowers = -1;
@@ -171,7 +176,14 @@ public final class HQ extends AbstractRobot {
     if (numTowers == -1) {
       locToSearchAround = controller.getLocation();
     } else {
-      locToSearchAround = currentTarget;
+      // We just killed an enemy, do a dance!
+
+      // If we want to continue attacking, search around currentTarget
+      // locToSearchAround = currentTarget;
+
+      // If we want to retreat, go back to defenseTarget
+      attackRoundCounter = 0;
+      return;
     }
     numTowers = enemyTowers.length;
 
