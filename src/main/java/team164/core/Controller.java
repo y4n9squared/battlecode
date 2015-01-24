@@ -77,6 +77,17 @@ public final class Controller {
   }
 
   /**
+   * Explodes a missile, and disintegrates any other unit.
+   */
+  public void explode() {
+    try {
+      rc.explode();
+    } catch (GameActionException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
    * Returns the location of our HQ.
    *
    * @return location of our HQ
@@ -472,5 +483,12 @@ public final class Controller {
   public void yield() {
     rc.yield();
     nearbyRobots = null;
+  }
+
+  /**
+   * Log a message for debugging.
+   */
+  public void log(String message) {
+    rc.addMatchObservation(message);
   }
 }
