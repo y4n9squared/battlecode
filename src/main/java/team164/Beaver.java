@@ -22,12 +22,12 @@ import battlecode.common.TerrainTile;
 public final class Beaver extends AbstractRobot {
 
   private static final RobotType[] BUILD_ORDER = new RobotType[] {
-    RobotType.MINERFACTORY, RobotType.BARRACKS, RobotType.TANKFACTORY,
-    RobotType.HELIPAD, RobotType.AEROSPACELAB, RobotType.SUPPLYDEPOT
+    RobotType.MINERFACTORY, RobotType.BARRACKS, RobotType.HELIPAD,
+    RobotType.TANKFACTORY, RobotType.AEROSPACELAB, RobotType.SUPPLYDEPOT
   };
 
   private static final int[] BUILD_COUNT = new int[] {
-    1, 1, 2, 1, 1, 5
+    1, 1, 2, 2, 0, 5
   };
 
   /**
