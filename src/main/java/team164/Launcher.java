@@ -16,6 +16,8 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 
+import java.util.Arrays;
+
 /**
  * A Launcher robot.
  *
@@ -48,16 +50,20 @@ public final class Launcher extends AbstractRobot {
       controller.launchMissile(getBestLaunchDirection(enemies));
     }
     if (controller.isCoreReady()) {
-      // TODO: Filter this so that no location in attack radius of tower exists
       MapLocation[] locs = getTraversableAdjacentMapLocations();
       MapLocation goal = intToLocation(
           controller.readBroadcast(Channels.TARGET_LOCATION),
           controller.getHQLocation());
       MapLocation[] pos = new MapLocation[] { goal };
+      double[] posCharges = new double[] { 1.0 };
       MapLocation[] neg = getRobotLocations(enemies);
-      MapLocation target = computeMaximumPotentialGradient(
-          locs, pos, neg, null);
-      controller.move(myLoc.directionTo(target));
+      double[] negCharges = new double[enemies.length];
+      Arrays.fill(negCharges, 1.0);
+      MapLocation target = maxPotentialMapLocation(
+          locs, pos, posCharges, neg, negCharges);
+      if (target != null) {
+        controller.move(myLoc.directionTo(target));
+      }
     }
   }
 

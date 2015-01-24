@@ -79,7 +79,6 @@ public final class Beaver extends AbstractRobot {
       if (!isMovingToBuild) {
         buildNextStructure();
       }
-
       if (isMovingToBuild) {
         MapLocation myLoc = getLocation();
         if (pastLocations[head] != myLoc) {
@@ -92,45 +91,17 @@ public final class Beaver extends AbstractRobot {
             isMovingToBuild = false;
           }
         } else {
-          Direction dir = computeGradient();
-          if (dir != null) {
-            controller.move(computeGradient());
+          MapLocation[] locs = getTraversableAdjacentMapLocations();
+          MapLocation[] pos = new MapLocation[] { destination };
+          double[] posCharges = new double[] { 1.0 };
+          MapLocation target = maxPotentialMapLocation(
+              locs, pos, posCharges, null, null);
+          if (target != null) {
+            controller.move(myLoc.directionTo(target));
           }
         }
       }
     }
-  }
-
-  private Direction computeGradient() {
-    MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(
-        getLocation(), 2);
-    MapLocation myLoc = getLocation();
-    double maxPotential = Double.NEGATIVE_INFINITY;
-    int choice = -1;
-    for (int i = locs.length; --i >= 0;) {
-      if (controller.canMove(myLoc.directionTo(locs[i]))) {
-        double potential = getPotential(locs[i]);
-        if (potential > maxPotential) {
-          maxPotential = potential;
-          choice = i;
-        }
-      }
-    }
-    if (choice == -1) {
-      return null;
-    }
-    return getLocation().directionTo(locs[choice]);
-  }
-
-  private double getPotential(MapLocation loc) {
-    int distDest = loc.distanceSquaredTo(destination);
-    double potential = 10.0 / Math.abs(distDest + 1);
-    for (int i = head; --i >= Math.max(0, head - 2);) {
-      if (loc.distanceSquaredTo(pastLocations[i]) <= 3) {
-        potential -= 0.001;
-      }
-    }
-    return potential;
   }
 
   private MapLocation getConstructionLocation() {
