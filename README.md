@@ -15,11 +15,13 @@ git clone git@github.com:y4n9squared/battlecode.git
 ant
 ```
 
-**Prerequisites**: Zasshu runs on Oracle JDK 6. In addition, we use Apache Ant to build and Apache Ivy to resolve project dependencies. Lastly, we use checkstyle for lint.
+**Prerequisites**: Zasshu runs on Oracle JDK 7. In addition, we use Apache Ant to build and Apache Ivy to resolve project dependencies. Lastly, we use checkstyle for lint.
 
 Creators
 --------
 
 **Holman Gao** - https://github.com/golmansax
+
+**Shariq Hashme** - https://github.com/hashme
 
 **Yang Yang** - https://github.com/y4n9squared
