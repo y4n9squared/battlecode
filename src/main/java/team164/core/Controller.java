@@ -473,4 +473,8 @@ public final class Controller {
     rc.yield();
     nearbyRobots = null;
   }
+
+  public void setIndicatorString(int index, String string) {
+    rc.setIndicatorString(index, string);
+  }
 }
