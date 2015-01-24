@@ -5,6 +5,8 @@
 
 package team164;
 
+import static battlecode.common.RobotType.*;
+import static team164.core.Channels.*;
 import static team164.util.Algorithms.*;
 
 import team164.core.AbstractRobot;
@@ -80,15 +82,14 @@ public final class HQ extends AbstractRobot {
 
     if (controller.isCoreReady()) {
       // Check for the number of beavers on the map that we own.
-      if (Clock.getRoundNum() % RobotType.BEAVER.buildTurns == 1) {
-        int numBeavers = controller.readBroadcast(Channels.NUM_BEAVERS);
+      if (Clock.getRoundNum() % BEAVER.buildTurns == 2) {
+        int numBeavers = controller.readBroadcast(getCountChannel(BEAVER));
         if (numBeavers < NUM_BEAVER_TARGET) {
-          controller.spawn(getEnemyHQDirection(), RobotType.BEAVER);
+          controller.spawn(getEnemyHQDirection(), BEAVER);
         }
-        controller.broadcast(Channels.NUM_BEAVERS, 0);
       }
     }
-
+    resetRobotCount();
     computeAttackTarget();
 
     RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
@@ -142,5 +143,15 @@ public final class HQ extends AbstractRobot {
     }
     controller.broadcast(Channels.TARGET_LOCATION,
         locationToInt(currentTarget, controller.getLocation()));
+  }
+
+  private void resetRobotCount() {
+    int roundNum = Clock.getRoundNum();
+    RobotType[] types = RobotType.values();
+    for (int i = types.length; --i >= 0;) {
+      if (roundNum % types[i].buildTurns == 0) {
+        controller.broadcast(getCountChannel(types[i]), 0);
+      }
+    }
   }
 }

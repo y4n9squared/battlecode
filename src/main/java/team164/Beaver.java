@@ -5,13 +5,13 @@
 
 package team164;
 
+import static battlecode.common.RobotType.*;
 import static team164.util.Algorithms.*;
 
 import team164.core.AbstractRobot;
 import team164.core.Channels;
 import team164.core.Controller;
 
-import battlecode.common.Clock;
 import battlecode.common.DependencyProgress;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
@@ -22,8 +22,7 @@ import battlecode.common.TerrainTile;
 public final class Beaver extends AbstractRobot {
 
   private static final RobotType[] BUILD_ORDER = new RobotType[] {
-    RobotType.MINERFACTORY, RobotType.BARRACKS, RobotType.TANKFACTORY,
-    RobotType.HELIPAD, RobotType.AEROSPACELAB, RobotType.SUPPLYDEPOT
+    MINERFACTORY, BARRACKS, TANKFACTORY, HELIPAD, AEROSPACELAB, SUPPLYDEPOT
   };
 
   private static final int[] BUILD_COUNT = new int[] {
@@ -75,9 +74,6 @@ public final class Beaver extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
-    if (Clock.getRoundNum() % RobotType.BEAVER.buildTurns == 0) {
-      broadcastAlive();
-    }
     if (controller.isCoreReady()) {
       // TODO: If enemies are close, flee from danger.
       if (!isMovingToBuild) {
@@ -171,14 +167,6 @@ public final class Beaver extends AbstractRobot {
       }
     }
     return true;
-  }
-
-  /**
-   * Broadcast that we are allive by incrementing the beaver channel.
-   */
-  private void broadcastAlive() {
-    int numBeavers = controller.readBroadcast(Channels.NUM_BEAVERS);
-    controller.broadcast(Channels.NUM_BEAVERS, numBeavers + 1);
   }
 
   /**
