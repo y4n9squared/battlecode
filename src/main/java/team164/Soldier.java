@@ -156,6 +156,7 @@ public final class Soldier extends AbstractRobot {
     }
 
     if (!controller.move(maxDir)
+        && enemies.length == 0
         && myLoc.distanceSquaredTo(target) >= attackDistance + 2) {
       startBugNavigation();
     }
