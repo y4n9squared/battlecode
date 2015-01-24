@@ -78,8 +78,20 @@ public final class Soldier extends AbstractRobot {
       if (enemies.length > 0) {
         useBugNavigator = false;
       }
-      // if target has changed, turn off bug navigator
-      // if you are screwed, turn on bug navigator
+
+      MapLocation newTarget = intToLocation(
+          controller.readBroadcast(Channels.TARGET_LOCATION),
+          controller.getHQLocation());
+      int newAttackDistance =
+          controller.readBroadcast(Channels.ATTACK_DISTANCE);
+
+      if (!newTarget.equals(target) || newAttackDistance != attackDistance) {
+        useBugNavigator = false;
+        target = newTarget;
+        attackDistance = newAttackDistance;
+      } else if (myLoc.distanceSquaredTo(target) < bugInitialDistanceSquared) {
+        useBugNavigator = false;
+      }
 
       if (useBugNavigator) {
         moveLikeABug();
@@ -92,67 +104,54 @@ public final class Soldier extends AbstractRobot {
   }
 
   private void moveWithPotential() {
-    MapLocation myLoc = controller.getLocation();
     MapLocation[] locs = getTraversableAdjacentMapLocations();
     double maxPotential = Double.NEGATIVE_INFINITY;
     Direction maxDir = Direction.NONE;
-    RobotInfo[] enemies = this.enemies;
 
     MapLocation[] targets = getAttackTargets();
-    MapLocation target = intToLocation(
-        controller.readBroadcast(Channels.TARGET_LOCATION),
-        controller.getHQLocation());
-
-    int attackDistance = controller.readBroadcast(Channels.ATTACK_DISTANCE);
 
     for (int i = locs.length; --i >= 0;) {
-      Direction dir = myLoc.directionTo(locs[i]);
-      if (controller.canMove(dir)) {
-        double potential = 0.0;
-        boolean badDir = false;
-        MapLocation loc = locs[i];
+      MapLocation loc = locs[i];
+      Direction dir = myLoc.directionTo(loc);
+      double potential = 0.0;
+      boolean badDir = false;
 
-        for (int j = targets.length; --j >= 0;) {
-          MapLocation possibleTarget = targets[j];
-          int distanceToTarget = loc.distanceSquaredTo(possibleTarget);
+      for (int j = targets.length; --j >= 0;) {
+        MapLocation possibleTarget = targets[j];
+        int distanceToTarget = loc.distanceSquaredTo(possibleTarget);
 
-          if (targets[j].equals(target)) {
-            potential +=
-              50 * computePositiveForce(distanceToTarget, attackDistance);
+        if (targets[j].equals(target)) {
+          potential +=
+            50 * computePositiveForce(distanceToTarget, attackDistance);
 
-            if (distanceToTarget <= attackDistance) {
-              badDir = true;
-              break;
-            }
-          } else if (distanceToTarget <= 24) {
+          if (distanceToTarget <= attackDistance) {
             badDir = true;
             break;
           }
+        } else if (distanceToTarget <= 24) {
+          badDir = true;
+          break;
         }
-        if (badDir) {
-          continue;
-        }
+      }
+      if (badDir) {
+        continue;
+      }
 
-        for (int j = enemies.length; --j >= 0;) {
-          double force = computeForce(loc, enemies[j]);
-          potential = Math.max(potential, force);
-        }
+      for (int j = enemies.length; --j >= 0;) {
+        double force = computeForce(loc, enemies[j]);
+        potential = Math.max(potential, force);
+      }
 
-        MapLocation[] trail = controller.getTrail();
-        for (int j = trail.length; --j >= 0;) {
-          if (loc.distanceSquaredTo(trail[j]) <= 3) {
-            potential -= 0.001;
-          }
-        }
-
-        if (maxPotential < potential) {
-          maxPotential = potential;
-          maxDir = dir;
-        }
+      if (maxPotential < potential) {
+        maxPotential = potential;
+        maxDir = dir;
       }
     }
 
-    controller.move(maxDir);
+    if (!controller.move(maxDir)
+        && myLoc.distanceSquaredTo(target) >= attackDistance + 20) {
+      startBugNavigation();
+    }
   }
 
   private double computeForce(MapLocation loc, RobotInfo robot) {
