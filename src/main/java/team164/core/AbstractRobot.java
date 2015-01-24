@@ -152,18 +152,23 @@ public abstract class AbstractRobot implements Robot {
     controller.move(dir);
   }
 
-  protected void moveLikeABug() {
-    Direction dir = bugHeading.opposite();
+  protected boolean moveLikeABug() {
+    Direction dir = bugHeading.opposite().rotateLeft();
+    if (controller.canMove(dir)) {
+      return false;
+    }
+
     for (int i = 8; --i >= 0;) {
-      dir = dir.rotateLeft();
       //if (controller.getTerrain(myLoc.add(dir)) != TerrainTile.VOID) {
       if (controller.canMove(dir)) {
         break;
       }
+      dir = dir.rotateLeft();
     }
 
     if (controller.move(dir)) {
       bugHeading = dir;
     }
+    return true;
   }
 }

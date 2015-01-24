@@ -94,8 +94,12 @@ public final class Soldier extends AbstractRobot {
       }
 
       if (useBugNavigator) {
-        moveLikeABug();
-      } else {
+        if (!moveLikeABug()) {
+          useBugNavigator = false;
+        }
+      }
+
+      if (!useBugNavigator) {
         moveWithPotential();
       }
     }
@@ -152,7 +156,7 @@ public final class Soldier extends AbstractRobot {
     }
 
     if (!controller.move(maxDir)
-        && myLoc.distanceSquaredTo(target) >= attackDistance + 20) {
+        && myLoc.distanceSquaredTo(target) >= attackDistance + 2) {
       startBugNavigation();
     }
   }
