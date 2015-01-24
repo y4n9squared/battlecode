@@ -109,8 +109,8 @@ public abstract class AbstractRobot implements Robot {
     int count = 0;
     for (int i = locs.length; --i >= 0;) {
       MapLocation loc = locs[i];
-      if (controller.canMove(myLoc.directionTo(loc))
-          || loc.equals(myLoc)) {
+      if (controller.canMove(myLoc.directionTo(loc)) || loc.equals(myLoc)) {
+        // TODO: Check for towers
         arr[count++] = loc;
       }
     }

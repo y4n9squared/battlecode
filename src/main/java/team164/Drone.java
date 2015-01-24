@@ -132,6 +132,28 @@ public final class Drone extends AbstractRobot {
     // Gradient should be the direction of retreat.
   }
 
+  @Override protected MapLocation[] getTraversableAdjacentMapLocations() {
+    MapLocation myLoc = getLocation();
+    MapLocation[] arr = new MapLocation[9];
+    MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(
+        getLocation(), 2);
+    int count = 0;
+    for (int i = locs.length; --i >= 0;) {
+      MapLocation loc = locs[i];
+      if (controller.isLocationOccupied(loc)
+          && !controller.getRobotAtLocation(loc).type.isBuilding) {
+        // Location is occupied by a mobile robot
+        arr[count++] = loc;
+      } else {
+        // Location is unoccupied
+        arr[count++] = loc;
+      }
+    }
+    MapLocation[] returnLocs = new MapLocation[count];
+    System.arraycopy(arr, 0, returnLocs, 0, count);
+    return returnLocs;
+  }
+
   private double computeForce(MapLocation loc, RobotInfo robot) {
     double potential = 0;
     int d = loc.distanceSquaredTo(robot.location);
