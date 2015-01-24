@@ -5,14 +5,17 @@
 
 package team164.core;
 
+import static team164.core.Channels.*;
 import static team164.util.Algorithms.*;
 
 import team164.util.Timer;
 
+import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
+import battlecode.common.RobotType;
 import battlecode.common.TerrainTile;
 
 /**
@@ -25,6 +28,7 @@ public abstract class AbstractRobot implements Robot {
 
   protected final Controller controller;
   protected final Timer timer;
+  protected final RobotType type;
 
   protected MapLocation target;
   protected MapLocation myLoc;
@@ -35,11 +39,15 @@ public abstract class AbstractRobot implements Robot {
   protected AbstractRobot(Controller ctrl) {
     controller = ctrl;
     timer = new Timer(controller.getType());
+    type = controller.getType();
   }
 
   @Override public void run() {
     while (true) {
       try {
+        if (Clock.getRoundNum() % type.buildTurns == 1) {
+          broadcastAlive();
+        }
         runHelper();
       } catch (Exception e) {
         e.printStackTrace();
@@ -146,5 +154,14 @@ public abstract class AbstractRobot implements Robot {
     // keep rotating until you find an open space (but dont factor in robots)
     // try to move there
     // observe Caterpies
+  }
+
+  /**
+   * Increments the attendance channel for this robot type by 1.
+   */
+  private void broadcastAlive() {
+    int channel = getCountChannel(controller.getType());
+    int count = controller.readBroadcast(channel);
+    controller.broadcast(channel, count + 1);
   }
 }

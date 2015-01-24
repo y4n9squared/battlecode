@@ -5,6 +5,7 @@
 
 package team164;
 
+import static battlecode.common.RobotType.*;
 import static team164.core.Channels.*;
 
 import team164.core.AbstractRobot;
@@ -47,12 +48,12 @@ public final class MinerFactory extends AbstractRobot {
 
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
-      if (Clock.getRoundNum() % RobotType.MINER.buildTurns == 1) {
-        int numMiners = controller.readBroadcast(NUM_MINERS);
+      if (Clock.getRoundNum() % MINER.buildTurns == 1) {
+        int numMiners = controller.readBroadcast(getCountChannel(MINER));
         if (numMiners < numTargetMiners) {
-          controller.spawn(getEnemyHQDirection(), RobotType.MINER);
+          controller.spawn(getEnemyHQDirection(), MINER);
         }
-        controller.broadcast(NUM_MINERS, 0);
+        controller.broadcast(getCountChannel(MINER), 0);
       }
     }
   }
