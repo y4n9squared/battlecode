@@ -35,13 +35,25 @@ public final class HQ extends AbstractRobot {
       RobotType.HQ.sensorRadiusSquared;
 
   /**
-   * The round on which to start attacking.
+   * The distance at which to be from target when we are retreating.
    */
-  private static final int MIN_ATTACK_ROUND = 500;
+  private static final int RETREAT_RADIUS_SQUARED =
+      RobotType.HQ.sensorRadiusSquared / 2;
+
+  /**
+   * The rounds it takes to spawn an army.
+   */
+  private static final int ROUNDS_UNTIL_ATTACK = 100;
 
   private int attackDistance = SWARM_RADIUS_SQUARED;
   private MapLocation currentTarget = null;
   private int numTowers = -1;
+  private boolean attacking = false;
+
+  /**
+   * We start this so we will start attacking on some arbitrary turn.
+   */
+  private int attackRoundCounter = ROUNDS_UNTIL_ATTACK - 500;
 
   /**
    * This is the order in which the HQ attacks enemys.
@@ -90,26 +102,69 @@ public final class HQ extends AbstractRobot {
       }
     }
     resetRobotCount();
-    computeAttackTarget();
 
-    RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
-        currentTarget,
-        SWARM_RADIUS_SQUARED + 20,
-        controller.getTeam());
+    if (++attackRoundCounter < ROUNDS_UNTIL_ATTACK) {
+      if (attacking) {
+        attacking = false;
+        numTowers = -1;
+      }
 
-    if (Clock.getRoundNum() < MIN_ATTACK_ROUND) {
-      attackDistance =
-          controller.getLocation().distanceSquaredTo(currentTarget) - 24;
-    } else if (teammatesAroundTarget.length >= 12) {
-      attackDistance = 0;
-    } else if (teammatesAroundTarget.length < 5) {
-      attackDistance = SWARM_RADIUS_SQUARED;
+      computeDefenseTarget();
+      attackDistance = RETREAT_RADIUS_SQUARED;
+    } else {
+      if (!attacking) {
+        attacking = true;
+        numTowers = -1;
+      }
+
+      computeAttackTarget();
+
+      RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
+          currentTarget,
+          SWARM_RADIUS_SQUARED + 20,
+          controller.getTeam());
+
+      if (teammatesAroundTarget.length >= 12) {
+        attackDistance = 0;
+      } else if (teammatesAroundTarget.length < 5) {
+        attackDistance = SWARM_RADIUS_SQUARED;
+      }
     }
+
     int existingAttackDistance =
         controller.readBroadcast(Channels.ATTACK_DISTANCE);
     if (existingAttackDistance != attackDistance) {
       controller.broadcast(Channels.ATTACK_DISTANCE, attackDistance);
     }
+  }
+
+  private void computeDefenseTarget() {
+    MapLocation[] myTowers = controller.getTowerLocations();
+
+    if (numTowers == myTowers.length) {
+      return;
+    }
+
+    MapLocation locToSearchAround;
+    locToSearchAround = controller.getEnemyHQLocation();
+    numTowers = myTowers.length;
+
+    int targetIndex = 0;
+    if (numTowers > 0) {
+      double closestDistance = Double.POSITIVE_INFINITY;
+      for (int i = numTowers; --i >= 0;) {
+        double distance = locToSearchAround.distanceSquaredTo(myTowers[i]);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          targetIndex = i + 1;
+        }
+      }
+      currentTarget = myTowers[targetIndex - 1];
+    } else {
+      currentTarget = controller.getEnemyHQLocation();
+    }
+    controller.broadcast(Channels.TARGET_LOCATION,
+        locationToInt(currentTarget, controller.getLocation()));
   }
 
   private void computeAttackTarget() {
@@ -120,11 +175,23 @@ public final class HQ extends AbstractRobot {
     }
 
     MapLocation locToSearchAround;
-    if (numTowers == -1) {
+    if (numTowers != -1) {
+      // We just killed an enemy, do a dance!
+
+      // If we want to continue attacking, search around currentTarget
+      // locToSearchAround = currentTarget;
+
+      // If we want to retreat, go back to defenseTarget
+      attackRoundCounter = 0;
+      return;
+    }
+
+    if (currentTarget == null) {
       locToSearchAround = controller.getLocation();
     } else {
       locToSearchAround = currentTarget;
     }
+
     numTowers = enemyTowers.length;
 
     int targetIndex = 0;

@@ -26,6 +26,8 @@ public final class Tank extends AbstractRobot {
 
   private static final RobotType ROBOT_TYPE = RobotType.SOLDIER;
 
+  private RobotInfo[] enemies;
+
   /**
    * This is the order in which the tank attacks enemys.
    */
@@ -69,64 +71,94 @@ public final class Tank extends AbstractRobot {
       }
     }
     if (controller.isCoreReady()) {
-      MapLocation myLoc = controller.getLocation();
-      MapLocation[] locs = getTraversableAdjacentMapLocations();
-      double maxPotential = Double.NEGATIVE_INFINITY;
-      Direction maxDir = Direction.NONE;
+      enemies = controller.getNearbyRobots(
+        ROBOT_TYPE.sensorRadiusSquared,
+        controller.getOpponentTeam());
 
-      MapLocation[] targets = getAttackTargets();
-      MapLocation target = intToLocation(
+      if (enemies.length > 0) {
+        useBugNavigator = false;
+      }
+
+      MapLocation newTarget = intToLocation(
           controller.readBroadcast(Channels.TARGET_LOCATION),
           controller.getHQLocation());
+      int newAttackDistance =
+          controller.readBroadcast(Channels.ATTACK_DISTANCE);
 
-      RobotInfo[] enemies = controller.getNearbyRobots(
-          ROBOT_TYPE.sensorRadiusSquared,
-          controller.getOpponentTeam());
+      if (!newTarget.equals(target) || newAttackDistance != attackDistance) {
+        useBugNavigator = false;
+        target = newTarget;
+        attackDistance = newAttackDistance;
+      } else if (myLoc.distanceSquaredTo(target) < bugInitialDistanceSquared) {
+        useBugNavigator = false;
+      }
 
-      int attackDistance = controller.readBroadcast(Channels.ATTACK_DISTANCE);
-
-      for (int i = locs.length; --i >= 0;) {
-        Direction dir = myLoc.directionTo(locs[i]);
-        double potential = 0.0;
-        boolean badDir = false;
-        MapLocation loc = locs[i];
-
-        for (int j = targets.length; --j >= 0;) {
-          MapLocation possibleTarget = targets[j];
-          int distanceToTarget = loc.distanceSquaredTo(possibleTarget);
-
-          if (targets[j].equals(target)) {
-            potential +=
-              50 * computePositiveForce(distanceToTarget, attackDistance);
-
-            if (distanceToTarget <= attackDistance) {
-              badDir = true;
-              break;
-            }
-          } else if (distanceToTarget <= 24) {
-            badDir = true;
-            break;
-          }
-        }
-        if (badDir) {
-          continue;
-        }
-
-        for (int j = enemies.length; --j >= 0;) {
-          double force = computeForce(loc, enemies[j]);
-          potential = Math.max(potential, force);
-        }
-
-        if (maxPotential < potential) {
-          maxPotential = potential;
-          maxDir = dir;
+      if (useBugNavigator) {
+        if (!moveLikeABug()) {
+          useBugNavigator = false;
         }
       }
 
-      controller.move(maxDir);
+      if (!useBugNavigator) {
+        moveWithPotential();
+      }
     }
     // TODO: Add a retreat strategy that moves according to influence gradient.
     // Gradient should be the direction of retreat.
+  }
+
+  private void moveWithPotential() {
+    MapLocation[] locs = getTraversableAdjacentMapLocations();
+    double maxPotential = Double.NEGATIVE_INFINITY;
+    Direction maxDir = Direction.NONE;
+
+    MapLocation[] targets = getAttackTargets();
+
+    for (int i = locs.length; --i >= 0;) {
+      MapLocation loc = locs[i];
+      Direction dir = myLoc.directionTo(loc);
+      double potential = 0.0;
+      boolean badDir = false;
+
+      // Add computations for target
+      potential +=
+        computeTargetForce(loc.distanceSquaredTo(target), attackDistance);
+
+      // Add computations for targets
+      for (int j = targets.length; --j >= 0;) {
+        MapLocation possibleTarget = targets[j];
+        int distanceToTarget = loc.distanceSquaredTo(possibleTarget);
+
+        if (targets[j].equals(target)) {
+          if (distanceToTarget <= attackDistance) {
+            badDir = true;
+            break;
+          }
+        } else if (distanceToTarget <= 24) {
+          badDir = true;
+          break;
+        }
+      }
+
+      if (badDir) {
+        continue;
+      }
+
+      for (int j = enemies.length; --j >= 0;) {
+        double force = computeForce(loc, enemies[j]);
+        potential = Math.max(potential, force);
+      }
+
+      if (maxPotential < potential) {
+        maxPotential = potential;
+        maxDir = dir;
+      }
+    }
+
+    if (!controller.move(maxDir)
+        && myLoc.distanceSquaredTo(target) >= attackDistance + 2) {
+      startBugNavigation();
+    }
   }
 
   private double computeForce(MapLocation loc, RobotInfo robot) {
@@ -150,8 +182,8 @@ public final class Tank extends AbstractRobot {
         / (Math.abs(d - ROBOT_TYPE.attackRadiusSquared) + 1);
   }
 
-  private double computePositiveForce(int d, int optimalDistance) {
-    return ROBOT_TYPE.attackRadiusSquared
+  private double computeTargetForce(int d, int optimalDistance) {
+    return 5 * ROBOT_TYPE.attackRadiusSquared
         / (Math.abs(d - optimalDistance) + 1.0);
   }
 

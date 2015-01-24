@@ -30,7 +30,8 @@ public abstract class AbstractRobot implements Robot {
   protected final Timer timer;
   protected final RobotType type;
 
-  protected MapLocation target;
+  protected MapLocation target = null;
+  protected int attackDistance;
   protected MapLocation myLoc;
   protected boolean useBugNavigator = false;
   protected Direction bugHeading;
@@ -48,6 +49,7 @@ public abstract class AbstractRobot implements Robot {
         if (Clock.getRoundNum() % type.buildTurns == 1) {
           broadcastAlive();
         }
+        myLoc = controller.getLocation();
         runHelper();
       } catch (Exception e) {
         e.printStackTrace();
@@ -88,7 +90,6 @@ public abstract class AbstractRobot implements Robot {
    * @return list of available locations for robot to move
    */
   protected MapLocation[] getTraversableAdjacentMapLocations() {
-    MapLocation myLoc = getLocation();
     MapLocation[] arr = new MapLocation[9];
     MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(
         getLocation(), 2);
@@ -146,16 +147,39 @@ public abstract class AbstractRobot implements Robot {
   }
 
   protected void startBugNavigation() {
-    // calculate direction to target
-    // bugHeading = rotate clockwise until you find a non void space;
-    // set bugInitialDistanceSquared;
+    bugInitialDistanceSquared = myLoc.distanceSquaredTo(target);
+    useBugNavigator = true;
+
+    Direction dir = myLoc.directionTo(target);
+    for (int i = 8; --i >= 0;) {
+      //if (controller.getTerrain(myLoc.add(dir)) != TerrainTile.VOID) {
+      if (controller.canMove(dir)) {
+        break;
+      }
+      dir = dir.rotateLeft();
+    }
+    bugHeading = dir;
+    controller.move(dir);
   }
 
-  protected void moveLikeABug() {
-    // start in direction opposite bugHeading
-    // keep rotating until you find an open space (but dont factor in robots)
-    // try to move there
-    // observe Caterpies
+  protected boolean moveLikeABug() {
+    Direction dir = bugHeading.opposite().rotateLeft();
+    if (controller.canMove(dir)) {
+      return false;
+    }
+
+    for (int i = 8; --i >= 0;) {
+      //if (controller.getTerrain(myLoc.add(dir)) != TerrainTile.VOID) {
+      if (controller.canMove(dir)) {
+        break;
+      }
+      dir = dir.rotateLeft();
+    }
+
+    if (controller.move(dir)) {
+      bugHeading = dir;
+    }
+    return true;
   }
 
   /**
