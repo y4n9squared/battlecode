@@ -491,4 +491,8 @@ public final class Controller {
   public void log(String message) {
     rc.addMatchObservation(message);
   }
+
+  public void setIndicatorString(int index, String string) {
+    rc.setIndicatorString(index, string);
+  }
 }

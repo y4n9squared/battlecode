@@ -16,14 +16,18 @@ import battlecode.common.RobotType;
 
 public final class Barracks extends AbstractRobot {
 
+  private static final RobotType TYPE_TO_BUILD = RobotType.SOLDIER;
+
   public Barracks(Controller controller) {
     super(controller);
   }
 
   @Override protected void runHelper() {
-    if (controller.isCoreReady()) {
+    if (controller.isCoreReady()
+        && Clock.getRoundNum() % TYPE_TO_BUILD.buildTurns > 1
+        && shouldSpawnUnit(TYPE_TO_BUILD)) {
       Direction dir = getEnemyHQDirection();
-      controller.spawn(dir, RobotType.SOLDIER);
+      controller.spawn(dir, TYPE_TO_BUILD);
     }
   }
 }
