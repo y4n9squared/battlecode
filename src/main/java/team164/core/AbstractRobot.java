@@ -9,6 +9,7 @@ import static team164.util.Algorithms.*;
 
 import team164.util.Timer;
 
+import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
@@ -44,7 +45,9 @@ public abstract class AbstractRobot implements Robot {
       } catch (Exception e) {
         e.printStackTrace();
       } finally {
-        propogateSupply();
+        if (Clock.getBytecodesLeft() > 750) {
+          propogateSupply();
+        }
         controller.yield();
       }
     }
