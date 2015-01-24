@@ -69,6 +69,9 @@ public class RobotPlayer {
       case LAUNCHER:
         robot = new Launcher(controller);
         break;
+      case MISSILE:
+        robot = new Missile(controller);
+        break;
       default:
         // Should never happen
         return;
