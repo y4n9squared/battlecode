@@ -150,12 +150,14 @@ public abstract class AbstractRobot implements Robot {
     bugInitialDistanceSquared = myLoc.distanceSquaredTo(target);
     useBugNavigator = true;
 
+    MapLocation[] targets = getAttackTargets();
+
     Direction dir = myLoc.directionTo(target);
     for (int i = 8; --i >= 0;) {
-      //if (controller.getTerrain(myLoc.add(dir)) != TerrainTile.VOID) {
-      if (controller.canMove(dir)) {
+      if (validBugDirection(dir, targets)) {
         break;
       }
+
       dir = dir.rotateLeft();
     }
     bugHeading = dir;
@@ -163,16 +165,18 @@ public abstract class AbstractRobot implements Robot {
   }
 
   protected boolean moveLikeABug() {
+    MapLocation[] targets = getAttackTargets();
+
     Direction dir = bugHeading.opposite().rotateLeft();
-    if (controller.canMove(dir)) {
+    if (validBugDirection(dir, targets)) {
       return false;
     }
 
     for (int i = 8; --i >= 0;) {
-      //if (controller.getTerrain(myLoc.add(dir)) != TerrainTile.VOID) {
-      if (controller.canMove(dir)) {
+      if (validBugDirection(dir, targets)) {
         break;
       }
+
       dir = dir.rotateLeft();
     }
 
@@ -189,5 +193,19 @@ public abstract class AbstractRobot implements Robot {
     int channel = getCountChannel(controller.getType());
     int count = controller.readBroadcast(channel);
     controller.broadcast(channel, count + 1);
+  }
+
+  private boolean validBugDirection(Direction dir, MapLocation[] targets) {
+    if (!controller.canMove(dir)) {
+      return false;
+    }
+
+    MapLocation loc = myLoc.add(dir);
+    for (int j = targets.length; --j >= 0;) {
+      if (loc.distanceSquaredTo(targets[j]) <= 24) {
+        return false;
+      }
+    }
+    return true;
   }
 }
