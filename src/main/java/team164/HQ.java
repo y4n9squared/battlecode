@@ -173,9 +173,7 @@ public final class HQ extends AbstractRobot {
     }
 
     MapLocation locToSearchAround;
-    if (numTowers == -1) {
-      locToSearchAround = controller.getLocation();
-    } else {
+    if (numTowers != -1) {
       // We just killed an enemy, do a dance!
 
       // If we want to continue attacking, search around currentTarget
@@ -185,6 +183,13 @@ public final class HQ extends AbstractRobot {
       attackRoundCounter = 0;
       return;
     }
+
+    if (currentTarget == null) {
+      locToSearchAround = controller.getLocation();
+    } else {
+      locToSearchAround = currentTarget;
+    }
+
     numTowers = enemyTowers.length;
 
     int targetIndex = 0;
