@@ -46,7 +46,7 @@ public abstract class AbstractRobot implements Robot {
   @Override public void run() {
     while (true) {
       try {
-        if (Clock.getRoundNum() % type.buildTurns == 1) {
+        if (type.buildTurns > 0 && Clock.getRoundNum() % type.buildTurns == 1) {
           broadcastAlive();
         }
         myLoc = controller.getLocation();

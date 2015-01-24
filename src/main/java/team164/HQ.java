@@ -216,7 +216,7 @@ public final class HQ extends AbstractRobot {
     int roundNum = Clock.getRoundNum();
     RobotType[] types = RobotType.values();
     for (int i = types.length; --i >= 0;) {
-      if (roundNum % types[i].buildTurns == 0) {
+      if (types[i].buildTurns > 0 && roundNum % types[i].buildTurns == 0) {
         controller.broadcast(getCountChannel(types[i]), 0);
       }
     }
