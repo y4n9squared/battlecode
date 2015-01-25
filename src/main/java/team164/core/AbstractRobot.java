@@ -171,6 +171,11 @@ public abstract class AbstractRobot implements Robot {
   }
 
   protected boolean shouldSpawnUnit(RobotType type) {
+    // If we really sucked at ore management...
+    if (controller.getTeamOre() > 2100) {
+      return true;
+    }
+
     int[] counts = new int[UNIT_TYPES.length];
     double currentRatio = 0.0;
     int currentRatioSum = 0;
