@@ -92,7 +92,10 @@ public final class Beaver extends AbstractRobot {
             isMovingToBuild = false;
           }
         } else {
-          controller.move(computeGradient());
+          Direction dir = computeGradient();
+          if (dir != null) {
+            controller.move(computeGradient());
+          }
         }
       }
     }
@@ -112,6 +115,9 @@ public final class Beaver extends AbstractRobot {
           choice = i;
         }
       }
+    }
+    if (choice == -1) {
+      return null;
     }
     return getLocation().directionTo(locs[choice]);
   }
