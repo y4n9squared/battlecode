@@ -23,7 +23,7 @@ import battlecode.common.RobotType;
  * <p>The number of miners produced is based on a logistic function where the
  * variable is the distance between HQs.
  */
-public final class MinerFactory extends AbstractRobot {
+public final class MinerFactory extends ProductionStructure {
 
   private static final int MAX_MINERS = 30;
   private static final double GROWTH_RATE = 0.01;
@@ -39,22 +39,23 @@ public final class MinerFactory extends AbstractRobot {
    * @param controller controller
    */
   public MinerFactory(Controller controller) {
-    super(controller);
+    super(controller, MINER);
     int d = controller.getHQLocation().distanceSquaredTo(
         controller.getEnemyHQLocation());
     numTargetMiners = (int) (MAX_MINERS / (1 + Math.pow(
             Math.E, -1 * GROWTH_RATE * Math.sqrt(d))));
   }
 
-  @Override protected void runHelper() {
+  @Override protected boolean shouldSpawnUnit() {
     if (controller.isCoreReady()) {
-      if (Clock.getRoundNum() % MINER.buildTurns == 2) {
+      if (Clock.getRoundNum() % MINER.buildTurns > 1) {
         int numMiners = controller.readBroadcast(getCountChannel(MINER));
         if (numMiners < numTargetMiners) {
-          controller.spawn(getEnemyHQDirection(), MINER);
+          return true;
         }
         controller.broadcast(getCountChannel(MINER), 0);
       }
     }
+    return false;
   }
 }

@@ -5,6 +5,8 @@
 
 package team164;
 
+import static battlecode.common.RobotType.*;
+
 import team164.core.Controller;
 import team164.core.Robot;
 
@@ -40,7 +42,7 @@ public class RobotPlayer {
         robot = new Soldier(controller);
         break;
       case BARRACKS:
-        robot = new Barracks(controller);
+        robot = new ProductionStructure(controller, SOLDIER);
         break;
       case MINER:
         robot = new Miner(controller);
@@ -49,7 +51,7 @@ public class RobotPlayer {
         robot = new MinerFactory(controller);
         break;
       case HELIPAD:
-        robot = new Helipad(controller);
+        robot = new ProductionStructure(controller, DRONE);
         break;
       case DRONE:
         robot = new Drone(controller);
@@ -58,10 +60,10 @@ public class RobotPlayer {
         robot = new SupplyDepot(controller);
         break;
       case TANKFACTORY:
-        robot = new TankFactory(controller);
+        robot = new ProductionStructure(controller, TANK);
         break;
       case AEROSPACELAB:
-        robot = new AerospaceLab(controller);
+        robot = new ProductionStructure(controller, LAUNCHER);
         break;
       case TANK:
         robot = new Tank(controller);
