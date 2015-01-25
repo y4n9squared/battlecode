@@ -48,7 +48,7 @@ public final class MinerFactory extends AbstractRobot {
 
   @Override protected void runHelper() {
     if (controller.isCoreReady()) {
-      if (Clock.getRoundNum() % MINER.buildTurns == 1) {
+      if (Clock.getRoundNum() % MINER.buildTurns == 2) {
         int numMiners = controller.readBroadcast(getCountChannel(MINER));
         if (numMiners < numTargetMiners) {
           controller.spawn(getEnemyHQDirection(), MINER);
