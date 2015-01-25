@@ -9,12 +9,11 @@ import team164.core.AbstractRobot;
 import team164.core.Channels;
 import team164.core.Controller;
 
-import battlecode.common.Clock;
-import battlecode.common.Team;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
+import battlecode.common.Team;
 
 /**
  * A Missile robot. Explodes when within range of any enemy robot.
@@ -63,8 +62,7 @@ public final class Missile extends AbstractRobot {
         controller.move(location.directionTo(enemies[closestEnemy].location));
         controller.yield();
       } else if (enemies.length == 2) {
-        if (location.distanceSquaredTo(enemies[0].location) <
-            location.distanceSquaredTo(enemies[1].location)) {
+        if (location.distanceSquaredTo(enemies[0].location) < location.distanceSquaredTo(enemies[1].location)) {
           controller.move(location.directionTo(enemies[0].location));
         } else {
           controller.move(location.directionTo(enemies[1].location));
@@ -72,7 +70,7 @@ public final class Missile extends AbstractRobot {
         controller.yield();
       } else if (enemies.length == 0) {
         //TODO : don't just move randomly?
-        controller.move(Direction.values()[controller.getID()%8]);
+        controller.move(Direction.values()[controller.getID() % 8]);
         controller.yield();
       } else {
         controller.move(location.directionTo(enemies[0].location));
