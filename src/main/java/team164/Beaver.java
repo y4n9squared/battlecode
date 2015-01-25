@@ -5,6 +5,7 @@
 
 package team164;
 
+import static battlecode.common.DependencyProgress.*;
 import static battlecode.common.RobotType.*;
 import static team164.util.Algorithms.*;
 
@@ -12,7 +13,6 @@ import team164.core.AbstractRobot;
 import team164.core.Channels;
 import team164.core.Controller;
 
-import battlecode.common.DependencyProgress;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
@@ -25,10 +25,6 @@ public final class Beaver extends AbstractRobot {
     MINERFACTORY, BARRACKS, TANKFACTORY, HELIPAD, AEROSPACELAB, SUPPLYDEPOT
   };
 
-  private static final int[] BUILD_COUNT = new int[] {
-    1, 1, 2, 1, 1, 5
-  };
-
   /**
    * Whether or not this robot is currently traveling to its build location.
    */
@@ -39,12 +35,6 @@ public final class Beaver extends AbstractRobot {
    * the structure to be built.
    */
   private MapLocation destination;
-
-  /**
-   * If {@code isMovingToBuild} is {@code true}, this specifies the type of
-   * structure to build once the robot reaches its destination.
-   */
-  private RobotType buildType = null;
 
   /**
    * If {@code buildOnEven} is {@code true}, Beavers can only build at map
@@ -77,7 +67,8 @@ public final class Beaver extends AbstractRobot {
     if (controller.isCoreReady()) {
       // TODO: If enemies are close, flee from danger.
       if (!isMovingToBuild) {
-        buildNextStructure();
+        destination = getConstructionLocation();
+        isMovingToBuild = true;
       }
 
       if (isMovingToBuild) {
@@ -86,10 +77,17 @@ public final class Beaver extends AbstractRobot {
           pastLocations[head++] = myLoc;
         }
         if (myLoc.distanceSquaredTo(destination) <= 2) {
-          boolean success = controller.build(
-              myLoc.directionTo(destination), buildType);
-          if (success) {
-            isMovingToBuild = false;
+          RobotType buildType = buildNextStructure();
+          if (buildType != null) {
+            boolean success = controller.build(
+                myLoc.directionTo(destination), buildType);
+            if (success) {
+              isMovingToBuild = false;
+            } else {
+              if (controller.isLocationOccupied(destination)) {
+                destination = getConstructionLocation();
+              }
+            }
           }
         } else {
           Direction dir = computeGradient();
@@ -182,23 +180,16 @@ public final class Beaver extends AbstractRobot {
    * {@code buildType} and the location is set in {@code destination}. {@code
    * isMovingToBuild} will be set to {@code true}.
    */
-  private void buildNextStructure() {
-    // Figure out what to build next.
-
-    RobotInfo[] robots = controller.getNearbyRobots();
-    int[] count = getRobotCount(robots, controller.getTeam());
-
-    buildType = null;
+  private RobotType buildNextStructure() {
+    RobotType buildType = null;
     for (int i = 0; i < BUILD_ORDER.length; ++i) {
       RobotType type = BUILD_ORDER[i];
-      if (count[type.ordinal()] < BUILD_COUNT[i]) {
+      if (controller.getDependencyProgress(type.dependency) == DONE
+          && controller.getDependencyProgress(type) == NONE) {
         buildType = type;
         break;
       }
     }
-    if (buildType != null) {
-      isMovingToBuild = true;
-      destination = getConstructionLocation();
-    }
+    return buildType;
   }
 }
