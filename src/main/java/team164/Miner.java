@@ -126,7 +126,9 @@ public final class Miner extends AbstractRobot {
         }
       }
     }
-    controller.move(myLoc.directionTo(target));
+    if (target != null) {
+      controller.move(myLoc.directionTo(target));
+    }
   }
 
   /**
