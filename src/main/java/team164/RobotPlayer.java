@@ -27,6 +27,10 @@ public class RobotPlayer {
     Controller controller = new Controller(rc);
     Robot robot;
     switch (rc.getType()) {
+      case MISSILE:
+        Missile missile = new Missile(controller);
+        missile.run();
+        return;
       case HQ:
         robot = new HQ(controller);
         break;
@@ -68,9 +72,6 @@ public class RobotPlayer {
         break;
       case LAUNCHER:
         robot = new Launcher(controller);
-        break;
-      case MISSILE:
-        robot = new Missile(controller);
         break;
       default:
         // Should never happen
