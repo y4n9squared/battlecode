@@ -62,7 +62,9 @@ public final class Missile extends AbstractRobot {
         controller.move(location.directionTo(enemies[closestEnemy].location));
         controller.yield();
       } else if (enemies.length == 2) {
-        if (location.distanceSquaredTo(enemies[0].location) < location.distanceSquaredTo(enemies[1].location)) {
+        int distance0 = location.distanceSquaredTo(enemies[0].location);
+        int distance1 = location.distanceSquaredTo(enemies[1].location);
+        if (distance0 < distance1) {
           controller.move(location.directionTo(enemies[0].location));
         } else {
           controller.move(location.directionTo(enemies[1].location));
