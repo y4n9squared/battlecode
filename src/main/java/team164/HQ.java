@@ -139,6 +139,7 @@ public final class HQ extends AbstractRobot {
   }
 
   private void computeDefenseTarget() {
+    /*
     MapLocation[] myTowers = controller.getTowerLocations();
 
     if (numTowers == myTowers.length) {
@@ -163,6 +164,8 @@ public final class HQ extends AbstractRobot {
     } else {
       currentTarget = controller.getHQLocation();
     }
+    */
+    currentTarget = controller.getHQLocation();
     controller.broadcast(Channels.TARGET_LOCATION,
         locationToInt(currentTarget, controller.getLocation()));
   }
