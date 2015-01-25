@@ -32,6 +32,8 @@ import java.util.Arrays;
  */
 public final class Launcher extends AbstractRobot {
 
+  private RobotInfo[] enemies;
+
   /**
    * Constructs a {@code Launcher} robot.
    *
@@ -43,27 +45,48 @@ public final class Launcher extends AbstractRobot {
 
   @Override protected void runHelper() {
     MapLocation myLoc = getLocation();
-    RobotInfo[] enemies = controller.getNearbyRobots(
+    enemies = controller.getNearbyRobots(
         RobotType.LAUNCHER.sensorRadiusSquared, controller.getOpponentTeam());
+
     if (controller.getMissileCount() > 0 && enemies.length > 0) {
       // TODO: Also launch missile if we are within seige distance of tower
       controller.launchMissile(getBestLaunchDirection(enemies));
     }
     if (controller.isCoreReady()) {
-      MapLocation[] locs = getTraversableAdjacentMapLocations();
-      MapLocation goal = intToLocation(
+      MapLocation newTarget = intToLocation(
           controller.readBroadcast(Channels.TARGET_LOCATION),
           controller.getHQLocation());
-      MapLocation[] pos = new MapLocation[] { goal };
-      double[] posCharges = new double[] { 1.0 };
-      MapLocation[] neg = getRobotLocations(enemies);
-      double[] negCharges = new double[enemies.length];
-      Arrays.fill(negCharges, 1.0);
-      MapLocation target = maxPotentialMapLocation(
-          locs, pos, posCharges, neg, negCharges);
-      if (target != null) {
-        controller.move(myLoc.directionTo(target));
+
+      if (!newTarget.equals(target)) {
+        useBugNavigator = false;
+        target = newTarget;
+      } else if (myLoc.distanceSquaredTo(target) < bugInitialDistanceSquared) {
+        useBugNavigator = false;
       }
+
+      if (useBugNavigator) {
+        if (!moveLikeABug()) {
+          useBugNavigator = false;
+        }
+      }
+
+      if (!useBugNavigator) {
+        moveWithPotential();
+      }
+    }
+  }
+
+  private void moveWithPotential() {
+    MapLocation[] locs = getTraversableAdjacentMapLocations();
+    MapLocation[] pos = new MapLocation[] { target };
+    double[] posCharges = new double[] { 1.0 };
+    MapLocation[] neg = getRobotLocations(enemies);
+    double[] negCharges = new double[enemies.length];
+    Arrays.fill(negCharges, 1.0);
+    MapLocation target = maxPotentialMapLocation(
+        locs, pos, posCharges, neg, negCharges);
+    if (target != null || !controller.move(myLoc.directionTo(target))) {
+      startBugNavigation();
     }
   }
 
