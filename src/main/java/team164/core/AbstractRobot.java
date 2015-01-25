@@ -43,6 +43,8 @@ public abstract class AbstractRobot implements Robot {
   protected Direction bugHeading;
   protected int bugInitialDistanceSquared;
 
+  private MapLocation[] targets;
+
   protected AbstractRobot(Controller ctrl) {
     controller = ctrl;
     timer = new Timer(controller.getType());
@@ -56,6 +58,7 @@ public abstract class AbstractRobot implements Robot {
           broadcastAlive();
         }
         myLoc = controller.getLocation();
+        targets = null;
         runHelper();
       } catch (Exception e) {
         e.printStackTrace();
@@ -99,7 +102,9 @@ public abstract class AbstractRobot implements Robot {
    *
    * @return list of available locations for robot to move
    */
-  protected MapLocation[] getTraversableAdjacentMapLocations() {
+  protected MapLocation[] getTraversableAdjacentMapLocations(
+      boolean avoidTargets) {
+
     MapLocation[] arr = new MapLocation[9];
     MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(
         getLocation(), 2);
@@ -107,6 +112,10 @@ public abstract class AbstractRobot implements Robot {
     for (int i = locs.length; --i >= 0;) {
       MapLocation loc = locs[i];
       if (controller.canMove(myLoc.directionTo(loc)) || loc.equals(myLoc)) {
+        if (avoidTargets && isWithinEnemyTowerRange(loc)) {
+          continue;
+        }
+
         arr[count++] = loc;
       }
     }
@@ -199,9 +208,13 @@ public abstract class AbstractRobot implements Robot {
   }
 
   protected MapLocation[] getAttackTargets() {
+    if (targets != null) {
+      return targets;
+    }
+
     MapLocation hq = controller.getEnemyHQLocation();
     MapLocation[] towers = controller.getEnemyTowerLocations();
-    MapLocation[] targets = new MapLocation[towers.length + 1];
+    targets = new MapLocation[towers.length + 1];
     targets[0] = hq;
     System.arraycopy(towers, 0, targets, 1, towers.length);
     return targets;

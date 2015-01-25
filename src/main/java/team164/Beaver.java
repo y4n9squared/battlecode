@@ -89,7 +89,7 @@ public final class Beaver extends AbstractRobot {
             }
           }
         } else {
-          MapLocation[] locs = getTraversableAdjacentMapLocations();
+          MapLocation[] locs = getTraversableAdjacentMapLocations(false);
           MapLocation[] pos = new MapLocation[] { destination };
           double[] posCharges = new double[] { 1.0 };
           MapLocation target = maxPotentialMapLocation(

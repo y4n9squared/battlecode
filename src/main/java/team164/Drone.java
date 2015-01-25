@@ -70,7 +70,7 @@ public final class Drone extends AbstractRobot {
     }
     if (controller.isCoreReady()) {
       MapLocation myLoc = controller.getLocation();
-      MapLocation[] locs = getTraversableAdjacentMapLocations();
+      MapLocation[] locs = getTraversableAdjacentMapLocations(false);
       double maxPotential = Double.NEGATIVE_INFINITY;
       Direction maxDir = Direction.NONE;
 

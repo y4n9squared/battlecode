@@ -108,7 +108,7 @@ public final class Tank extends AbstractRobot {
   }
 
   private void moveWithPotential() {
-    MapLocation[] locs = getTraversableAdjacentMapLocations();
+    MapLocation[] locs = getTraversableAdjacentMapLocations(false);
     double maxPotential = Double.NEGATIVE_INFINITY;
     Direction maxDir = Direction.NONE;
 
