@@ -32,18 +32,6 @@ public abstract class AbstractRobot implements Robot {
    */
   private static final double UNIT_STRUCTURE_SUPPLY_RATIO = 5.0;
 
-  /**
-   * Following are used in calculating optimal army ratios.
-   */
-  private static final RobotType[] UNIT_TYPES = new RobotType[] {
-    SOLDIER, TANK, DRONE, LAUNCHER
-  };
-
-  // MAKE SURE THIS ADDS UP TO ONE BEFORE EDITING!
-  private static final double[] UNIT_RATIOS = new double[] {
-    1.0 / 4, 1.0 / 4, 1.0 / 4, 1.0 / 4
-  };
-
   protected final Controller controller;
   protected final Timer timer;
   protected final RobotType type;
@@ -239,39 +227,6 @@ public abstract class AbstractRobot implements Robot {
     }
 
     return true;
-  }
-
-  protected boolean shouldSpawnUnit(RobotType type) {
-    // If we really sucked at ore management...
-    if (controller.getTeamOre() > 2100) {
-      return true;
-    }
-
-    int[] counts = new int[UNIT_TYPES.length];
-    double currentRatio = 0.0;
-    int currentRatioSum = 0;
-    int typeIndex = -1;
-
-    for (int i = UNIT_TYPES.length; --i >= 0;) {
-      RobotType myType = UNIT_TYPES[i];
-
-      // For computing current ratio
-      int count = controller.readBroadcast(getCountChannel(myType));
-      currentRatioSum += count;
-
-      if (myType == type) {
-        currentRatio = (double) count;
-        typeIndex = i;
-      }
-    }
-
-    if (currentRatioSum == 0) {
-      return true;
-    }
-
-    currentRatio /= currentRatioSum;
-
-    return (currentRatio <= UNIT_RATIOS[typeIndex]);
   }
 
   /**
