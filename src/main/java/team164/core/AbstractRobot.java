@@ -151,51 +151,22 @@ public abstract class AbstractRobot implements Robot {
   protected MapLocation[] getAttackTargets() {
     MapLocation hq = controller.getEnemyHQLocation();
     MapLocation[] towers = controller.getEnemyTowerLocations();
-
     MapLocation[] targets = new MapLocation[towers.length + 1];
     targets[0] = hq;
     System.arraycopy(towers, 0, targets, 1, towers.length);
-
     return targets;
   }
 
   protected void startBugNavigation() {
-    bugInitialDistanceSquared = myLoc.distanceSquaredTo(target);
     useBugNavigator = true;
-
-    MapLocation[] targets = getAttackTargets();
-
+    bugInitialDistanceSquared = myLoc.distanceSquaredTo(target);
     Direction dir = myLoc.directionTo(target);
-    for (int i = 8; --i >= 0;) {
-      if (validBugDirection(dir, targets)) {
-        break;
-      }
-
-      dir = dir.rotateLeft();
-    }
-    bugHeading = dir;
+    bugHeading = getAvailableMoveDirection(dir);
     controller.move(dir);
   }
 
   protected boolean moveLikeABug() {
-    MapLocation[] targets = getAttackTargets();
-
-    Direction dir = bugHeading.opposite().rotateLeft();
-    if (validBugDirection(dir, targets)) {
-      return false;
-    }
-
-    for (int i = 8; --i >= 0;) {
-      if (validBugDirection(dir, targets)) {
-        break;
-      }
-
-      dir = dir.rotateLeft();
-    }
-
-    if (controller.move(dir)) {
-      bugHeading = dir;
-    }
+    bugHeading = getAvailableMoveDirection(bugHeading.opposite());
     return true;
   }
 
@@ -236,17 +207,37 @@ public abstract class AbstractRobot implements Robot {
     controller.broadcast(channel, count + 1);
   }
 
-  private boolean validBugDirection(Direction dir, MapLocation[] targets) {
-    if (!controller.canMove(dir)) {
-      return false;
-    }
-
-    MapLocation loc = myLoc.add(dir);
+  /**
+   * Returns {@code true} if the specified map location is within sensor range
+   * of enemy towers and HQ.
+   *
+   * @param loc map location
+   * @return {@code true} if {@code loc} is within enemy tower/HQ sensor range
+   */
+  private boolean isWithinEnemyTowerRange(MapLocation loc) {
+    MapLocation[] targets = getAttackTargets();
     for (int j = targets.length; --j >= 0;) {
       if (loc.distanceSquaredTo(targets[j]) <= 24) {
-        return false;
+        return true;
       }
     }
-    return true;
+    return false;
+  }
+
+  /**
+   * Returns the first direction available to move or {@code Direction.NONE} if
+   * none exists. Directions are considered in a counter-clockwise fashion.
+   *
+   * @param dir starting direction
+   * @return direction to move
+   */
+  private Direction getAvailableMoveDirection(Direction dir) {
+    for (int i = 8; --i >= 0;) {
+      if (controller.canMove(dir) && !isWithinEnemyTowerRange(myLoc.add(dir))) {
+        return dir;
+      }
+      dir = dir.rotateLeft();
+    }
+    return Direction.NONE;
   }
 }
