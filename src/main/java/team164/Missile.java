@@ -21,7 +21,9 @@ import battlecode.common.Team;
  * @author Shariq Hashme
  */
 
-public final class Missile extends AbstractRobot {
+public final class Missile {
+
+  private Controller controller;
 
   /**
    * Constructs a {@code Missile} robot.
@@ -29,12 +31,12 @@ public final class Missile extends AbstractRobot {
    * @param c controller
    */
   public Missile(Controller c) {
-    super(c);
+    controller = c;
   }
 
-  @Override public void run() {
+  public void run() {
     Team opponentTeam = controller.getOpponentTeam();
-// reduce bytecode usage
+    // reduce bytecode usage
     while (true) {
       // no use destroying without enemies close by
       RobotInfo[] enemies = controller.getNearbyRobots(
