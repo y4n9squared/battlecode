@@ -63,11 +63,7 @@ public abstract class AbstractRobot implements Robot {
       } catch (Exception e) {
         e.printStackTrace();
       } finally {
-        controller.setIndicatorString(0, "USING BUG: " + useBugNavigator);
-        if (bugHeading != null) {
-          controller.setIndicatorString(1, "HEADING: " + bugHeading);
-        }
-        if (Clock.getBytecodesLeft() > 750) {
+        if (Clock.getBytecodesLeft() > 1500) {
           propogateSupply();
         }
         controller.yield();
