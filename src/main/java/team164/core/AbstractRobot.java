@@ -28,6 +28,11 @@ import battlecode.common.TerrainTile;
 public abstract class AbstractRobot implements Robot {
 
   /**
+   * Ratio used for supply weighted average calculation.
+   */
+  private static final double UNIT_STRUCTURE_SUPPLY_RATIO = 5.0;
+
+  /**
    * Following are used in calculating optimal army ratios.
    */
   private static final RobotType[] UNIT_TYPES = new RobotType[] {
@@ -119,6 +124,11 @@ public abstract class AbstractRobot implements Robot {
     return returnLocs;
   }
 
+  private boolean countsAsStructureForSupply(RobotType type) {
+    return type.isBuilding || type == RobotType.BEAVER
+        || type == RobotType.MINER;
+  }
+
   /**
    * Transfers supply to the robot with lowest supply, if our supply level is
    * above the average supply level.
@@ -129,22 +139,71 @@ public abstract class AbstractRobot implements Robot {
     RobotInfo[] robots = controller.getNearbyRobots(
         GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED, controller.getTeam());
 
+    if (robots.length == 0) {
+      return;
+    }
+
+    int unitCount = 0;
+    int structureCount = 0;
+    double totalUnitSupply = 0.0;
+    double totalStructureSupply = 0.0;
+
     double mySupply = controller.getSupplyLevel();
-    RobotInfo target = null;
-    double maxDifference = 0;
-    double totalSupply = mySupply;
+    if (countsAsStructureForSupply(type)) {
+      ++structureCount;
+      totalStructureSupply += mySupply;
+    } else {
+      ++unitCount;
+      totalUnitSupply += mySupply;
+    }
+
+    RobotInfo unitMin = null;
+    RobotInfo structureMin = null;
+    double unitSupplyMin = Double.POSITIVE_INFINITY;
+    double structureSupplyMin = Double.POSITIVE_INFINITY;
 
     for (int i = robots.length; --i >= 0;) {
-      totalSupply += robots[i].supplyLevel;
-      double supplyDifference = mySupply - robots[i].supplyLevel;
-      if (supplyDifference > maxDifference) {
-        maxDifference = supplyDifference;
-        target = robots[i];
+      double supply = robots[i].supplyLevel;
+      if (countsAsStructureForSupply(robots[i].type)) {
+        ++structureCount;
+        totalStructureSupply += supply;
+
+        if (structureSupplyMin > supply) {
+          structureMin = robots[i];
+          structureSupplyMin = supply;
+        }
+      } else {
+        ++unitCount;
+        totalUnitSupply += supply;
+
+        if (unitSupplyMin > supply) {
+          unitMin = robots[i];
+          unitSupplyMin = supply;
+        }
       }
     }
-    double avgSupply = totalSupply / (robots.length + 1);
-    if (mySupply > avgSupply) {
-      controller.transferSupplies((int) (mySupply - avgSupply), target);
+
+    double totalSupply = totalStructureSupply + totalUnitSupply;
+
+    double optimalStructureSupply = totalSupply
+        / (structureCount + unitCount * UNIT_STRUCTURE_SUPPLY_RATIO);
+    double optimalUnitSupply = optimalStructureSupply
+        * UNIT_STRUCTURE_SUPPLY_RATIO;
+
+    double myOptimalSupply = countsAsStructureForSupply(type)
+        ? optimalStructureSupply : optimalUnitSupply;
+
+    if (mySupply > myOptimalSupply) {
+      RobotInfo supplyTarget;
+      if (optimalUnitSupply - unitSupplyMin
+          > optimalStructureSupply - structureSupplyMin) {
+        supplyTarget = unitMin;
+      } else {
+        supplyTarget = structureMin;
+      }
+
+      controller.transferSupplies((int) (mySupply - myOptimalSupply),
+          supplyTarget);
     }
   }
 
