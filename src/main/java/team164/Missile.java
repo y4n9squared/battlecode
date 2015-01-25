@@ -49,6 +49,7 @@ public final class Missile extends AbstractRobot {
           RobotType.MISSILE.sensorRadiusSquared, controller.getOpponentTeam());
       if (enemies.length > 2) {
 // more than this runs into bytecode limit
+// very close to bytecode limit: only 10 bytecodes left!
         int closestEnemy = 0;
         int closestDistance = 25;
         // sensorRadiusSquared is 24
@@ -70,12 +71,10 @@ public final class Missile extends AbstractRobot {
         }
         controller.yield();
       } else if (enemies.length == 0) {
-        //TODO : don't just move randomly
+        //TODO : don't just move randomly?
         controller.move(Direction.values()[controller.getID()%8]);
         controller.yield();
       } else {
-        //TODO : maybe pick the enemy more intelligently?
-        // for enemies.length == 1 or enemies.length > 2
         controller.move(location.directionTo(enemies[0].location));
         controller.yield();
       }
