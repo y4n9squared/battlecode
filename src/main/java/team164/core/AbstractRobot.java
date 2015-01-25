@@ -72,6 +72,10 @@ public abstract class AbstractRobot implements Robot {
       } catch (Exception e) {
         e.printStackTrace();
       } finally {
+        controller.setIndicatorString(0, "USING BUG: " + useBugNavigator);
+        if (bugHeading != null) {
+          controller.setIndicatorString(1, "HEADING: " + bugHeading);
+        }
         if (Clock.getBytecodesLeft() > 750) {
           propogateSupply();
         }
@@ -225,7 +229,16 @@ public abstract class AbstractRobot implements Robot {
   }
 
   protected boolean moveLikeABug() {
-    bugHeading = getAvailableMoveDirection(bugHeading.opposite());
+    Direction dir = bugHeading.opposite().rotateLeft();
+    if (controller.canMove(dir) && !isWithinEnemyTowerRange(myLoc.add(dir))) {
+      return false;
+    }
+
+    dir = getAvailableMoveDirection(dir);
+    if (controller.move(dir)) {
+      bugHeading = dir;
+    }
+
     return true;
   }
 
