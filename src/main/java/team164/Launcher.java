@@ -77,7 +77,7 @@ public final class Launcher extends AbstractRobot {
   }
 
   private void moveWithPotential() {
-    MapLocation[] locs = getTraversableAdjacentMapLocations();
+    MapLocation[] locs = getTraversableAdjacentMapLocations(true);
     MapLocation[] pos = new MapLocation[] { target };
     double[] posCharges = new double[] { 1.0 };
     MapLocation[] neg = getRobotLocations(enemies);
