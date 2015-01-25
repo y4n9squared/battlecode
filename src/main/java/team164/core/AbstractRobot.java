@@ -224,7 +224,7 @@ public abstract class AbstractRobot implements Robot {
 
     currentRatio /= currentRatioSum;
 
-    return (currentRatio < UNIT_RATIOS[typeIndex]);
+    return (currentRatio <= UNIT_RATIOS[typeIndex]);
   }
 
   /**
