@@ -5,9 +5,13 @@
 
 package team164;
 
+import static team164.util.Algorithms.*;
+
 import team164.core.AbstractRobot;
+import team164.core.Channels;
 import team164.core.Controller;
 
+import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 
@@ -21,8 +25,13 @@ public final class Tower extends AbstractRobot {
     COMPUTER;
   }
 
+  private MapLocation myLoc;
+  private int myLocAsInt;
+
   public Tower(Controller controller) {
     super(controller);
+    myLoc = controller.getLocation();
+    myLocAsInt = locationToInt(myLoc, controller.getHQLocation());
   }
 
   @Override protected void runHelper() {
@@ -46,8 +55,18 @@ public final class Tower extends AbstractRobot {
       if (target != null) {
         controller.attack(target);
       }
+    } else {
+      RobotInfo[] sensedEnemies = controller.getNearbyRobots(
+          RobotType.TOWER.sensorRadiusSquared + 5,
+          controller.getOpponentTeam());
+
+      if (sensedEnemies.length > 0) {
+        int currentTower = controller.readBroadcast(Channels.TOWER_HELP);
+
+        if (currentTower != myLocAsInt) {
+          controller.broadcast(Channels.TOWER_HELP, myLocAsInt);
+        }
+      }
     }
-    // TODO: Implement a way for the tower to call for help, possibly based on
-    // checking an influence threshold and broadcasting.
   }
 }

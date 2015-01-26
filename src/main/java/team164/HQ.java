@@ -115,6 +115,7 @@ public final class HQ extends AbstractRobot {
     myTowers = controller.getTowerLocations();
     enemyTowers = controller.getEnemyTowerLocations();
 
+    // TODO: if a tower is calling for help, pivot strategies
     if (myTowers.length > enemyTowers.length
         || ++attackRoundCounter < ROUNDS_UNTIL_ATTACK) {
       computeDefenseTarget();
