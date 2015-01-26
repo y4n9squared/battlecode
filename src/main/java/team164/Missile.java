@@ -5,6 +5,8 @@
 
 package team164;
 
+import static team164.util.Algorithms.*;
+
 import team164.core.AbstractRobot;
 import team164.core.Channels;
 import team164.core.Controller;
@@ -52,8 +54,8 @@ public final class Missile {
       enemies = controller.getNearbyRobots(
           RobotType.MISSILE.sensorRadiusSquared, controller.getOpponentTeam());
       if (enemies.length > 2) {
-// more than this runs into bytecode limit
-// very close to bytecode limit: only 10 bytecodes left!
+        // more than this runs into bytecode limit
+        // very close to bytecode limit: only 10 bytecodes left!
         int closestEnemy = 0;
         int closestDistance = 25;
         // sensorRadiusSquared is 24
@@ -76,8 +78,13 @@ public final class Missile {
         }
         controller.yield();
       } else if (enemies.length == 0) {
-        //TODO : don't just move randomly?
-        controller.move(Direction.values()[controller.getID() % 8]);
+        // Move towards the target
+        // TODO: how does this work when target is one of us???
+
+        MapLocation target = intToLocation(
+            controller.readBroadcast(Channels.TARGET_LOCATION),
+            controller.getHQLocation());
+        controller.move(controller.getLocation().directionTo(target));
         controller.yield();
       } else {
         controller.move(location.directionTo(enemies[0].location));
