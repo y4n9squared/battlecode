@@ -35,6 +35,7 @@ public final class Tower extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
+    boolean attacked = false;
     if (controller.isWeaponReady()) {
       RobotInfo[] enemies = controller.getNearbyRobots(
           RobotType.TOWER.attackRadiusSquared, controller.getOpponentTeam());
@@ -53,19 +54,23 @@ public final class Tower extends AbstractRobot {
         }
       }
       if (target != null) {
-        controller.attack(target);
+        attacked = controller.attack(target);
       }
-    } else {
+    }
+
+    if (!attacked) {
       RobotInfo[] sensedEnemies = controller.getNearbyRobots(
           RobotType.TOWER.sensorRadiusSquared + 5,
           controller.getOpponentTeam());
 
-      if (sensedEnemies.length > 0) {
-        int currentTower = controller.readBroadcast(Channels.TOWER_HELP);
+      int currentTower = controller.readBroadcast(Channels.TOWER_HELP);
 
+      if (sensedEnemies.length > 0) {
         if (currentTower != myLocAsInt) {
           controller.broadcast(Channels.TOWER_HELP, myLocAsInt);
         }
+      } else if (currentTower == myLocAsInt) {
+        controller.broadcast(Channels.TOWER_HELP, 0);
       }
     }
   }
