@@ -56,6 +56,7 @@ public final class HQ extends AbstractRobot {
   private int numTowers = -1;
   private MapLocation[] myTowers;
   private MapLocation[] enemyTowers;
+  private MapLocation myLoc;
 
   /**
    * We start this so we will start attacking on some arbitrary turn.
@@ -78,6 +79,7 @@ public final class HQ extends AbstractRobot {
   public HQ(Controller controller) {
     super(controller);
     rnd.setSeed(controller.getID());
+    myLoc = controller.getLocation();
   }
 
   @Override protected void runHelper() {
@@ -114,7 +116,6 @@ public final class HQ extends AbstractRobot {
     myTowers = controller.getTowerLocations();
     enemyTowers = controller.getEnemyTowerLocations();
 
-    // TODO: if a tower is calling for help, pivot strategies
     computeDefenseTarget();
 
     // If we are losing or tied
@@ -149,26 +150,38 @@ public final class HQ extends AbstractRobot {
   }
 
   private void computeDefenseTarget() {
-    if (defenseTarget != null
-        && ++defenseRoundCounter < ROUNDS_UNTIL_DEFENSE_SWITCH) {
-      return;
-    }
-    defenseRoundCounter = 0;
+    int helpTarget = controller.readBroadcast(Channels.TOWER_HELP);
+    if (helpTarget != 0) {
+      MapLocation newTarget = intToLocation(helpTarget, myLoc);
+      if (newTarget.equals(defenseTarget)) {
+        return;
+      }
 
-    if (myTowers.length == 0) {
-      defenseTarget = controller.getHQLocation();
-    } else {
-      MapLocation newTarget;
-      do {
-        int index = rnd.nextInt(myTowers.length + 1);
-        if (index == 0) {
-          newTarget = controller.getHQLocation();
-        } else {
-          newTarget = myTowers[index - 1];
-        }
-      } while (newTarget.equals(defenseTarget));
-
+      defenseRoundCounter = 0;
       defenseTarget = newTarget;
+
+    } else {
+      if (defenseTarget != null
+          && ++defenseRoundCounter < ROUNDS_UNTIL_DEFENSE_SWITCH) {
+        return;
+      }
+      defenseRoundCounter = 0;
+
+      if (myTowers.length == 0) {
+        defenseTarget = controller.getHQLocation();
+      } else {
+        MapLocation newTarget;
+        do {
+          int index = rnd.nextInt(myTowers.length + 1);
+          if (index == 0) {
+            newTarget = controller.getHQLocation();
+          } else {
+            newTarget = myTowers[index - 1];
+          }
+        } while (newTarget.equals(defenseTarget));
+
+        defenseTarget = newTarget;
+      }
     }
 
     controller.broadcast(Channels.DEFENSE_TARGET,
