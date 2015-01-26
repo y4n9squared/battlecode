@@ -34,6 +34,9 @@ public final class Missile {
     controller = c;
   }
 
+  /**
+   * Entry-point for Battlecode server.
+   */
   public void run() {
     Team opponentTeam = controller.getOpponentTeam();
     // reduce bytecode usage
