@@ -19,6 +19,8 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 
+import java.util.Random;
+
 public final class HQ extends AbstractRobot {
 
   /**
@@ -44,6 +46,9 @@ public final class HQ extends AbstractRobot {
    * The rounds it takes to spawn an army.
    */
   private static final int ROUNDS_UNTIL_ATTACK = 100;
+  private static final int ROUNDS_UNTIL_DEFENSE_SWITCH = 100;
+
+  private final Random rnd = new Random();
 
   private int attackDistance = SWARM_RADIUS_SQUARED;
   private MapLocation currentTarget = null;
@@ -56,6 +61,7 @@ public final class HQ extends AbstractRobot {
    * We start this so we will start attacking on some arbitrary turn.
    */
   private int attackRoundCounter = ROUNDS_UNTIL_ATTACK - 500;
+  private int defenseRoundCounter = 0;
 
   /**
    * This is the order in which the HQ attacks enemys.
@@ -72,6 +78,7 @@ public final class HQ extends AbstractRobot {
    */
   public HQ(Controller controller) {
     super(controller);
+    rnd.setSeed(controller.getID());
   }
 
   @Override protected void runHelper() {
@@ -108,13 +115,9 @@ public final class HQ extends AbstractRobot {
     myTowers = controller.getTowerLocations();
     enemyTowers = controller.getEnemyTowerLocations();
 
+    // TODO: if a tower is calling for help, pivot strategies
     if (myTowers.length > enemyTowers.length
         || ++attackRoundCounter < ROUNDS_UNTIL_ATTACK) {
-      if (attacking) {
-        attacking = false;
-        numTowers = -1;
-      }
-
       computeDefenseTarget();
       attackDistance = RETREAT_RADIUS_SQUARED;
     } else {
@@ -145,36 +148,29 @@ public final class HQ extends AbstractRobot {
   }
 
   private void computeDefenseTarget() {
-    /*
-    if (numTowers == myTowers.length) {
+    if (attacking) {
+      attacking = false;
+    } else if (++defenseRoundCounter < ROUNDS_UNTIL_DEFENSE_SWITCH) {
       return;
     }
+    defenseRoundCounter = 0;
 
-    MapLocation locToSearchAround;
-    locToSearchAround = controller.getEnemyHQLocation();
-    numTowers = myTowers.length;
-
-    int targetIndex = 0;
-    if (numTowers > 0) {
-      double closestDistance = Double.POSITIVE_INFINITY;
-      for (int i = numTowers; --i >= 0;) {
-        double distance = locToSearchAround.distanceSquaredTo(myTowers[i]);
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          targetIndex = i + 1;
-        }
-      }
-      currentTarget = myTowers[targetIndex - 1];
-    } else {
+    if (myTowers.length == 0) {
       currentTarget = controller.getHQLocation();
-    }
-    */
-    MapLocation[] myTowers = controller.getTowerLocations();
+    } else {
+      MapLocation newTarget;
+      do {
+        int index = rnd.nextInt(myTowers.length + 1);
+        if (index == 0) {
+          newTarget = controller.getHQLocation();
+        } else {
+          newTarget = myTowers[index - 1];
+        }
+      } while (newTarget.equals(currentTarget));
 
-    if (numTowers == myTowers.length) {
-      return;
+      currentTarget = newTarget;
     }
-    currentTarget = controller.getHQLocation();
+
     controller.broadcast(Channels.TARGET_LOCATION,
         locationToInt(currentTarget, controller.getLocation()));
   }

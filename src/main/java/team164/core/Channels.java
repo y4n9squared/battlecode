@@ -17,6 +17,8 @@ public class Channels {
   public static final int TARGET_LOCATION = 200;
   public static final int ATTACK_DISTANCE = 202;
 
+  public static final int TOWER_HELP = 300;
+
   /**
    * Start channel for attendance. Channel {@code ATTENDANCE +
    * RobotType.ordinal()} is the number of allied robots of type {@code
