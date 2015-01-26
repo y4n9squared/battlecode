@@ -25,20 +25,20 @@ public final class Tower extends AbstractRobot {
     COMPUTER;
   }
 
+  private static final int ATTACK_RADIUS = RobotType.TOWER.attackRadiusSquared;
+
   private MapLocation myLoc;
-  private int myLocAsInt;
 
   public Tower(Controller controller) {
     super(controller);
     myLoc = controller.getLocation();
-    myLocAsInt = locationToInt(myLoc, controller.getHQLocation());
   }
 
   @Override protected void runHelper() {
-    boolean attacked = false;
+    MapLocation locToBroadcast = null;
     if (controller.isWeaponReady()) {
       RobotInfo[] enemies = controller.getNearbyRobots(
-          RobotType.TOWER.attackRadiusSquared, controller.getOpponentTeam());
+          ATTACK_RADIUS, controller.getOpponentTeam());
 
       RobotInfo target = null;
       int maxPriority = AttackPriority.COMPUTER.ordinal();
@@ -54,24 +54,35 @@ public final class Tower extends AbstractRobot {
         }
       }
       if (target != null) {
-        attacked = controller.attack(target);
+        controller.attack(target);
+        locToBroadcast = target.location;
       }
     }
 
-    if (!attacked) {
+    if (locToBroadcast == null) {
       RobotInfo[] sensedEnemies = controller.getNearbyRobots(
           RobotType.TOWER.sensorRadiusSquared + 5,
           controller.getOpponentTeam());
 
-      int currentTower = controller.readBroadcast(Channels.TOWER_HELP);
-
       if (sensedEnemies.length > 0) {
-        if (currentTower != myLocAsInt) {
-          controller.broadcast(Channels.TOWER_HELP, myLocAsInt);
-        }
-      } else if (currentTower == myLocAsInt) {
+        locToBroadcast = myLoc;
+      }
+    }
+
+    int helpTargetAsInt = controller.readBroadcast(Channels.TOWER_HELP);
+    MapLocation helpTarget = helpTargetAsInt == 0 ? null
+        : intToLocation(helpTargetAsInt, controller.getHQLocation());
+
+    if (locToBroadcast == null) {
+      // If we were the one to broadcast the help, clear it
+      if (helpTarget != null
+          && myLoc.distanceSquaredTo(helpTarget) <= ATTACK_RADIUS) {
         controller.broadcast(Channels.TOWER_HELP, 0);
       }
+    } else if (helpTarget == null || !locToBroadcast.equals(helpTarget)) {
+      // If we need help and the target is not the same
+      controller.broadcast(Channels.TOWER_HELP,
+          locationToInt(locToBroadcast, controller.getHQLocation()));
     }
   }
 }
