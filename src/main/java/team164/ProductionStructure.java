@@ -45,13 +45,13 @@ public class ProductionStructure extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
-    if (Clock.getRoundNum() % buildType.buildTurns > 1) {
+    if (Clock.getRoundNum() % buildType.buildTurns >= 2) {
       if (shouldSpawnUnit()) {
         if (controller.isCoreReady()) {
           Direction dir = getEnemyHQDirection();
           controller.spawn(dir, buildType);
         } else {
-          if (Clock.getRoundNum() % buildType.buildTurns == 2) {
+          if (Clock.getRoundNum() % buildType.buildTurns == 3) {
             int channel = getDebtChannel(myType);
             controller.broadcast(channel, 1);
           }
