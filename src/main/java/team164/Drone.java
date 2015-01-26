@@ -75,15 +75,23 @@ public final class Drone extends AbstractRobot {
       Direction maxDir = Direction.NONE;
 
       MapLocation[] targets = getAttackTargets();
+
+      boolean attacking = mySpawnRound
+          < controller.readBroadcast(Channels.ATTACKERS_MAX_SPAWN_ROUND);
+
+      int channel = attacking ? Channels.ATTACK_TARGET
+          : Channels.DEFENSE_TARGET;
+
       MapLocation target = intToLocation(
-          controller.readBroadcast(Channels.TARGET_LOCATION),
+          controller.readBroadcast(channel),
           controller.getHQLocation());
 
       RobotInfo[] enemies = controller.getNearbyRobots(
           ROBOT_TYPE.sensorRadiusSquared,
           controller.getOpponentTeam());
 
-      int attackDistance = controller.readBroadcast(Channels.ATTACK_DISTANCE);
+      int attackDistance = attacking
+          ? controller.readBroadcast(Channels.ATTACK_DISTANCE) : 1;
 
       for (int i = locs.length; --i >= 0;) {
         Direction dir = myLoc.directionTo(locs[i]);

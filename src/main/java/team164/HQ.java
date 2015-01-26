@@ -45,22 +45,21 @@ public final class HQ extends AbstractRobot {
   /**
    * The rounds it takes to spawn an army.
    */
-  private static final int ROUNDS_UNTIL_ATTACK = 100;
+  private static final int MIN_ROUND_TO_ATTACK = 800;
   private static final int ROUNDS_UNTIL_DEFENSE_SWITCH = 100;
 
   private final Random rnd = new Random();
 
   private int attackDistance = SWARM_RADIUS_SQUARED;
-  private MapLocation currentTarget = null;
+  private MapLocation defenseTarget = null;
+  private MapLocation attackTarget = null;
   private int numTowers = -1;
-  private boolean attacking = false;
   private MapLocation[] myTowers;
   private MapLocation[] enemyTowers;
 
   /**
    * We start this so we will start attacking on some arbitrary turn.
    */
-  private int attackRoundCounter = ROUNDS_UNTIL_ATTACK - 500;
   private int defenseRoundCounter = 0;
 
   /**
@@ -116,20 +115,15 @@ public final class HQ extends AbstractRobot {
     enemyTowers = controller.getEnemyTowerLocations();
 
     // TODO: if a tower is calling for help, pivot strategies
-    if (myTowers.length > enemyTowers.length
-        || ++attackRoundCounter < ROUNDS_UNTIL_ATTACK) {
-      computeDefenseTarget();
-      attackDistance = RETREAT_RADIUS_SQUARED;
-    } else {
-      if (!attacking) {
-        attacking = true;
-        numTowers = -1;
-      }
+    computeDefenseTarget();
 
+    // If we are losing or tied
+    if (myTowers.length <= enemyTowers.length
+        && Clock.getRoundNum() > MIN_ROUND_TO_ATTACK) {
       computeAttackTarget();
 
       RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
-          currentTarget,
+          attackTarget,
           SWARM_RADIUS_SQUARED + 20,
           controller.getTeam());
 
@@ -138,25 +132,31 @@ public final class HQ extends AbstractRobot {
       } else if (teammatesAroundTarget.length < 5) {
         attackDistance = SWARM_RADIUS_SQUARED;
       }
-    }
 
-    int existingAttackDistance =
-        controller.readBroadcast(Channels.ATTACK_DISTANCE);
-    if (existingAttackDistance != attackDistance) {
-      controller.broadcast(Channels.ATTACK_DISTANCE, attackDistance);
+      int existingAttackDistance =
+          controller.readBroadcast(Channels.ATTACK_DISTANCE);
+      if (existingAttackDistance != attackDistance) {
+        controller.broadcast(Channels.ATTACK_DISTANCE, attackDistance);
+      }
+    } else {
+      int existingAttackersRound = controller.readBroadcast(
+          Channels.ATTACKERS_MAX_SPAWN_ROUND);
+
+      if (existingAttackersRound != 0) {
+        controller.broadcast(Channels.ATTACKERS_MAX_SPAWN_ROUND, 0);
+      }
     }
   }
 
   private void computeDefenseTarget() {
-    if (attacking) {
-      attacking = false;
-    } else if (++defenseRoundCounter < ROUNDS_UNTIL_DEFENSE_SWITCH) {
+    if (defenseTarget != null
+        && ++defenseRoundCounter < ROUNDS_UNTIL_DEFENSE_SWITCH) {
       return;
     }
     defenseRoundCounter = 0;
 
     if (myTowers.length == 0) {
-      currentTarget = controller.getHQLocation();
+      defenseTarget = controller.getHQLocation();
     } else {
       MapLocation newTarget;
       do {
@@ -166,13 +166,13 @@ public final class HQ extends AbstractRobot {
         } else {
           newTarget = myTowers[index - 1];
         }
-      } while (newTarget.equals(currentTarget));
+      } while (newTarget.equals(defenseTarget));
 
-      currentTarget = newTarget;
+      defenseTarget = newTarget;
     }
 
-    controller.broadcast(Channels.TARGET_LOCATION,
-        locationToInt(currentTarget, controller.getLocation()));
+    controller.broadcast(Channels.DEFENSE_TARGET,
+        locationToInt(defenseTarget, controller.getLocation()));
   }
 
   private void computeAttackTarget() {
@@ -180,22 +180,14 @@ public final class HQ extends AbstractRobot {
       return;
     }
 
+    controller.broadcast(Channels.ATTACKERS_MAX_SPAWN_ROUND,
+        Clock.getRoundNum());
+
     MapLocation locToSearchAround;
-    if (numTowers != -1) {
-      // We just killed an enemy, do a dance!
-
-      // If we want to continue attacking, search around currentTarget
-      // locToSearchAround = currentTarget;
-
-      // If we want to retreat, go back to defenseTarget
-      attackRoundCounter = 0;
-      return;
-    }
-
-    if (currentTarget == null) {
+    if (attackTarget == null) {
       locToSearchAround = controller.getLocation();
     } else {
-      locToSearchAround = currentTarget;
+      locToSearchAround = attackTarget;
     }
 
     numTowers = enemyTowers.length;
@@ -210,12 +202,12 @@ public final class HQ extends AbstractRobot {
           targetIndex = i + 1;
         }
       }
-      currentTarget = enemyTowers[targetIndex - 1];
+      attackTarget = enemyTowers[targetIndex - 1];
     } else {
-      currentTarget = controller.getEnemyHQLocation();
+      attackTarget = controller.getEnemyHQLocation();
     }
-    controller.broadcast(Channels.TARGET_LOCATION,
-        locationToInt(currentTarget, controller.getLocation()));
+    controller.broadcast(Channels.ATTACK_TARGET,
+        locationToInt(attackTarget, controller.getLocation()));
   }
 
   private void resetRobotCount() {

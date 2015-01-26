@@ -35,6 +35,7 @@ public abstract class AbstractRobot implements Robot {
   protected final Controller controller;
   protected final Timer timer;
   protected final RobotType type;
+  protected final int mySpawnRound;
 
   protected MapLocation target = null;
   protected int attackDistance;
@@ -49,6 +50,7 @@ public abstract class AbstractRobot implements Robot {
     controller = ctrl;
     timer = new Timer(controller.getType());
     type = controller.getType();
+    mySpawnRound = Clock.getRoundNum();
   }
 
   @Override public void run() {

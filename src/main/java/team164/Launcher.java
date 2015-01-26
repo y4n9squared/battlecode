@@ -53,8 +53,14 @@ public final class Launcher extends AbstractRobot {
       controller.launchMissile(getBestLaunchDirection(enemies));
     }
     if (controller.isCoreReady()) {
+      boolean attacking = mySpawnRound
+          < controller.readBroadcast(Channels.ATTACKERS_MAX_SPAWN_ROUND);
+
+      int channel = attacking ? Channels.ATTACK_TARGET
+          : Channels.DEFENSE_TARGET;
+
       MapLocation newTarget = intToLocation(
-          controller.readBroadcast(Channels.TARGET_LOCATION),
+          controller.readBroadcast(channel),
           controller.getHQLocation());
 
       if (!newTarget.equals(target)) {

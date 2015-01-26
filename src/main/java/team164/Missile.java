@@ -79,10 +79,8 @@ public final class Missile {
         controller.yield();
       } else if (enemies.length == 0) {
         // Move towards the target
-        // TODO: how does this work when target is one of us???
-
         MapLocation target = intToLocation(
-            controller.readBroadcast(Channels.TARGET_LOCATION),
+            controller.readBroadcast(Channels.ATTACK_TARGET),
             controller.getHQLocation());
         controller.move(controller.getLocation().directionTo(target));
         controller.yield();
