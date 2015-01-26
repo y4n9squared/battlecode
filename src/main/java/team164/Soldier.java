@@ -79,11 +79,17 @@ public final class Soldier extends AbstractRobot {
         useBugNavigator = false;
       }
 
+      boolean attacking = mySpawnRound
+          < controller.readBroadcast(Channels.ATTACKERS_MAX_SPAWN_ROUND);
+
+      int channel = attacking ? Channels.ATTACK_TARGET
+          : Channels.DEFENSE_TARGET;
+
       MapLocation newTarget = intToLocation(
-          controller.readBroadcast(Channels.TARGET_LOCATION),
+          controller.readBroadcast(channel),
           controller.getHQLocation());
-      int newAttackDistance =
-          controller.readBroadcast(Channels.ATTACK_DISTANCE);
+      int newAttackDistance = attacking
+          ? controller.readBroadcast(Channels.ATTACK_DISTANCE) : 1;
 
       if (!newTarget.equals(target) || newAttackDistance != attackDistance) {
         useBugNavigator = false;

@@ -14,8 +14,10 @@ import battlecode.common.RobotType;
  */
 public class Channels {
 
-  public static final int TARGET_LOCATION = 200;
+  public static final int ATTACK_TARGET = 200;
+  public static final int DEFENSE_TARGET = 201;
   public static final int ATTACK_DISTANCE = 202;
+  public static final int ATTACKERS_MAX_SPAWN_ROUND = 203;
 
   public static final int TOWER_HELP = 300;
 
