@@ -7,12 +7,13 @@ package team164;
 
 import static battlecode.common.DependencyProgress.*;
 import static battlecode.common.RobotType.*;
+import static team164.core.Channels.*;
 import static team164.util.Algorithms.*;
 
 import team164.core.AbstractRobot;
-import team164.core.Channels;
 import team164.core.Controller;
 
+import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
@@ -159,6 +160,23 @@ public final class Beaver extends AbstractRobot {
           && controller.getDependencyProgress(type) == NONE) {
         buildType = type;
         break;
+      }
+    }
+
+    if (buildType == null) {
+      RobotType[] production = new RobotType[] {
+        BARRACKS, HELIPAD, TANKFACTORY, AEROSPACELAB
+      };
+      for (int i = production.length; --i >= 0;) {
+        RobotType type = production[i];
+        if (Clock.getRoundNum() % type.buildTurns > 2) {
+          int channel = getDebtChannel(type);
+          int debt = controller.readBroadcast(channel);
+          if (debt != 0) {
+            controller.broadcast(channel, 0);
+            return type;
+          }
+        }
       }
     }
     return buildType;
