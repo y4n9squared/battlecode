@@ -48,7 +48,7 @@ public final class MinerFactory extends ProductionStructure {
 
   @Override protected boolean shouldSpawnUnit() {
     if (controller.isCoreReady()) {
-      if (Clock.getRoundNum() % MINER.buildTurns > 1) {
+      if (Clock.getRoundNum() % MINER.buildTurns == 2) {
         int numMiners = controller.readBroadcast(getCountChannel(MINER));
         if (numMiners < numTargetMiners) {
           return true;

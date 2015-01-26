@@ -29,29 +29,34 @@ public class ProductionStructure extends AbstractRobot {
     1.0 / 4, 1.0 / 4, 1.0 / 4, 1.0 / 4
   };
 
+  private final RobotType myType;
   private final RobotType buildType;
-  private int debt;
 
+  /**
+   * Construct a robot that produces units.
+   *
+   * @param controller controller
+   * @param type robot type to produce
+   */
   public ProductionStructure(Controller controller, RobotType type) {
     super(controller);
     buildType = type;
+    myType = controller.getType();
   }
 
   @Override protected void runHelper() {
-    if (shouldSpawnUnit()) {
-      ++debt;
-      if (controller.isCoreReady()) {
-        if (Clock.getRoundNum() % buildType.buildTurns > 1) {
+    if (Clock.getRoundNum() % buildType.buildTurns > 1) {
+      if (shouldSpawnUnit()) {
+        if (controller.isCoreReady()) {
           Direction dir = getEnemyHQDirection();
           controller.spawn(dir, buildType);
-          --debt;
+        } else {
+          if (Clock.getRoundNum() % buildType.buildTurns == 2) {
+            int channel = getDebtChannel(myType);
+            controller.broadcast(channel, 1);
+          }
         }
       }
-    }
-    if (debt > buildType.buildTurns * 0.75) {
-      // TODO: Supply is not meeting demand. Broadcast for Beaver to build
-      // another production building
-      debt = 0;
     }
   }
 
@@ -59,6 +64,10 @@ public class ProductionStructure extends AbstractRobot {
     // If we really sucked at ore management...
     if (controller.getTeamOre() > 2100) {
       return true;
+    }
+
+    if (controller.getTeamOre() < buildType.oreCost) {
+      return false;
     }
 
     int[] counts = new int[UNIT_TYPES.length];

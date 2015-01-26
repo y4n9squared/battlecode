@@ -24,6 +24,8 @@ public class Channels {
    */
   private static final int ATTENDANCE_START = 100;
 
+  private static final int DEBT_START = 150;
+
   /**
    * Returns the channel number for the attedance of the specified type.
    *
@@ -32,6 +34,16 @@ public class Channels {
    */
   public static int getCountChannel(RobotType type) {
     return ATTENDANCE_START + type.ordinal();
+  }
+
+  /**
+   * Returns the channel number for the attedance of the specified type.
+   *
+   * @param type robot type
+   * @return channel number
+   */
+  public static int getDebtChannel(RobotType type) {
+    return DEBT_START + type.ordinal();
   }
 
   private Channels() {
