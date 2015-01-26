@@ -45,7 +45,7 @@ public final class HQ extends AbstractRobot {
   /**
    * The rounds it takes to spawn an army.
    */
-  private static final int MIN_ROUND_TO_ATTACK = 800;
+  private static final int MIN_ROUND_TO_ATTACK = 900;
   private static final int ROUNDS_UNTIL_DEFENSE_SWITCH = 100;
   private static final int ROUNDS_UNTIL_NEW_ATTACK = 300;
 
@@ -194,8 +194,9 @@ public final class HQ extends AbstractRobot {
   private void computeAttackTarget() {
     if (attackRoundCounter == -1
         || ++attackRoundCounter > ROUNDS_UNTIL_NEW_ATTACK) {
+      // Keep some robots home to defend
       controller.broadcast(Channels.ATTACKERS_MAX_SPAWN_ROUND,
-          Clock.getRoundNum());
+          Clock.getRoundNum() - 100);
       attackRoundCounter = 0;
     }
 
