@@ -47,6 +47,7 @@ public final class HQ extends AbstractRobot {
    */
   private static final int MIN_ROUND_TO_ATTACK = 800;
   private static final int ROUNDS_UNTIL_DEFENSE_SWITCH = 100;
+  private static final int ROUNDS_UNTIL_NEW_ATTACK = 300;
 
   private final Random rnd = new Random();
 
@@ -58,9 +59,7 @@ public final class HQ extends AbstractRobot {
   private MapLocation[] enemyTowers;
   private MapLocation myLoc;
 
-  /**
-   * We start this so we will start attacking on some arbitrary turn.
-   */
+  private int attackRoundCounter = -1;
   private int defenseRoundCounter = 0;
 
   /**
@@ -140,6 +139,7 @@ public final class HQ extends AbstractRobot {
         controller.broadcast(Channels.ATTACK_DISTANCE, attackDistance);
       }
     } else {
+      attackRoundCounter = -1;
       int existingAttackersRound = controller.readBroadcast(
           Channels.ATTACKERS_MAX_SPAWN_ROUND);
 
@@ -189,12 +189,16 @@ public final class HQ extends AbstractRobot {
   }
 
   private void computeAttackTarget() {
+    if (attackRoundCounter == -1
+        || ++attackRoundCounter > ROUNDS_UNTIL_NEW_ATTACK) {
+      controller.broadcast(Channels.ATTACKERS_MAX_SPAWN_ROUND,
+          Clock.getRoundNum());
+      attackRoundCounter = 0;
+    }
+
     if (numTowers == enemyTowers.length) {
       return;
     }
-
-    controller.broadcast(Channels.ATTACKERS_MAX_SPAWN_ROUND,
-        Clock.getRoundNum());
 
     MapLocation locToSearchAround;
     if (attackTarget == null) {
