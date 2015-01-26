@@ -26,7 +26,7 @@ public class ProductionStructure extends AbstractRobot {
 
   // MAKE SURE THIS ADDS UP TO ONE BEFORE EDITING!
   private static final double[] UNIT_RATIOS = new double[] {
-    1.0 / 4, 2.0 / 4, 1.0 / 4, 0.0 / 4
+    1.0 / 2, 1.0 / 4, 1.0 / 4, 0.0 / 4
   };
 
   private final RobotType myType;
