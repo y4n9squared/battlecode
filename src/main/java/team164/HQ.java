@@ -152,6 +152,9 @@ public final class HQ extends AbstractRobot {
   private void computeDefenseTarget() {
     int helpTarget = controller.readBroadcast(Channels.TOWER_HELP);
     if (helpTarget != 0) {
+      // TODO: Should we check if this target is still valid?  aka if the tower
+      // died.
+
       MapLocation newTarget = intToLocation(helpTarget, myLoc);
       if (newTarget.equals(defenseTarget)) {
         return;
