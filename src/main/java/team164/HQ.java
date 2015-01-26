@@ -49,6 +49,8 @@ public final class HQ extends AbstractRobot {
   private MapLocation currentTarget = null;
   private int numTowers = -1;
   private boolean attacking = false;
+  private MapLocation[] myTowers;
+  private MapLocation[] enemyTowers;
 
   /**
    * We start this so we will start attacking on some arbitrary turn.
@@ -103,7 +105,11 @@ public final class HQ extends AbstractRobot {
     }
     resetRobotCount();
 
-    if (++attackRoundCounter < ROUNDS_UNTIL_ATTACK) {
+    myTowers = controller.getTowerLocations();
+    enemyTowers = controller.getEnemyTowerLocations();
+
+    if (myTowers.length > enemyTowers.length
+        || ++attackRoundCounter < ROUNDS_UNTIL_ATTACK) {
       if (attacking) {
         attacking = false;
         numTowers = -1;
@@ -140,8 +146,6 @@ public final class HQ extends AbstractRobot {
 
   private void computeDefenseTarget() {
     /*
-    MapLocation[] myTowers = controller.getTowerLocations();
-
     if (numTowers == myTowers.length) {
       return;
     }
@@ -176,8 +180,6 @@ public final class HQ extends AbstractRobot {
   }
 
   private void computeAttackTarget() {
-    MapLocation[] enemyTowers = controller.getEnemyTowerLocations();
-
     if (numTowers == enemyTowers.length) {
       return;
     }
