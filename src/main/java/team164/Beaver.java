@@ -19,11 +19,15 @@ import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 import battlecode.common.TerrainTile;
 
+import java.util.Random;
+
 public final class Beaver extends AbstractRobot {
 
   private static final RobotType[] BUILD_ORDER = new RobotType[] {
     MINERFACTORY, BARRACKS, TANKFACTORY, HELIPAD, AEROSPACELAB, SUPPLYDEPOT
   };
+
+  private final Random rnd = new Random();
 
   /**
    * Whether or not this robot is currently traveling to its build location.
@@ -55,6 +59,7 @@ public final class Beaver extends AbstractRobot {
    */
   public Beaver(Controller c) {
     super(c);
+    rnd.setSeed(controller.getID());
     MapLocation hqLocation = controller.getHQLocation();
     if ((hqLocation.x + hqLocation.y) % 2 == 0) {
       buildOnEven = true;
@@ -83,7 +88,7 @@ public final class Beaver extends AbstractRobot {
             if (success) {
               isMovingToBuild = false;
             } else {
-              if (controller.isLocationOccupied(destination)) {
+              if (controller.getRobotAtLocation(destination).type.isBuilding) {
                 destination = getConstructionLocation();
               }
             }
@@ -105,15 +110,18 @@ public final class Beaver extends AbstractRobot {
   private MapLocation getConstructionLocation() {
     MapLocation[] locs = MapLocation.getAllMapLocationsWithinRadiusSq(
         controller.getLocation(), 16);
+    int size = 0;
+    MapLocation[] goodLocs = new MapLocation[locs.length];
     for (int i = locs.length; --i >= 0;) {
-      if (!controller.isLocationOccupied(locs[i])
-          && isLocationSafeToBuild(locs[i])) {
-        return locs[i];
+      MapLocation loc = locs[i];
+      if (isLocationSafeToBuild(loc)) {
+        boolean occupied = controller.isLocationOccupied(loc);
+        if (!occupied || !controller.getRobotAtLocation(loc).type.isBuilding) {
+          goodLocs[size++] = locs[i];
+        }
       }
     }
-    // TODO: If this happens, there are no safe locations to build anything. We
-    // will have to move the robot.
-    return null;
+    return goodLocs[rnd.nextInt(size)];
   }
 
   /**
@@ -158,6 +166,9 @@ public final class Beaver extends AbstractRobot {
       if (controller.getDependencyProgress(type.dependency) == DONE
           && controller.getDependencyProgress(type) == NONE) {
         buildType = type;
+        if (controller.getTeamOre() < buildType.oreCost) {
+          return null;
+        }
         break;
       }
     }
