@@ -165,6 +165,11 @@ public final class HQ extends AbstractRobot {
       currentTarget = controller.getHQLocation();
     }
     */
+    MapLocation[] myTowers = controller.getTowerLocations();
+
+    if (numTowers == myTowers.length) {
+      return;
+    }
     currentTarget = controller.getHQLocation();
     controller.broadcast(Channels.TARGET_LOCATION,
         locationToInt(currentTarget, controller.getLocation()));
