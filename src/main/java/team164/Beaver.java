@@ -181,7 +181,7 @@ public final class Beaver extends AbstractRobot {
       };
       for (int i = production.length; --i >= 0;) {
         RobotType type = production[i];
-        if (Clock.getRoundNum() % type.buildTurns > 2) {
+        if (Clock.getRoundNum() % type.buildTurns >= 4) {
           int channel = getDebtChannel(type);
           int debt = controller.readBroadcast(channel);
           if (debt != 0) {
