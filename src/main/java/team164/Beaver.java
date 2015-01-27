@@ -25,7 +25,7 @@ import java.util.Random;
 public final class Beaver extends AbstractRobot {
 
   private static final RobotType[] BUILD_ORDER = new RobotType[] {
-    MINERFACTORY, BARRACKS, TANKFACTORY, HELIPAD, SUPPLYDEPOT
+    MINERFACTORY, BARRACKS, TANKFACTORY, SUPPLYDEPOT
   };
 
   private final Random rnd = new Random();
