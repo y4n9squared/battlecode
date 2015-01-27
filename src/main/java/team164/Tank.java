@@ -48,7 +48,31 @@ public final class Tank extends AbstractRobot {
   }
 
   @Override protected void runHelper() {
-    if (controller.isWeaponReady()) {
+    RobotInfo[] attackable = controller.getNearbyRobots(
+        ROBOT_TYPE.sensorRadiusSquared,
+        controller.getOpponentTeam());
+
+    if (attackable.length > 0) {
+      if (controller.isWeaponReady()) {
+        RobotInfo target = null;
+        int maxPriority = AttackPriority.HANDWASHSTATION.ordinal();
+
+        for (int i = attackable.length; --i >= 0;) {
+          // Calling Enum.valueOf is potentially dangerous here - if the enemy
+          // RobotType.toString conversion does not match an AttackPriority
+          // enum, the method will throw IllegalArgumentException.
+          int p =
+              AttackPriority.valueOf(attackable[i].type.toString()).ordinal();
+          if (target == null || p < maxPriority
+              || (p == maxPriority && attackable[i].health > target.health)) {
+            target = attackable[i];
+          }
+        }
+        if (target != null) {
+          controller.attack(target);
+        }
+      }
+    } else if (controller.isCoreReady()) {
       enemies = controller.getNearbyRobots(
         ROBOT_TYPE.sensorRadiusSquared,
         controller.getOpponentTeam());
@@ -58,28 +82,6 @@ public final class Tank extends AbstractRobot {
           ROBOT_TYPE.sensorRadiusSquared + 10,
           controller.getOpponentTeam());
       }
-
-      RobotInfo target = null;
-      int maxPriority = AttackPriority.HANDWASHSTATION.ordinal();
-
-      for (int i = enemies.length; --i >= 0;) {
-        // Calling Enum.valueOf is potentially dangerous here - if the enemy
-        // RobotType.toString conversion does not match an AttackPriority
-        // enum, the method will throw IllegalArgumentException.
-        int p = AttackPriority.valueOf(enemies[i].type.toString()).ordinal();
-        if (target == null || p < maxPriority
-            || (p == maxPriority && enemies[i].health > target.health)) {
-          target = enemies[i];
-        }
-      }
-      if (target != null) {
-        controller.attack(target);
-      }
-    }
-    if (controller.isCoreReady()) {
-      enemies = controller.getNearbyRobots(
-        ROBOT_TYPE.sensorRadiusSquared,
-        controller.getOpponentTeam());
 
       if (enemies.length > 0) {
         useBugNavigator = false;
