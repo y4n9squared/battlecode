@@ -87,10 +87,13 @@ public final class Beaver extends AbstractRobot {
           if (buildType != null) {
             boolean success = controller.build(
                 myLoc.directionTo(destination), buildType);
+
             if (success) {
               isMovingToBuild = false;
             } else {
-              if (controller.getRobotAtLocation(destination).type.isBuilding) {
+              RobotType atDestination =
+                  controller.getRobotAtLocation(destination).type;
+              if (atDestination.isBuilding || atDestination == BEAVER) {
                 destination = getConstructionLocation();
               }
             }
@@ -118,7 +121,15 @@ public final class Beaver extends AbstractRobot {
       MapLocation loc = locs[i];
       if (isLocationSafeToBuild(loc)) {
         boolean occupied = controller.isLocationOccupied(loc);
-        if (!occupied || !controller.getRobotAtLocation(loc).type.isBuilding) {
+
+        if (occupied) {
+          RobotType atDestination = controller.getRobotAtLocation(loc).type;
+
+          if (!atDestination.isBuilding && atDestination != BEAVER) {
+            occupied = false;
+          }
+        }
+        if (!occupied) {
           goodLocs[size++] = locs[i];
         }
       }
@@ -184,7 +195,7 @@ public final class Beaver extends AbstractRobot {
         if (Clock.getRoundNum() % type.buildTurns >= 4) {
           int channel = getDebtChannel(type);
           int debt = controller.readBroadcast(channel);
-          if (debt != 0) {
+          if (debt != 0 && controller.getTeamOre() >= type.oreCost) {
             controller.broadcast(channel, 0);
             return type;
           }
