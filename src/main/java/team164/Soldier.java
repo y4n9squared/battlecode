@@ -76,6 +76,12 @@ public final class Soldier extends AbstractRobot {
         controller.getOpponentTeam());
 
       if (enemies.length > 0) {
+        enemies = controller.getNearbyRobots(
+          ROBOT_TYPE.sensorRadiusSquared + 10,
+          controller.getOpponentTeam());
+      }
+
+      if (enemies.length > 0) {
         useBugNavigator = false;
       }
 

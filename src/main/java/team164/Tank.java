@@ -49,9 +49,15 @@ public final class Tank extends AbstractRobot {
 
   @Override protected void runHelper() {
     if (controller.isWeaponReady()) {
-      RobotInfo[] enemies = controller.getNearbyRobots(
-          ROBOT_TYPE.attackRadiusSquared + 10,
+      enemies = controller.getNearbyRobots(
+        ROBOT_TYPE.sensorRadiusSquared,
+        controller.getOpponentTeam());
+
+      if (enemies.length > 0) {
+        enemies = controller.getNearbyRobots(
+          ROBOT_TYPE.sensorRadiusSquared + 10,
           controller.getOpponentTeam());
+      }
 
       RobotInfo target = null;
       int maxPriority = AttackPriority.HANDWASHSTATION.ordinal();
