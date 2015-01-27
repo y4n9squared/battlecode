@@ -75,6 +75,10 @@ public class RobotPlayer {
       case LAUNCHER:
         robot = new Launcher(controller);
         break;
+      case HANDWASHSTATION:
+        HandwashStation station = new HandwashStation(controller);
+        station.run();
+        return;
       default:
         // Should never happen
         return;

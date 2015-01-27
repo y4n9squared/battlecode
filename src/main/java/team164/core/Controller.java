@@ -474,4 +474,11 @@ public final class Controller {
   public void setIndicatorString(int index, String string) {
     rc.setIndicatorString(index, string);
   }
+
+  /**
+   * Hope that we don't need to call this function.
+   */
+  public int getRoundLimit() {
+    return rc.getRoundLimit();
+  }
 }
