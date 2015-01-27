@@ -25,7 +25,6 @@ import java.util.Random;
 public final class Beaver extends AbstractRobot {
 
   private static final RobotType[] BUILD_ORDER = new RobotType[] {
-    //MINERFACTORY, BARRACKS, TANKFACTORY, HELIPAD, AEROSPACELAB, SUPPLYDEPOT
     MINERFACTORY, BARRACKS, TANKFACTORY, HELIPAD, SUPPLYDEPOT
   };
 
@@ -48,11 +47,7 @@ public final class Beaver extends AbstractRobot {
    */
   private boolean buildOnEven;
 
-  /**
-   * A list of previous map locations that this robot moved to.
-   */
-  private MapLocation[] pastLocations = new MapLocation[10000];
-  private int head = 0;
+  private int numDepots = 0;
 
   /**
    * Constructs a {@code Beaver} object.
@@ -78,10 +73,6 @@ public final class Beaver extends AbstractRobot {
         isMovingToBuild = true;
       }
       if (isMovingToBuild) {
-        MapLocation myLoc = getLocation();
-        if (pastLocations[head] != myLoc) {
-          pastLocations[head++] = myLoc;
-        }
         if (myLoc.distanceSquaredTo(destination) <= 2) {
           RobotType buildType = buildNextStructure();
           if (buildType != null) {
@@ -201,6 +192,11 @@ public final class Beaver extends AbstractRobot {
           }
         }
       }
+    }
+    if (buildType == null && numDepots <= 5
+        && controller.getTeamOre() >= SUPPLYDEPOT.oreCost) {
+      buildType = SUPPLYDEPOT;
+      ++numDepots;
     }
     return buildType;
   }
