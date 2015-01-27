@@ -24,7 +24,7 @@ import battlecode.common.RobotType;
  */
 public final class Tank extends AbstractRobot {
 
-  private static final RobotType ROBOT_TYPE = RobotType.SOLDIER;
+  private static final RobotType ROBOT_TYPE = RobotType.TANK;
 
   private RobotInfo[] enemies;
 
@@ -49,7 +49,7 @@ public final class Tank extends AbstractRobot {
 
   @Override protected void runHelper() {
     RobotInfo[] attackable = controller.getNearbyRobots(
-        ROBOT_TYPE.sensorRadiusSquared,
+        ROBOT_TYPE.attackRadiusSquared,
         controller.getOpponentTeam());
 
     if (attackable.length > 0) {
