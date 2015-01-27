@@ -9,8 +9,6 @@ import static battlecode.common.RobotType.*;
 import static team164.core.Channels.*;
 import static team164.util.Algorithms.*;
 
-import team164.util.Timer;
-
 import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameConstants;
@@ -33,7 +31,6 @@ public abstract class AbstractRobot implements Robot {
   private static final double UNIT_STRUCTURE_SUPPLY_RATIO = 5.0;
 
   protected final Controller controller;
-  protected final Timer timer;
   protected final RobotType type;
   protected final int mySpawnRound;
 
@@ -48,7 +45,6 @@ public abstract class AbstractRobot implements Robot {
 
   protected AbstractRobot(Controller ctrl) {
     controller = ctrl;
-    timer = new Timer(controller.getType());
     type = controller.getType();
     mySpawnRound = Clock.getRoundNum();
   }

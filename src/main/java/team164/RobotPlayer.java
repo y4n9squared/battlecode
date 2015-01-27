@@ -29,10 +29,6 @@ public class RobotPlayer {
     Controller controller = new Controller(rc);
     Robot robot;
     switch (rc.getType()) {
-      case MISSILE:
-        Missile missile = new Missile(controller);
-        missile.run();
-        return;
       case HQ:
         robot = new HQ(controller);
         break;
@@ -54,26 +50,14 @@ public class RobotPlayer {
       case MINERFACTORY:
         robot = new MinerFactory(controller);
         break;
-      case HELIPAD:
-        robot = new ProductionStructure(controller, DRONE);
-        break;
-      case DRONE:
-        robot = new Drone(controller);
-        break;
       case SUPPLYDEPOT:
         robot = new SupplyDepot(controller);
         break;
       case TANKFACTORY:
         robot = new ProductionStructure(controller, TANK);
         break;
-      case AEROSPACELAB:
-        robot = new ProductionStructure(controller, LAUNCHER);
-        break;
       case TANK:
         robot = new Tank(controller);
-        break;
-      case LAUNCHER:
-        robot = new Launcher(controller);
         break;
       case HANDWASHSTATION:
         HandwashStation station = new HandwashStation(controller);

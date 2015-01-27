@@ -5,8 +5,6 @@
 
 package team164.core;
 
-import team164.util.MapLocationQueue;
-
 import battlecode.common.*;
 
 /**
@@ -232,15 +230,6 @@ public final class Controller {
   }
 
   /**
-   * Returns the number of missiles this robot has.
-   *
-   * @return number of missiles this robot has
-   */
-  public int getMissileCount() {
-    return rc.getMissileCount();
-  }
-
-  /**
    * Returns the value stored on the specified channel.
    *
    * @param channel channel number
@@ -381,24 +370,6 @@ public final class Controller {
   }
 
   /**
-   * Try to launch a missile.
-   *
-   * @param dir direction to launch missile
-   * @return {@code true} if successful
-   */
-  public boolean launchMissile(Direction dir) {
-    if (rc.canLaunch(dir)) {
-      try {
-        rc.launchMissile(dir);
-        return true;
-      } catch (GameActionException e) {
-        e.printStackTrace();
-      }
-    }
-    return false;
-  }
-
-  /**
    * Transfer supplies to a robot.
    *
    * @param supply amount of supply to transfer
@@ -462,17 +433,6 @@ public final class Controller {
   public void yield() {
     rc.yield();
     nearbyRobots = null;
-  }
-
-  /**
-   * Log a message for debugging.
-   */
-  public void log(String message) {
-    rc.addMatchObservation(message);
-  }
-
-  public void setIndicatorString(int index, String string) {
-    rc.setIndicatorString(index, string);
   }
 
   /**
