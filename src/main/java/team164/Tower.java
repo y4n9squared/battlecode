@@ -64,7 +64,7 @@ public final class Tower extends AbstractRobot {
 
     if (locToBroadcast == null) {
       RobotInfo[] sensedEnemies = controller.getNearbyRobots(
-          RobotType.TOWER.sensorRadiusSquared + 10,
+          RobotType.TOWER.sensorRadiusSquared + 5,
           controller.getOpponentTeam());
       if (sensedEnemies.length > 0) {
         locToBroadcast = sensedEnemies[0].location;
