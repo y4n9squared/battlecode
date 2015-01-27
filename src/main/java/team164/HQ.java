@@ -54,7 +54,8 @@ public final class HQ extends AbstractRobot {
   private int attackDistance = SWARM_RADIUS_SQUARED;
   private MapLocation defenseTarget = null;
   private MapLocation attackTarget = null;
-  private int numTowers = -1;
+  private int numEnemyTowers = -1;
+  private int numMyTowers = -1;
   private MapLocation[] myTowers;
   private MapLocation[] enemyTowers;
   private MapLocation myLoc;
@@ -150,7 +151,15 @@ public final class HQ extends AbstractRobot {
   }
 
   private void computeDefenseTarget() {
-    int helpTarget = controller.readBroadcast(Channels.TOWER_HELP);
+    int helpTarget = 0;
+    if (numMyTowers != myTowers.length) {
+      defenseTarget = null;
+      controller.broadcast(Channels.TOWER_HELP, 0);
+      numMyTowers = myTowers.length;
+    } else {
+      helpTarget = controller.readBroadcast(Channels.TOWER_HELP);
+    }
+
     if (helpTarget != 0) {
       // TODO: Should we check if this target is still valid?  aka if the tower
       // died.
@@ -200,7 +209,7 @@ public final class HQ extends AbstractRobot {
       attackRoundCounter = 0;
     }
 
-    if (numTowers == enemyTowers.length) {
+    if (numEnemyTowers == enemyTowers.length) {
       return;
     }
 
@@ -211,12 +220,12 @@ public final class HQ extends AbstractRobot {
       locToSearchAround = attackTarget;
     }
 
-    numTowers = enemyTowers.length;
+    numEnemyTowers = enemyTowers.length;
 
     int targetIndex = 0;
-    if (numTowers > 0) {
+    if (numEnemyTowers > 0) {
       double closestDistance = Double.POSITIVE_INFINITY;
-      for (int i = numTowers; --i >= 0;) {
+      for (int i = numEnemyTowers; --i >= 0;) {
         double distance = locToSearchAround.distanceSquaredTo(enemyTowers[i]);
         if (distance < closestDistance) {
           closestDistance = distance;
