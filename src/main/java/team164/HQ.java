@@ -66,8 +66,10 @@ public final class HQ extends AbstractRobot {
    * This is the order in which the HQ attacks enemys.
    */
   private enum AttackPriority {
-    MISSILE, LAUNCHER, COMMANDER, TANK, DRONE, BASHER, SOLDIER, MINER, BEAVER,
-    COMPUTER;
+    TOWER, MISSILE, HQ, LAUNCHER, COMMANDER, TANK, DRONE, BASHER, SOLDIER,
+    MINER, BEAVER, COMPUTER, AEROSPACELAB, BARRACKS, HELIPAD, MINERFACTORY,
+    SUPPLYDEPOT, TANKFACTORY, TECHNOLOGYINSTITUTE, TRAININGFIELD,
+    HANDWASHSTATION;
   }
 
   /**
@@ -85,19 +87,13 @@ public final class HQ extends AbstractRobot {
     if (controller.isWeaponReady()) {
       RobotInfo[] enemies = controller.getNearbyRobots(
           RobotType.HQ.attackRadiusSquared, controller.getOpponentTeam());
-
-      RobotInfo target = null;
-      int maxPriority = AttackPriority.COMPUTER.ordinal();
-
-      for (int i = enemies.length; --i >= 0;) {
-        int p = AttackPriority.valueOf(enemies[i].type.toString()).ordinal();
-        if (target == null || p < maxPriority
-            || (p == maxPriority && enemies[i].health > target.health)) {
-          target = enemies[i];
+      if (enemies.length > 0) {
+        RobotInfo target = getCriticalTarget(enemies);
+        if (target == null) {
+          target = getPriorityTarget(enemies);
         }
-      }
-      if (target != null) {
         controller.attack(target);
+        defenseTarget = target.location;
       }
     }
 
@@ -239,5 +235,44 @@ public final class HQ extends AbstractRobot {
         controller.broadcast(getCountChannel(types[i]), 0);
       }
     }
+  }
+
+  /**
+   * Returns the enemy with the maximum HP that can be killed by this HQ in
+   * one hit.
+   *
+   * @param enemies enemies in attack range
+   * @return enemy with largest HP that can be killed
+   */
+  private RobotInfo getCriticalTarget(RobotInfo[] enemies) {
+    RobotInfo target = null;
+    double maxHealth = 0;
+    for (int i = enemies.length; --i >= 0;) {
+      if (enemies[i].health > maxHealth
+          && enemies[i].health <= RobotType.HQ.attackPower) {
+        maxHealth = enemies[i].health;
+        target = enemies[i];
+      }
+    }
+    return target;
+  }
+
+  /**
+   * Returns the highest priority target with the highest HP.
+   *
+   * @param enemies enemies in attack range
+   * @return highest priority enemy with the highest HP
+   */
+  private RobotInfo getPriorityTarget(RobotInfo[] enemies) {
+    RobotInfo target = null;
+    int maxPriority = AttackPriority.HANDWASHSTATION.ordinal();
+    for (int i = enemies.length; --i >= 0;) {
+      int p = AttackPriority.valueOf(enemies[i].type.toString()).ordinal();
+      if (target == null || p < maxPriority
+          || (p == maxPriority && enemies[i].health > target.health)) {
+        target = enemies[i];
+      }
+    }
+    return target;
   }
 }
