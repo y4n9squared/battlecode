@@ -25,9 +25,10 @@ public final class AttackPriorityTest {
   @SuppressWarnings("serial")
   public static final List<Class<? extends AbstractRobot>> robotTypes
       = new ArrayList<Class<? extends AbstractRobot>>() {{
-    add(Drone.class);
     add(Soldier.class);
     add(Tank.class);
+    add(HQ.class);
+    add(Tower.class);
   }};
   // CHECKSTYLE.ON
 

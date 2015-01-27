@@ -24,7 +24,6 @@ public final class HandwashStation {
    */
   public HandwashStation(Controller c) {
     controller = c;
-    controller.setIndicatorString(0, "WOO IM ALIVE!");
   }
 
   /**
