@@ -160,7 +160,7 @@ public abstract class AbstractRobot implements Robot {
     double unitSupplyMin = Double.POSITIVE_INFINITY;
     double structureSupplyMin = Double.POSITIVE_INFINITY;
 
-    for (int i = robots.length; --i >= 0;) {
+    for (int i = Math.min(robots.length, 10); --i >= 0;) {
       double supply = robots[i].supplyLevel;
       if (countsAsStructureForSupply(robots[i].type)) {
         ++structureCount;
