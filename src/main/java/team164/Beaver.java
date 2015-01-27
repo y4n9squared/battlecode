@@ -188,7 +188,7 @@ public final class Beaver extends AbstractRobot {
 
     if (buildType == null) {
       RobotType[] production = new RobotType[] {
-        BARRACKS, HELIPAD, TANKFACTORY//, AEROSPACELAB
+        BARRACKS, TANKFACTORY//, HELIPAD, AEROSPACELAB
       };
       for (int i = production.length; --i >= 0;) {
         RobotType type = production[i];
