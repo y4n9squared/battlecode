@@ -24,6 +24,11 @@ import java.util.Random;
 
 public final class Beaver extends AbstractRobot {
 
+  /**
+   * Only bulid a depot ever this many turns.
+   */
+  private static final int DEPOT_ROUND_LIMIT = 200;
+
   private static final RobotType[] BUILD_ORDER = new RobotType[] {
     MINERFACTORY, BARRACKS, TANKFACTORY, SUPPLYDEPOT
   };
@@ -48,6 +53,7 @@ public final class Beaver extends AbstractRobot {
   private boolean buildOnEven;
 
   private int numDepots = 0;
+  private int depotCounter = 0;
 
   /**
    * Constructs a {@code Beaver} object.
@@ -192,11 +198,13 @@ public final class Beaver extends AbstractRobot {
         }
       }
     }
-    if (buildType == null && numDepots <= 5
-        && Clock.getRoundNum() > 1000
+    if (buildType == null && numDepots <= 4
+        && Clock.getRoundNum() > 800
+        && ++depotCounter > DEPOT_ROUND_LIMIT
         && controller.getTeamOre() >= SUPPLYDEPOT.oreCost) {
       buildType = SUPPLYDEPOT;
       ++numDepots;
+      depotCounter = 0;
     }
     return buildType;
   }
