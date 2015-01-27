@@ -50,7 +50,7 @@ public final class Soldier extends AbstractRobot {
   @Override protected void runHelper() {
     if (controller.isWeaponReady()) {
       RobotInfo[] enemies = controller.getNearbyRobots(
-          ROBOT_TYPE.attackRadiusSquared,
+          ROBOT_TYPE.attackRadiusSquared + 10,
           controller.getOpponentTeam());
 
       RobotInfo target = null;
