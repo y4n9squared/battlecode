@@ -25,7 +25,7 @@ import battlecode.common.RobotType;
  */
 public final class MinerFactory extends ProductionStructure {
 
-  private static final int MAX_MINERS = 30;
+  private static final int MAX_MINERS = 40;
   private static final double GROWTH_RATE = 0.01;
 
   /**
