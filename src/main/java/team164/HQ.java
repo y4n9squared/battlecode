@@ -54,6 +54,7 @@ public final class HQ extends AbstractRobot {
   private int attackDistance = SWARM_RADIUS_SQUARED;
   private MapLocation defenseTarget = null;
   private MapLocation attackTarget = null;
+  private MapLocation needHelp = null;
   private int numEnemyTowers = -1;
   private int numMyTowers = -1;
   private MapLocation[] myTowers;
@@ -94,8 +95,17 @@ public final class HQ extends AbstractRobot {
           target = getPriorityTarget(enemies);
         }
         controller.attack(target);
-        defenseTarget = target.location;
+        needHelp = target.location;
       }
+    }
+
+    RobotInfo[] sensedEnemies = controller.getNearbyRobots(
+        RobotType.HQ.sensorRadiusSquared + 10,
+        controller.getOpponentTeam());
+    if (needHelp == null && sensedEnemies.length > 0) {
+      needHelp = sensedEnemies[0].location;
+    } else if (sensedEnemies.length == 0) {
+      needHelp = null;
     }
 
     if (controller.isCoreReady()) {
@@ -147,6 +157,16 @@ public final class HQ extends AbstractRobot {
   }
 
   private void computeDefenseTarget() {
+    if (needHelp != null) {
+      if (needHelp.equals(defenseTarget)) {
+        return;
+      }
+      defenseTarget = needHelp;
+      controller.broadcast(Channels.DEFENSE_TARGET,
+          locationToInt(needHelp, controller.getLocation()));
+      return;
+    }
+
     int helpTarget = 0;
     if (numMyTowers != myTowers.length) {
       defenseTarget = null;
