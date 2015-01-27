@@ -172,6 +172,16 @@ public final class Beaver extends AbstractRobot {
    * isMovingToBuild} will be set to {@code true}.
    */
   private RobotType buildNextStructure() {
+    int turnsLeft = controller.getRoundLimit() - Clock.getRoundNum();
+    if (turnsLeft < 150 && turnsLeft > 100) {
+      MapLocation[] myTowers = controller.getTowerLocations();
+      MapLocation[] enemyTowers = controller.getEnemyTowerLocations();
+
+      if (myTowers.length == enemyTowers.length) {
+        return HANDWASHSTATION;
+      }
+    }
+
     RobotType buildType = null;
     for (int i = 0; i < BUILD_ORDER.length; ++i) {
       RobotType type = BUILD_ORDER[i];
