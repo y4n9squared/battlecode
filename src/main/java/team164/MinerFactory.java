@@ -27,7 +27,6 @@ public final class MinerFactory extends ProductionStructure {
 
   private static final int MAX_MINERS = 30;
   private static final double GROWTH_RATE = 0.01;
-  private static final double MINER_RATIO = 4.0;
 
   /**
    * The number of miners to maintain on the map.
@@ -51,16 +50,8 @@ public final class MinerFactory extends ProductionStructure {
     if (controller.isCoreReady()) {
       if (Clock.getRoundNum() % MINER.buildTurns == 2) {
         int numMiners = controller.readBroadcast(getCountChannel(MINER));
-
         if (numMiners < numTargetMiners) {
-          int otherRobots = controller.readBroadcast(getCountChannel(SOLDIER))
-              + controller.readBroadcast(getCountChannel(TANK))
-              + controller.readBroadcast(getCountChannel(DRONE))
-              + controller.readBroadcast(getCountChannel(LAUNCHER));
-
-          if (numMiners < MINER_RATIO * otherRobots) {
-            return true;
-          }
+          return true;
         }
         controller.broadcast(getCountChannel(MINER), 0);
       }
