@@ -23,6 +23,10 @@ import java.util.Random;
 
 public final class HQ extends AbstractRobot {
 
+  private static final RobotType[] ATTACKING_ROBOT_TYPES = new RobotType[] {
+    TANK, SOLDIER
+  };
+
   /**
    * The number of beavers the HQ will try to maintain on the map. This should
    * be set at minimum to 1, so that we can build structures, but not too large
@@ -45,9 +49,9 @@ public final class HQ extends AbstractRobot {
   /**
    * The rounds it takes to spawn an army.
    */
-  private static final int MIN_ROUND_TO_ATTACK = 900;
+  private static final int MIN_ROUND_TO_ATTACK = 500;
   private static final int ROUNDS_UNTIL_DEFENSE_SWITCH = 100;
-  private static final int ROUNDS_UNTIL_NEW_ATTACK = 300;
+  private static final int ROUNDS_UNTIL_NEW_ATTACK = 100;
 
   private final Random rnd = new Random();
 
@@ -62,6 +66,7 @@ public final class HQ extends AbstractRobot {
 
   private int attackRoundCounter = -1;
   private int defenseRoundCounter = 0;
+  boolean shouldAttack = false;
 
   /**
    * This is the order in which the HQ attacks enemys.
@@ -114,9 +119,38 @@ public final class HQ extends AbstractRobot {
 
     computeDefenseTarget();
 
-    // If we are losing or tied
+    // If we are tied or losing
     if (myTowers.length <= enemyTowers.length
         && Clock.getRoundNum() > MIN_ROUND_TO_ATTACK) {
+
+      boolean shouldTryNewAttack = false;
+      if (attackRoundCounter == -1
+          || ++attackRoundCounter > ROUNDS_UNTIL_NEW_ATTACK) {
+        shouldTryNewAttack = true;
+      }
+
+      if (shouldTryNewAttack) {
+        double powerCount = 0;
+        for (int i = ATTACKING_ROBOT_TYPES.length; --i >= 0;) {
+          int channel = getCountChannel(ATTACKING_ROBOT_TYPES[i]);
+          powerCount = controller.readBroadcast(channel)
+              * ATTACKING_ROBOT_TYPES[i].attackPower;
+        }
+        if (powerCount > 8 * TANK.attackPower) {
+          // if we have 8 tanks or 40 soldiers
+          shouldAttack = true;
+
+          // Keep some robots home to defend
+          controller.broadcast(Channels.ATTACKERS_MAX_SPAWN_ROUND,
+              Clock.getRoundNum() - 50);
+          attackRoundCounter = 0;
+        }
+      }
+    } else {
+      shouldAttack = false;
+    }
+
+    if (shouldAttack) {
       computeAttackTarget();
 
       RobotInfo[] teammatesAroundTarget = controller.getNearbyRobots(
@@ -124,9 +158,9 @@ public final class HQ extends AbstractRobot {
           SWARM_RADIUS_SQUARED + 20,
           controller.getTeam());
 
-      if (teammatesAroundTarget.length >= 12) {
+      if (teammatesAroundTarget.length >= 10) {
         attackDistance = 0;
-      } else if (teammatesAroundTarget.length < 5) {
+      } else if (teammatesAroundTarget.length < 3) {
         attackDistance = SWARM_RADIUS_SQUARED;
       }
 
@@ -136,6 +170,7 @@ public final class HQ extends AbstractRobot {
         controller.broadcast(Channels.ATTACK_DISTANCE, attackDistance);
       }
     } else {
+      shouldAttack = false;
       attackRoundCounter = -1;
       int existingAttackersRound = controller.readBroadcast(
           Channels.ATTACKERS_MAX_SPAWN_ROUND);
@@ -197,14 +232,6 @@ public final class HQ extends AbstractRobot {
   }
 
   private void computeAttackTarget() {
-    if (attackRoundCounter == -1
-        || ++attackRoundCounter > ROUNDS_UNTIL_NEW_ATTACK) {
-      // Keep some robots home to defend
-      controller.broadcast(Channels.ATTACKERS_MAX_SPAWN_ROUND,
-          Clock.getRoundNum() - 100);
-      attackRoundCounter = 0;
-    }
-
     if (numEnemyTowers == enemyTowers.length) {
       return;
     }
