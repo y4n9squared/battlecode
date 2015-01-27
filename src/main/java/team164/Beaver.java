@@ -82,10 +82,12 @@ public final class Beaver extends AbstractRobot {
             if (success) {
               isMovingToBuild = false;
             } else {
-              RobotType atDestination =
-                  controller.getRobotAtLocation(destination).type;
-              if (atDestination.isBuilding || atDestination == BEAVER) {
-                destination = getConstructionLocation();
+              if (controller.getTeamOre() >= buildType.oreCost) {
+                RobotType atDestination =
+                    controller.getRobotAtLocation(destination).type;
+                if (atDestination.isBuilding || atDestination == BEAVER) {
+                  destination = getConstructionLocation();
+                }
               }
             }
           }
@@ -170,9 +172,6 @@ public final class Beaver extends AbstractRobot {
       if (controller.getDependencyProgress(type.dependency) == DONE
           && controller.getDependencyProgress(type) == NONE) {
         buildType = type;
-        if (controller.getTeamOre() < buildType.oreCost) {
-          return null;
-        }
         break;
       }
     }
@@ -186,7 +185,7 @@ public final class Beaver extends AbstractRobot {
         if (Clock.getRoundNum() % type.buildTurns >= 4) {
           int channel = getDebtChannel(type);
           int debt = controller.readBroadcast(channel);
-          if (debt != 0 && controller.getTeamOre() >= type.oreCost) {
+          if (debt != 0) {
             controller.broadcast(channel, 0);
             return type;
           }
@@ -194,6 +193,7 @@ public final class Beaver extends AbstractRobot {
       }
     }
     if (buildType == null && numDepots <= 5
+        && Clock.getRoundNum() > 1000
         && controller.getTeamOre() >= SUPPLYDEPOT.oreCost) {
       buildType = SUPPLYDEPOT;
       ++numDepots;
