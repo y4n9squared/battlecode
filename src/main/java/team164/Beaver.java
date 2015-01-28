@@ -104,7 +104,9 @@ public final class Beaver extends AbstractRobot {
           MapLocation target = maxPotentialMapLocation(
               locs, pos, posCharges, null, null);
           if (target != null) {
-            controller.move(myLoc.directionTo(target));
+            if (!controller.move(myLoc.directionTo(target))) {
+              destination = getConstructionLocation();
+            }
           }
         }
       }
