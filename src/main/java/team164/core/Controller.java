@@ -441,4 +441,8 @@ public final class Controller {
   public int getRoundLimit() {
     return rc.getRoundLimit();
   }
+
+  public void setIndicatorString(int i, String s) {
+    rc.setIndicatorString(i, s);
+  }
 }
